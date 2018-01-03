@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_write</title>
+  <meta name="keywords" content="avw_write">
+  <meta name="description" content="avw_write - write Analyze files (*.img & *.hdr)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_write.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_write
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>avw_write - write Analyze files (*.img & *.hdr)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function avw_write(avw, fileprefix, IMGorient, machine) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> avw_write - write Analyze files (*.img &amp; *.hdr)
+ 
+ This function is a wrapper for
+ avw_hdr_write and avw_img_write.
+ 
+ avw_write(avw, fileprefix, [IMGorient], [machine])
+ 
+ where the input avw is a struct (see avw_read):
+ 
+ avw.hdr    - a struct with image data parameters.
+ avw.img    - a 3D matrix of image data (double precision).
+ 
+ fileprefix - a string, the filename without the .img
+              extension. If empty, may use avw.fileprefix
+ 
+ IMGorient - optional int; force writing of specified 
+             orientation, as follows:
+ 
+   [],  if empty, will use avw.hdr.hist.orient field
+    0,  transverse/axial unflipped (default, radiological)
+    1,  coronal unflipped
+    2,  sagittal unflipped
+    3,  transverse/axial flipped
+    4,  coronal flipped
+    5,  sagittal flipped
+ 
+ This function will set avw.hdr.hist.orient and write the 
+ image data in a corresponding order.  This function is in
+ alpha development, it has not been exhaustively tested 
+ (as of 07/2003).
+ 
+ See the comments and notes throughout avw_hdr_read and 
+ avw_img_read for more information and documentation on 
+ the Analyze orientation options.  Orientations 3-5 are
+ NOT recommended! They are part of the Analyze format, 
+ but only used in Analyze for faster raster graphics 
+ during movies. (Also see the copy of the Analyze 7.5 
+ format pdf in the mri_toolbox doc folder; although 
+ the code is largely self sufficient, that pdf is the 
+ authoritative description).
+ 
+ machine - optional string; see machineformat in fread
+           for details. The default here is 'ieee-le'.
+ 
+ Tip: to change the data type, set avw.hdr.dime.datatype to:
+ 
+     1    Binary             (  1 bit  per voxel)
+     2    Unsigned character (  8 bits per voxel)
+     4    Signed short       ( 16 bits per voxel)
+     8    Signed integer     ( 32 bits per voxel)
+    16    Floating point     ( 32 bits per voxel)
+    32    Complex, 2 floats  ( 64 bits per voxel), not supported
+    64    Double precision   ( 64 bits per voxel)
+   128    Red-Green-Blue     (128 bits per voxel), not supported
+ 
+ See also: <a href="avw_read.html" class="code" title="function [ avw, machine ] = avw_read(fileprefix,IMGorient,machine)">avw_read</a>, <a href="avw_hdr_write.html" class="code" title="function avw_hdr_write(avw, fileprefix, machine)">avw_hdr_write</a>, <a href="avw_img_write.html" class="code" title="function avw_img_write(avw, fileprefix, IMGorient, machine)">avw_img_write</a>
+           <a href="avw_hdr_read.html" class="code" title="function [ avw, machine ] = avw_hdr_read(fileprefix, machine)">avw_hdr_read</a>, <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>
+           <a href="avw_view.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">avw_view</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_img_write.html" class="code" title="function avw_img_write(avw, fileprefix, IMGorient, machine)">avw_img_write</a>	avw_img_write - write Analyze image files (*.img)</li><li><a href="avw_write.html" class="code" title="function avw_write(avw, fileprefix, IMGorient, machine)">avw_write</a>	avw_write - write Analyze files (*.img & *.hdr)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_write.html" class="code" title="function avw_write(avw, fileprefix, IMGorient, machine)">avw_write</a>	avw_write - write Analyze files (*.img & *.hdr)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function avw_write(avw, fileprefix, IMGorient, machine)</a>
+0002 
+0003 <span class="comment">% avw_write - write Analyze files (*.img &amp; *.hdr)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% This function is a wrapper for</span>
+0006 <span class="comment">% avw_hdr_write and avw_img_write.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% avw_write(avw, fileprefix, [IMGorient], [machine])</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% where the input avw is a struct (see avw_read):</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% avw.hdr    - a struct with image data parameters.</span>
+0013 <span class="comment">% avw.img    - a 3D matrix of image data (double precision).</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% fileprefix - a string, the filename without the .img</span>
+0016 <span class="comment">%              extension. If empty, may use avw.fileprefix</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% IMGorient - optional int; force writing of specified</span>
+0019 <span class="comment">%             orientation, as follows:</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%   [],  if empty, will use avw.hdr.hist.orient field</span>
+0022 <span class="comment">%    0,  transverse/axial unflipped (default, radiological)</span>
+0023 <span class="comment">%    1,  coronal unflipped</span>
+0024 <span class="comment">%    2,  sagittal unflipped</span>
+0025 <span class="comment">%    3,  transverse/axial flipped</span>
+0026 <span class="comment">%    4,  coronal flipped</span>
+0027 <span class="comment">%    5,  sagittal flipped</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% This function will set avw.hdr.hist.orient and write the</span>
+0030 <span class="comment">% image data in a corresponding order.  This function is in</span>
+0031 <span class="comment">% alpha development, it has not been exhaustively tested</span>
+0032 <span class="comment">% (as of 07/2003).</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">% See the comments and notes throughout avw_hdr_read and</span>
+0035 <span class="comment">% avw_img_read for more information and documentation on</span>
+0036 <span class="comment">% the Analyze orientation options.  Orientations 3-5 are</span>
+0037 <span class="comment">% NOT recommended! They are part of the Analyze format,</span>
+0038 <span class="comment">% but only used in Analyze for faster raster graphics</span>
+0039 <span class="comment">% during movies. (Also see the copy of the Analyze 7.5</span>
+0040 <span class="comment">% format pdf in the mri_toolbox doc folder; although</span>
+0041 <span class="comment">% the code is largely self sufficient, that pdf is the</span>
+0042 <span class="comment">% authoritative description).</span>
+0043 <span class="comment">%</span>
+0044 <span class="comment">% machine - optional string; see machineformat in fread</span>
+0045 <span class="comment">%           for details. The default here is 'ieee-le'.</span>
+0046 <span class="comment">%</span>
+0047 <span class="comment">% Tip: to change the data type, set avw.hdr.dime.datatype to:</span>
+0048 <span class="comment">%</span>
+0049 <span class="comment">%     1    Binary             (  1 bit  per voxel)</span>
+0050 <span class="comment">%     2    Unsigned character (  8 bits per voxel)</span>
+0051 <span class="comment">%     4    Signed short       ( 16 bits per voxel)</span>
+0052 <span class="comment">%     8    Signed integer     ( 32 bits per voxel)</span>
+0053 <span class="comment">%    16    Floating point     ( 32 bits per voxel)</span>
+0054 <span class="comment">%    32    Complex, 2 floats  ( 64 bits per voxel), not supported</span>
+0055 <span class="comment">%    64    Double precision   ( 64 bits per voxel)</span>
+0056 <span class="comment">%   128    Red-Green-Blue     (128 bits per voxel), not supported</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">% See also: avw_read, avw_hdr_write, avw_img_write</span>
+0059 <span class="comment">%           avw_hdr_read, avw_img_read</span>
+0060 <span class="comment">%           avw_view</span>
+0061 <span class="comment">%</span>
+0062 
+0063 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0064 
+0065 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0066 <span class="comment">% History:  05/2002, Darren.Weber@flinders.edu.au</span>
+0067 <span class="comment">%                    The Analyze 7.5 format is copyright</span>
+0068 <span class="comment">%                    (c) Copyright, 1986-1995</span>
+0069 <span class="comment">%                    Biomedical Imaging Resource, Mayo Foundation</span>
+0070 <span class="comment">%                    This code attempts to respect the integrity of</span>
+0071 <span class="comment">%                    the format, although no guarantee is given that</span>
+0072 <span class="comment">%                    it has been exhaustively tested for compatibility</span>
+0073 <span class="comment">%                    with Analyze software (it should be though).</span>
+0074 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0075 
+0076 
+0077 <span class="comment">%------------------------------------------------------------------------</span>
+0078 <span class="comment">% Check inputs</span>
+0079 
+0080 <span class="keyword">if</span> ~exist(<span class="string">'avw'</span>,<span class="string">'var'</span>),
+0081     doc <a href="avw_write.html" class="code" title="function avw_write(avw, fileprefix, IMGorient, machine)">avw_write</a>;
+0082     msg = sprintf(<span class="string">'\n...no input avw.\n'</span>);
+0083     error(msg);
+0084 <span class="keyword">elseif</span> isempty(avw),
+0085     msg = sprintf(<span class="string">'\n...empty input avw.\n'</span>);
+0086     error(msg);
+0087 <span class="keyword">elseif</span> ~isfield(avw,<span class="string">'img'</span>),
+0088     msg = sprintf(<span class="string">'\n...empty input avw.img\n'</span>);
+0089     error(msg);
+0090 <span class="keyword">end</span>
+0091 
+0092 <span class="keyword">if</span> ~exist(<span class="string">'fileprefix'</span>,<span class="string">'var'</span>),
+0093     <span class="keyword">if</span> isfield(avw,<span class="string">'fileprefix'</span>),
+0094         <span class="keyword">if</span> ~isempty(avw.fileprefix),
+0095             fileprefix = avw.fileprefix;
+0096         <span class="keyword">else</span>
+0097             doc <a href="avw_write.html" class="code" title="function avw_write(avw, fileprefix, IMGorient, machine)">avw_write</a>;
+0098             fprintf(<span class="string">'\nAVW_WRITE: No input fileprefix - see help AVW_write\n'</span>);
+0099             <span class="keyword">return</span>;
+0100         <span class="keyword">end</span>
+0101     <span class="keyword">else</span>
+0102         doc <a href="avw_write.html" class="code" title="function avw_write(avw, fileprefix, IMGorient, machine)">avw_write</a>;
+0103         fprintf(<span class="string">'\nAVW_WRITE: No input fileprefix - see help avw_write\n'</span>);
+0104         <span class="keyword">return</span>;
+0105     <span class="keyword">end</span>
+0106 <span class="keyword">end</span>
+0107 
+0108 <span class="keyword">if</span> ~exist(<span class="string">'IMGorient'</span>,<span class="string">'var'</span>), IMGorient = <span class="string">''</span>; <span class="keyword">end</span>
+0109 <span class="keyword">if</span> ~exist(<span class="string">'machine'</span>,<span class="string">'var'</span>), machine = <span class="string">'ieee-le'</span>; <span class="keyword">end</span>
+0110 
+0111 <span class="keyword">if</span> findstr(<span class="string">'.hdr'</span>,fileprefix),
+0112 <span class="comment">%    fprintf('AVW_WRITE: Removing .hdr extension from ''%s''\n',fileprefix);</span>
+0113     fileprefix = strrep(fileprefix,<span class="string">'.hdr'</span>,<span class="string">''</span>);
+0114 <span class="keyword">end</span>
+0115 <span class="keyword">if</span> findstr(<span class="string">'.img'</span>,fileprefix),
+0116 <span class="comment">%    fprintf('AVW_WRITE: Removing .img extension from ''%s''\n',fileprefix);</span>
+0117     fileprefix = strrep(fileprefix,<span class="string">'.img'</span>,<span class="string">''</span>);
+0118 <span class="keyword">end</span>
+0119 
+0120 
+0121 
+0122 <span class="comment">%------------------------------------------------------------------------</span>
+0123 <span class="comment">% MAIN</span>
+0124 
+0125 version = <span class="string">'[$Revision: 1.2 $]'</span>;
+0126 
+0127 <a href="avw_img_write.html" class="code" title="function avw_img_write(avw, fileprefix, IMGorient, machine)">avw_img_write</a>(avw,fileprefix,IMGorient,machine);
+0128 
+0129 <span class="comment">% MUST write header after the image, to ensure any</span>
+0130 <span class="comment">% orientation changes during image write are saved</span>
+0131 <span class="comment">% in the header.  The header is saved by avw_img_write, so it's</span>
+0132 <span class="comment">% not necessary to call it here.  If it were called here, it</span>
+0133 <span class="comment">% would be called as such:</span>
+0134 <span class="comment">% avw_hdr_write(avw,fileprefix,machine);</span>
+0135 
+0136 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

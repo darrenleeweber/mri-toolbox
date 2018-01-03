@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_img_compose</title>
+  <meta name="keywords" content="avw_img_compose">
+  <meta name="description" content="AVW_IMG_COMPOSE - Compose single slice Analyze files into a volume">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_img_compose.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_img_compose
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>AVW_IMG_COMPOSE - Compose single slice Analyze files into a volume</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function avw = avw_img_compose(files,IMGorient,machine), </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> AVW_IMG_COMPOSE - Compose single slice Analyze files into a volume
+
+ [ avw, machine ] = avw_img_compose(files, orient, machine)
+
+ files  - a struct created with F = DIR('*.img').
+          The filenames of the .img files are in F.name and
+          these files are composed into a volume, in the 
+          order given by the DIR command
+ 
+ orient - force reading IMG in specified orientation, integer values:
+
+          '', read header history orient field
+          0,  transverse/axial unflipped
+          1,  coronal unflipped
+          2,  sagittal unflipped
+          3,  transverse/axial flipped
+          4,  coronal flipped
+          5,  sagittal flipped
+
+          Note that composed volume is given in this orientation
+ 
+ machine - a string, see machineformat in fread for details.
+           The default here is 'ieee-le' but the routine
+           will automatically switch between little and big
+           endian to read any such Analyze header.  It
+           reports the appropriate machine format and can
+           return the machine value.
+
+ Returned values:
+ 
+ avw.hdr - a struct with image data parameters.
+ avw.img - a 3D matrix of image data (double precision).
+ 
+ See also: <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">AVW_IMG_READ</a> &amp; <a href="avw_hdr_read.html" class="code" title="function [ avw, machine ] = avw_hdr_read(fileprefix, machine)">AVW_HDR_READ</a> (called by this function)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_hdr_read.html" class="code" title="function [ avw, machine ] = avw_hdr_read(fileprefix, machine)">avw_hdr_read</a>	avw_hdr_read - read Analyze format data header (*.hdr)</li><li><a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>	avw_img_read - read Analyze format data image (*.img)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [avw] = avw_add_slice(avw,slice,Nslice,orient),</a></li><li><a href="#_sub2" class="code">function [avw] = avw_img_init(avw),</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function avw = avw_img_compose(files,IMGorient,machine),</a>
+0002 
+0003 <span class="comment">% AVW_IMG_COMPOSE - Compose single slice Analyze files into a volume</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% [ avw, machine ] = avw_img_compose(files, orient, machine)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% files  - a struct created with F = DIR('*.img').</span>
+0008 <span class="comment">%          The filenames of the .img files are in F.name and</span>
+0009 <span class="comment">%          these files are composed into a volume, in the</span>
+0010 <span class="comment">%          order given by the DIR command</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% orient - force reading IMG in specified orientation, integer values:</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%          '', read header history orient field</span>
+0015 <span class="comment">%          0,  transverse/axial unflipped</span>
+0016 <span class="comment">%          1,  coronal unflipped</span>
+0017 <span class="comment">%          2,  sagittal unflipped</span>
+0018 <span class="comment">%          3,  transverse/axial flipped</span>
+0019 <span class="comment">%          4,  coronal flipped</span>
+0020 <span class="comment">%          5,  sagittal flipped</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%          Note that composed volume is given in this orientation</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% machine - a string, see machineformat in fread for details.</span>
+0025 <span class="comment">%           The default here is 'ieee-le' but the routine</span>
+0026 <span class="comment">%           will automatically switch between little and big</span>
+0027 <span class="comment">%           endian to read any such Analyze header.  It</span>
+0028 <span class="comment">%           reports the appropriate machine format and can</span>
+0029 <span class="comment">%           return the machine value.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">% Returned values:</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">% avw.hdr - a struct with image data parameters.</span>
+0034 <span class="comment">% avw.img - a 3D matrix of image data (double precision).</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">% See also: AVW_IMG_READ &amp; AVW_HDR_READ (called by this function)</span>
+0037 <span class="comment">%</span>
+0038 
+0039 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0040 
+0041 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0042 <span class="comment">% History:  05/2002, Darren.Weber@flinders.edu.au</span>
+0043 <span class="comment">%                    The Analyze format is copyright</span>
+0044 <span class="comment">%                    (c) Copyright, 1986-1995</span>
+0045 <span class="comment">%                    Biomedical Imaging Resource, Mayo Foundation</span>
+0046 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0047 
+0048 <span class="keyword">if</span> ~exist(<span class="string">'files'</span>,<span class="string">'var'</span>),
+0049     error(<span class="string">'AVW_IMG_COMPOSE: No files to compose'</span>);
+0050 <span class="keyword">end</span>
+0051 
+0052 <span class="keyword">if</span> ~exist(<span class="string">'IMGorient'</span>,<span class="string">'var'</span>), IMGorient = <span class="string">''</span>; <span class="keyword">end</span>
+0053 <span class="keyword">if</span> ~exist(<span class="string">'machine'</span>,<span class="string">'var'</span>), machine = <span class="string">'ieee-le'</span>; <span class="keyword">end</span>
+0054 
+0055 
+0056 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0057 <span class="comment">% Number of files (slices) to compose</span>
+0058 Nfiles = size(files,1);
+0059 <span class="comment">% Size of first file (slice) in bytes</span>
+0060 Fsize = files(1).bytes;
+0061 
+0062 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0063 <span class="comment">% Initialise the composed volume</span>
+0064 
+0065 <span class="comment">% Read the first slice header</span>
+0066 firstslice = <a href="avw_hdr_read.html" class="code" title="function [ avw, machine ] = avw_hdr_read(fileprefix, machine)">avw_hdr_read</a>(files(1).name,machine);
+0067 
+0068 avw = firstslice;
+0069 
+0070 <span class="comment">% Not sure if this is always the case, but individual</span>
+0071 <span class="comment">% slice files output by http://xmedcon.sourceforge.net</span>
+0072 <span class="comment">% have the FOV in .hdr.dime.pixdim(4) after reading</span>
+0073 <span class="comment">% some Siemens .ima files.  It might be worth checking</span>
+0074 <span class="comment">% at this point and dividing this FOV by the</span>
+0075 <span class="comment">% number of slices</span>
+0076 <span class="keyword">if</span> avw.hdr.dime.pixdim(4) &gt; 20,
+0077     msg = sprintf(<span class="string">'AVW_IMG_COMPOSE: slice pixdim(4) is very large, assuming it is FOV and converting!\n'</span>);
+0078     warning(msg);
+0079     <span class="comment">% OK this field is probably FOV, so lets</span>
+0080     <span class="comment">% divide it by the total number of slices</span>
+0081     SliceFOV = double(avw.hdr.dime.pixdim(4));
+0082     avw.hdr.dime.pixdim(4) = single(SliceFOV / Nfiles);
+0083 <span class="keyword">end</span>
+0084 
+0085 <span class="comment">% Initialise avw.img and reset some header dimensions</span>
+0086 avw.hdr.dime.dim(4) = Nfiles;
+0087 avw = <a href="#_sub2" class="code" title="subfunction [avw] = avw_img_init(avw),">avw_img_init</a>(avw);
+0088 
+0089 <span class="comment">% Now reset orient field of avw, as all data will</span>
+0090 <span class="comment">% be in standard axial unflipped orientation after</span>
+0091 <span class="comment">% avw_img_read.</span>
+0092 avw.hdr.hist.orient = char(0);
+0093 
+0094 
+0095 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0096 <span class="comment">% Add slices, depends on whether slice order is normal or flipped</span>
+0097 
+0098 orient = double(firstslice.hdr.hist.orient);
+0099 
+0100 <span class="keyword">if</span> orient &lt; 3,
+0101     <span class="comment">% process slices as unflipped volume</span>
+0102     <span class="keyword">for</span> f = 1:Nfiles,
+0103         <span class="keyword">if</span> files(f).bytes == Fsize,
+0104             slice = <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>(files(f).name,IMGorient,machine);
+0105             avw   = <a href="#_sub1" class="code" title="subfunction [avw] = avw_add_slice(avw,slice,Nslice,orient),">avw_add_slice</a>(avw,slice,f,orient);
+0106         <span class="keyword">else</span>
+0107             msg = sprint(<span class="string">'AVW_IMG_COMPOSE: This file is not the same size as the first file!'</span>);
+0108             error(msg);
+0109         <span class="keyword">end</span>
+0110     <span class="keyword">end</span>
+0111 <span class="keyword">else</span>
+0112     <span class="comment">% process slices as flipped volume</span>
+0113     <span class="keyword">for</span> f = Nfiles:-1:1,
+0114         <span class="keyword">if</span> files(f).bytes == Fsize,
+0115             slice = <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>(files(f).name,IMGorient,machine);
+0116             avw   = <a href="#_sub1" class="code" title="subfunction [avw] = avw_add_slice(avw,slice,Nslice,orient),">avw_add_slice</a>(avw,slice,f,orient);
+0117         <span class="keyword">else</span>
+0118             msg = sprint(<span class="string">'AVW_IMG_COMPOSE: This file is not the same size as the first file!'</span>);
+0119             error(msg);
+0120         <span class="keyword">end</span>
+0121     <span class="keyword">end</span>
+0122 <span class="keyword">end</span>
+0123 
+0124 
+0125 <span class="keyword">return</span>
+0126 
+0127 
+0128 
+0129 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0130 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0131 <a name="_sub1" href="#_subfunctions" class="code">function [avw] = avw_add_slice(avw,slice,Nslice,orient),</a>
+0132     
+0133     <span class="comment">% Check that composed volume and current slice</span>
+0134     <span class="comment">% have the same orientation</span>
+0135     Vorient = double(  avw.hdr.hist.orient);
+0136     Sorient = double(slice.hdr.hist.orient);
+0137     
+0138     <span class="keyword">if</span> Vorient ~= Sorient,
+0139         msg = sprintf(<span class="string">'AVW_IMG_COMPOSE: Slice %3d has different orientation to volume'</span>,Nslice);
+0140         error(msg);
+0141     <span class="keyword">end</span>
+0142     
+0143     <span class="keyword">switch</span> double(orient),
+0144     
+0145     <span class="keyword">case</span> 0, <span class="comment">% axial unflipped</span>
+0146         
+0147         <span class="comment">% Slices in 'z' axis - from patient inferior to superior</span>
+0148         avw.img(:,:,Nslice) = slice.img;
+0149         
+0150     <span class="keyword">case</span> 1, <span class="comment">% coronal unflipped</span>
+0151         
+0152         <span class="comment">% Slices in 'y' axis - from patient posterior to anterior</span>
+0153         avw.img(:,Nslice,:) = slice.img;
+0154         
+0155     <span class="keyword">case</span> 2, <span class="comment">% sagittal unflipped</span>
+0156         
+0157         <span class="comment">% Slices in 'x' axis - from patient right to left</span>
+0158         avw.img(Nslice,:,:) = slice.img;
+0159         
+0160     <span class="keyword">case</span> 3, <span class="comment">% axial flipped</span>
+0161         
+0162         <span class="comment">% Slices in 'z' axis - from patient inferior to superior</span>
+0163         avw.img(:,:,Nslice) = slice.img;
+0164         
+0165     <span class="keyword">case</span> 4, <span class="comment">% coronal flipped</span>
+0166         
+0167         <span class="comment">% Slices in 'y' axis - from patient anterior to posterior</span>
+0168         avw.img(:,Nslice,:) = slice.img;
+0169         
+0170     <span class="keyword">case</span> 5, <span class="comment">% sagittal flipped</span>
+0171         
+0172         <span class="comment">% Slices in 'x' axis - from patient right to left</span>
+0173         avw.img(Nslice,:,:) = slice.img;
+0174     <span class="keyword">end</span>
+0175     
+0176 <span class="keyword">return</span>
+0177 
+0178 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0179 <a name="_sub2" href="#_subfunctions" class="code">function [avw] = avw_img_init(avw),</a>
+0180     
+0181     PixelDim = double(avw.hdr.dime.dim(2));
+0182     RowDim   = double(avw.hdr.dime.dim(3));
+0183     SliceDim = double(avw.hdr.dime.dim(4));
+0184     
+0185     PixelSz  = double(avw.hdr.dime.pixdim(2));
+0186     RowSz    = double(avw.hdr.dime.pixdim(3));
+0187     SliceSz  = double(avw.hdr.dime.pixdim(4));
+0188     
+0189     <span class="keyword">switch</span> double(avw.hdr.hist.orient),
+0190     
+0191     <span class="keyword">case</span> {0,3}, <span class="comment">% axial unflipped or flipped</span>
+0192         
+0193         x = PixelDim;   Xsz = PixelSz;
+0194         y = RowDim;     Ysz = RowSz;
+0195         z = SliceDim;   Zsz = SliceSz;
+0196         
+0197     <span class="keyword">case</span> {1,4}, <span class="comment">% coronal unflipped or flipped</span>
+0198         
+0199         x = PixelDim;   Xsz = PixelSz;
+0200         y = SliceDim;   Ysz = SliceSz;
+0201         z = RowDim;     Zsz = RowSz;
+0202         
+0203     <span class="keyword">case</span> {2,5}, <span class="comment">% sagittal unflipped or flipped</span>
+0204         
+0205         x = SliceDim;   Xsz = SliceSz;
+0206         y = PixelDim;   Ysz = PixelSz;
+0207         z = RowDim;     Zsz = RowSz;
+0208         
+0209     <span class="keyword">otherwise</span>, <span class="comment">% assume axial unflipped or flipped</span>
+0210         
+0211         msg = sprintf(<span class="string">'AVW_IMG_COMPOSE: No specified orientation\n'</span>);
+0212         warning(msg);
+0213         
+0214         x = PixelDim;   Xsz = PixelSz;
+0215         y = RowDim;     Ysz = RowSz;
+0216         z = SliceDim;   Zsz = SliceSz;
+0217         
+0218     <span class="keyword">end</span>
+0219     
+0220     avw.img = zeros(x,y,z);
+0221     avw.hdr.dime.dim(2) = x;
+0222     avw.hdr.dime.dim(3) = y;
+0223     avw.hdr.dime.dim(4) = z;
+0224     
+0225     avw.hdr.dime.pixdim(2) = Xsz;
+0226     avw.hdr.dime.pixdim(3) = Ysz;
+0227     avw.hdr.dime.pixdim(4) = Zsz;
+0228     
+0229 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

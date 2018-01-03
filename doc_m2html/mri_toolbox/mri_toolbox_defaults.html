@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mri_toolbox_defaults</title>
+  <meta name="keywords" content="mri_toolbox_defaults">
+  <meta name="description" content="mri_toolbox_defaults - Create, read, write mri_toolbox defaults">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; mri_toolbox_defaults.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>mri_toolbox_defaults
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>mri_toolbox_defaults - Create, read, write mri_toolbox defaults</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [mri] = mri_toolbox_defaults(command,mri); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> mri_toolbox_defaults - Create, read, write mri_toolbox defaults
+
+ Useage:   [mri] = mri_toolbox_defaults(command,[mri])
+
+ command  =  'create'
+             'read'
+             'write' or 'write_other'
+ mri      =  structure returned by create|read command
+             structure to write for write command
+
+ All read and write commands are to a matlab .mat file.  The
+ 'write_other' command will write out a data specific archive
+ that can be accessed from the recent files list.  It will be
+ located in the folder where the eeg data is opened.
+ 
+ Examples:
+ mri = mri_toolbox_defaults; % create new defaults
+ mri = mri_toolbox_defaults('read'); % read saved defaults
+ mri_toolbox_defaults('write',mri);  % write current mri as default
+ mri_toolbox_defaults('write_other',mri); % write current mri data
+
+ The write command will write to the mri_toolbox
+ installation folder.  The read command will first 
+ try to find the paramater file in the mri_toolbox
+ installation and otherwise recreates the defaults.
+
+ Notes:    Handles parameter structure for the 
+           mri_toolbox routines.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>	mri_toolbox_defaults - Create, read, write mri_toolbox defaults</li><li><a href="mri_toolbox_recent.html" class="code" title="function [ files, varargout ] = mri_toolbox_recent(filename,command);">mri_toolbox_recent</a>	mri_toolbox_recent - Keep track of mri_toolbox .mat files</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="gui_avw_open.html" class="code" title="function [mri] = gui_avw_open(mri,command,parent)">gui_avw_open</a>	gui_avw_open - Load & Display Analyze 7.5 data</li><li><a href="gui_cor_open.html" class="code" title="function [mri] = gui_cor_open(mri,command,parent)">gui_cor_open</a>	gui_cor_open - Load & Display FreeSurfer COR-??? data</li><li><a href="gui_ge_open.html" class="code" title="function [mri] = gui_ge_open(mri,command,parent)">gui_ge_open</a>	gui_ge_open - Load & Display MRI data</li><li><a href="gui_mri_open.html" class="code" title="function [mri] = gui_mri_open(mri,command,parent)">gui_mri_open</a>	gui_mri_open - Load & Display MRI data</li><li><a href="mri_open.html" class="code" title="function [mri] = mri_open(mri)">mri_open</a>	mri_open - function to call various mri data tools</li><li><a href="mri_toolbox.html" class="code" title="function [ varargout ] = mri_toolbox(command)">mri_toolbox</a>	mri_toolbox - Graphical user interface (GUI) to various MRI tools</li><li><a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>	mri_toolbox_defaults - Create, read, write mri_toolbox defaults</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [mri] = mri_toolbox_defaults(command,mri);</a>
+0002 
+0003 <span class="comment">% mri_toolbox_defaults - Create, read, write mri_toolbox defaults</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Useage:   [mri] = mri_toolbox_defaults(command,[mri])</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% command  =  'create'</span>
+0008 <span class="comment">%             'read'</span>
+0009 <span class="comment">%             'write' or 'write_other'</span>
+0010 <span class="comment">% mri      =  structure returned by create|read command</span>
+0011 <span class="comment">%             structure to write for write command</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% All read and write commands are to a matlab .mat file.  The</span>
+0014 <span class="comment">% 'write_other' command will write out a data specific archive</span>
+0015 <span class="comment">% that can be accessed from the recent files list.  It will be</span>
+0016 <span class="comment">% located in the folder where the eeg data is opened.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Examples:</span>
+0019 <span class="comment">% mri = mri_toolbox_defaults; % create new defaults</span>
+0020 <span class="comment">% mri = mri_toolbox_defaults('read'); % read saved defaults</span>
+0021 <span class="comment">% mri_toolbox_defaults('write',mri);  % write current mri as default</span>
+0022 <span class="comment">% mri_toolbox_defaults('write_other',mri); % write current mri data</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% The write command will write to the mri_toolbox</span>
+0025 <span class="comment">% installation folder.  The read command will first</span>
+0026 <span class="comment">% try to find the paramater file in the mri_toolbox</span>
+0027 <span class="comment">% installation and otherwise recreates the defaults.</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Notes:    Handles parameter structure for the</span>
+0030 <span class="comment">%           mri_toolbox routines.</span>
+0031 <span class="comment">%</span>
+0032 
+0033 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0034 
+0035 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0036 <span class="comment">% Created:  01/2002 Darren.Weber@flinders.edu.au</span>
+0037 <span class="comment">% Modified: 02/2002 Darren.Weber@flinders.edu.au</span>
+0038 <span class="comment">%           - adapted read/write output from .txt format</span>
+0039 <span class="comment">%             to .mat format so it will contain data structures.</span>
+0040 <span class="comment">%             Hence, it is no longer editable text.</span>
+0041 <span class="comment">%           08/2002 Darren.Weber@flinders.edu.au</span>
+0042 <span class="comment">%                   added MRI defaults</span>
+0043 <span class="comment">%</span>
+0044 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0045 
+0046 mriversion = <span class="string">'$Revision: 1.2 $'</span>;
+0047 fprintf(<span class="string">'\nMRI_TOOLBOX_DEFAULTS [v %s]\n'</span>,mriversion(11:15));
+0048 
+0049 <span class="keyword">if</span> version(<span class="string">'-release'</span>) &lt; 10,
+0050     msg = printf(<span class="string">'matlab release &lt; version 10, mri_toolbox GUIs may fail.\n'</span>);
+0051     warning(msg);
+0052 <span class="keyword">end</span>
+0053 
+0054 <span class="keyword">if</span> ~exist(<span class="string">'command'</span>,<span class="string">'var'</span>), command = <span class="string">'create'</span>; <span class="keyword">end</span>
+0055 
+0056 <span class="comment">% try to locate the installation path</span>
+0057 mriPath = fileparts(which(<span class="string">'mri_toolbox'</span>));
+0058 <span class="keyword">if</span> isempty(mriPath),
+0059     msg = sprintf(<span class="string">'Cannot find mri_toolbox on the matlab path.\nPlease use the addpath command.\n\n'</span>);
+0060     error(msg);
+0061 <span class="keyword">else</span>
+0062     mriPath = strcat(mriPath,filesep);
+0063 <span class="keyword">end</span>
+0064 
+0065 
+0066 <span class="comment">% try to locate the mri_toolbox installation path</span>
+0067 mriPath = fileparts(which(<span class="string">'avw_view'</span>));
+0068 <span class="keyword">if</span> isempty(mriPath),
+0069     msg = sprintf(<span class="string">'Cannot find mri_toolbox on the matlab path.\nPlease install and use the addpath command.\n\n'</span>);
+0070     warning(msg);
+0071     mriPath = mriPath;
+0072 <span class="keyword">else</span>
+0073     mriPath = strcat(mriPath,filesep);
+0074 <span class="keyword">end</span>
+0075 
+0076 
+0077 <span class="keyword">switch</span> command
+0078 <span class="keyword">case</span> <span class="string">'create'</span>,
+0079     
+0080     fprintf(<span class="string">'...creating mri_toolbox defaults\n\n'</span>);
+0081     
+0082     mri = [];
+0083     
+0084     <span class="comment">% parameters for 'mri_open' &amp; 'avw_view', see these for more information</span>
+0085     mri.path          = strcat(mriPath,<span class="string">'mri_example_data'</span>,filesep);
+0086     mri.file          = <span class="string">'T1.img'</span>;  <span class="comment">% SPM T1 template</span>
+0087     mri.type          = <span class="string">'Analyze'</span>; <span class="comment">% Analyze files</span>
+0088     mri.orient        = <span class="string">'auto'</span>;
+0089     mri.series        = 1;
+0090     mri.data          = [];
+0091     mri.fiducials     = []; <span class="comment">% MRI fiducial points</span>
+0092     mri.IEEEMachine   = <span class="string">'ieee-be'</span>; <span class="comment">% T1 is big endian MRI data</span>
+0093     mri.plot          = 0;
+0094     
+0095     mri.colormap      = gray(255);
+0096     mri.hold          = 0;   <span class="comment">% default for GUI hold checkboxes</span>
+0097     
+0098 <span class="keyword">case</span> <span class="string">'read'</span>
+0099     
+0100     <span class="comment">% Look for default file</span>
+0101     [path,name,ext] = fileparts(strcat(mriPath,<span class="string">'mri_toolbox_defaults.mat'</span>));
+0102     file = fullfile(path,[name ext]);
+0103     <span class="keyword">if</span> exist(file) == 2,
+0104         fprintf(<span class="string">'...reading mri_toolbox defaults from:\n%s\n\n'</span>,file);
+0105         load(file);
+0106     <span class="keyword">else</span>
+0107         fprintf(<span class="string">'...cannot locate mri_toolbox defaults - recreating defaults.\n\n'</span>);
+0108         mri = <a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>;
+0109     <span class="keyword">end</span>
+0110     
+0111     <span class="comment">% verify that path to default files exists;</span>
+0112     <span class="comment">% if not, create defaults again (I hope this will avoid</span>
+0113     <span class="comment">% new installation problems)</span>
+0114     mriPathExist = exist(mri.path);
+0115     <span class="keyword">if</span> ~mriPathExist,
+0116         fprintf(<span class="string">'...mri.path does not exist - reinitializing defaults.\n'</span>);
+0117         mri = <a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>(<span class="string">'create'</span>);
+0118         <a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>(<span class="string">'write'</span>,mri);
+0119     <span class="keyword">end</span>
+0120     
+0121 <span class="keyword">case</span> <span class="string">'write'</span>
+0122     
+0123     <span class="keyword">if</span> ~exist(<span class="string">'mri'</span>,<span class="string">'var'</span>),
+0124         msg = sprintf(<span class="string">'mri argument is essential: mri_toolbox_defaults(''write'',mri)'</span>);
+0125         error(msg);
+0126     <span class="keyword">end</span>
+0127     
+0128     [path,name,ext] = fileparts(strcat(mriPath,<span class="string">'mri_toolbox_defaults.mat'</span>));
+0129     file = fullfile(path,[name ext]);
+0130     
+0131     save(file,<span class="string">'mri'</span>);
+0132     
+0133     fprintf(<span class="string">'...saved mri_toolbox defaults to:\n%s\n\n'</span>,file);
+0134     
+0135 <span class="keyword">case</span> <span class="string">'write_other'</span>
+0136     
+0137     <span class="keyword">if</span> ~exist(<span class="string">'mri'</span>,<span class="string">'var'</span>),
+0138         msg = sprintf(<span class="string">'mri argument is essential: mri_toolbox_defaults(''write_other'',mri)'</span>);
+0139         error(msg);
+0140     <span class="keyword">end</span>
+0141     
+0142     [path,name,ext] = fileparts(strcat(mri.path, filesep, mri.file));
+0143     ext = <span class="string">'.mat'</span>;
+0144     file = fullfile(path,[name ext]);
+0145     
+0146     [newfile,newpath] = uiputfile(file,<span class="string">'Save MRI_TOOLBOX Dataset to File:'</span>);
+0147     <span class="keyword">if</span> (newfile == 0) &amp; (newpath == 0),
+0148         fprintf(<span class="string">'...aborting save\n\n'</span>);
+0149     <span class="keyword">else</span>
+0150         [path,name,ext] = fileparts(strcat(newpath, filesep, newfile));
+0151         ext = <span class="string">'.mat'</span>;
+0152         file = fullfile(path,[name ext]);
+0153         save(file,<span class="string">'mri'</span>);
+0154         fprintf(<span class="string">'...saved mri_toolbox parameters to:\n%s\n\n'</span>,file);
+0155         recentfiles = <a href="mri_toolbox_recent.html" class="code" title="function [ files, varargout ] = mri_toolbox_recent(filename,command);">mri_toolbox_recent</a>(file);
+0156     <span class="keyword">end</span>
+0157     
+0158 <span class="keyword">otherwise</span>
+0159     error(<span class="string">'...invalid command\n\n'</span>);
+0160 <span class="keyword">end</span>
+0161 
+0162 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

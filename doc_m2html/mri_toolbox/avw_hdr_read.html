@@ -1,0 +1,444 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_hdr_read</title>
+  <meta name="keywords" content="avw_hdr_read">
+  <meta name="description" content="avw_hdr_read - read Analyze format data header (*.hdr)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_hdr_read.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_hdr_read
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>avw_hdr_read - read Analyze format data header (*.hdr)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ avw, machine ] = avw_hdr_read(fileprefix, machine) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> avw_hdr_read - read Analyze format data header (*.hdr)
+
+ [ avw, machine ] = avw_hdr_read(fileprefix, [machine])
+
+ fileprefix - string filename (without .hdr); the file name
+              can be given as a full path or relative to the
+              current directory.
+ 
+ machine - a string, see machineformat in fread for details.
+           The default here is 'ieee-le' but the routine
+           will automatically switch between little and big
+           endian to read any such Analyze header.  It
+           reports the appropriate machine format and can
+           return the machine value.
+
+ avw.hdr - a struct, all fields returned from the header.
+           For details, find a good description on the web
+           or see the Analyze File Format pdf in the 
+           mri_toolbox doc folder or read this .m file.
+
+ This function is called by avw_img_read
+ 
+ See also <a href="avw_hdr_write.html" class="code" title="function avw_hdr_write(avw, fileprefix, machine)">avw_hdr_write</a>, <a href="avw_hdr_make.html" class="code" title="function [ avw ] = avw_hdr_make">avw_hdr_make</a>, <a href="avw_view_hdr.html" class="code" title="function avw_view_hdr(avw,parent)">avw_view_hdr</a>, <a href="avw_view.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">avw_view</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_img_compose.html" class="code" title="function avw = avw_img_compose(files,IMGorient,machine),">avw_img_compose</a>	AVW_IMG_COMPOSE - Compose single slice Analyze files into a volume</li><li><a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>	avw_img_read - read Analyze format data image (*.img)</li><li><a href="avw_img_read_4d.html" class="code" title="function [ avw, machine ] = avw_img_read_4d(fileprefix,volIndex,IMGorient,machine)">avw_img_read_4d</a>	avw_img_read - read Analyze format data image (*.img)</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [ dsr ] = read_header(fid)</a></li><li><a href="#_sub2" class="code">function [hk] = header_key(fid)</a></li><li><a href="#_sub3" class="code">function [ dime ] = image_dimension(fid)</a></li><li><a href="#_sub4" class="code">function [ hist ] = data_history(fid)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ avw, machine ] = avw_hdr_read(fileprefix, machine)</a>
+0002 
+0003 <span class="comment">% avw_hdr_read - read Analyze format data header (*.hdr)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% [ avw, machine ] = avw_hdr_read(fileprefix, [machine])</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% fileprefix - string filename (without .hdr); the file name</span>
+0008 <span class="comment">%              can be given as a full path or relative to the</span>
+0009 <span class="comment">%              current directory.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% machine - a string, see machineformat in fread for details.</span>
+0012 <span class="comment">%           The default here is 'ieee-le' but the routine</span>
+0013 <span class="comment">%           will automatically switch between little and big</span>
+0014 <span class="comment">%           endian to read any such Analyze header.  It</span>
+0015 <span class="comment">%           reports the appropriate machine format and can</span>
+0016 <span class="comment">%           return the machine value.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% avw.hdr - a struct, all fields returned from the header.</span>
+0019 <span class="comment">%           For details, find a good description on the web</span>
+0020 <span class="comment">%           or see the Analyze File Format pdf in the</span>
+0021 <span class="comment">%           mri_toolbox doc folder or read this .m file.</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% This function is called by avw_img_read</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% See also avw_hdr_write, avw_hdr_make, avw_view_hdr, avw_view</span>
+0026 <span class="comment">%</span>
+0027 
+0028 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0029 
+0030 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0031 <span class="comment">% History:  05/2002, Darren.Weber@flinders.edu.au</span>
+0032 <span class="comment">%                    The Analyze format and c code below is copyright</span>
+0033 <span class="comment">%                    (c) Copyright, 1986-1995</span>
+0034 <span class="comment">%                    Biomedical Imaging Resource, Mayo Foundation</span>
+0035 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0036 
+0037 version = <span class="string">'[$Revision: 1.2 $]'</span>;
+0038 fprintf(<span class="string">'\nAVW_HDR_READ [v%s]\n'</span>,version(12:16));  tic;
+0039 
+0040 <span class="keyword">if</span> ~exist(<span class="string">'fileprefix'</span>,<span class="string">'var'</span>),
+0041     msg = sprintf(<span class="string">'...no input fileprefix - see help avw_hdr_read\n\n'</span>);
+0042     error(msg);
+0043 <span class="keyword">end</span>
+0044 <span class="keyword">if</span> ~exist(<span class="string">'machine'</span>,<span class="string">'var'</span>), machine = <span class="string">'ieee-le'</span>; <span class="keyword">end</span>
+0045 
+0046 
+0047 <span class="keyword">if</span> findstr(<span class="string">'.hdr'</span>,fileprefix),
+0048     <span class="comment">% fprintf('...removing .hdr extension from ''%s''\n',fileprefix);</span>
+0049     fileprefix = strrep(fileprefix,<span class="string">'.hdr'</span>,<span class="string">''</span>);
+0050 <span class="keyword">end</span>
+0051 <span class="keyword">if</span> findstr(<span class="string">'.img'</span>,fileprefix),
+0052     <span class="comment">% fprintf('...removing .img extension from ''%s''\n',fileprefix);</span>
+0053     fileprefix = strrep(fileprefix,<span class="string">'.img'</span>,<span class="string">''</span>);
+0054 <span class="keyword">end</span>
+0055 file = sprintf(<span class="string">'%s.hdr'</span>,fileprefix);
+0056 
+0057 <span class="keyword">if</span> exist(file),
+0058     fprintf(<span class="string">'...reading %s Analyze format'</span>,machine);
+0059     fid = fopen(file,<span class="string">'r'</span>,machine);
+0060     avw.hdr = <a href="#_sub1" class="code" title="subfunction [ dsr ] = read_header(fid)">read_header</a>(fid);
+0061     avw.fileprefix = fileprefix;
+0062     fclose(fid);
+0063     
+0064     <span class="keyword">if</span> ~isequal(avw.hdr.hk.sizeof_hdr,348),
+0065         fprintf(<span class="string">'...failed.\n'</span>);
+0066         <span class="comment">% first try reading the opposite endian to 'machine'</span>
+0067         <span class="keyword">switch</span> machine,
+0068         <span class="keyword">case</span> <span class="string">'ieee-le'</span>, machine = <span class="string">'ieee-be'</span>;
+0069         <span class="keyword">case</span> <span class="string">'ieee-be'</span>, machine = <span class="string">'ieee-le'</span>;
+0070         <span class="keyword">end</span>
+0071         fprintf(<span class="string">'...reading %s Analyze format'</span>,machine);
+0072         fid = fopen(file,<span class="string">'r'</span>,machine);
+0073         avw.hdr = <a href="#_sub1" class="code" title="subfunction [ dsr ] = read_header(fid)">read_header</a>(fid);
+0074         avw.fileprefix = fileprefix;
+0075         fclose(fid);
+0076     <span class="keyword">end</span>
+0077     <span class="keyword">if</span> ~isequal(avw.hdr.hk.sizeof_hdr,348),
+0078         <span class="comment">% Now throw an error</span>
+0079         fprintf(<span class="string">'...failed.\n'</span>);
+0080         msg = sprintf(<span class="string">'...size of header not equal to 348 bytes!\n\n'</span>);
+0081         error(msg);
+0082     <span class="keyword">end</span>
+0083 <span class="keyword">else</span>
+0084     msg = sprintf(<span class="string">'...cannot find file %s.hdr\n\n'</span>,file);
+0085     error(msg);
+0086 <span class="keyword">end</span>
+0087 
+0088 t=toc; fprintf(<span class="string">'...done (%5.2f sec).\n'</span>,t);
+0089 
+0090 <span class="keyword">return</span>
+0091 
+0092 
+0093 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0094 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0095 <a name="_sub1" href="#_subfunctions" class="code">function [ dsr ] = read_header(fid)</a>
+0096     
+0097     <span class="comment">% Original header structures - ANALYZE 7.5</span>
+0098     <span class="comment">%struct dsr</span>
+0099     <span class="comment">%       {</span>
+0100     <span class="comment">%       struct header_key hk;            /*   0 +  40       */</span>
+0101     <span class="comment">%       struct image_dimension dime;     /*  40 + 108       */</span>
+0102     <span class="comment">%       struct data_history hist;        /* 148 + 200       */</span>
+0103     <span class="comment">%       };                               /* total= 348 bytes*/</span>
+0104     dsr.hk   = <a href="#_sub2" class="code" title="subfunction [hk] = header_key(fid)">header_key</a>(fid);
+0105     dsr.dime = <a href="#_sub3" class="code" title="subfunction [ dime ] = image_dimension(fid)">image_dimension</a>(fid);
+0106     dsr.hist = <a href="#_sub4" class="code" title="subfunction [ hist ] = data_history(fid)">data_history</a>(fid);
+0107     
+0108 <span class="keyword">return</span>
+0109 
+0110 
+0111 
+0112 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0113 <a name="_sub2" href="#_subfunctions" class="code">function [hk] = header_key(fid)</a>
+0114     
+0115     <span class="comment">% The required elements in the header_key substructure are:</span>
+0116     <span class="comment">%</span>
+0117     <span class="comment">% int sizeof_header   Must indicate the byte size of the header file.</span>
+0118     <span class="comment">% int extents         Should be 16384, the image file is created as</span>
+0119     <span class="comment">%                     contiguous with a minimum extent size.</span>
+0120     <span class="comment">% char regular        Must be 'r' to indicate that all images and</span>
+0121     <span class="comment">%                     volumes are the same size.</span>
+0122     
+0123     <span class="comment">% Original header structures - ANALYZE 7.5</span>
+0124     <span class="comment">% struct header_key                      /* header key      */</span>
+0125     <span class="comment">%       {                                /* off + size      */</span>
+0126     <span class="comment">%       int sizeof_hdr                   /*  0 +  4         */</span>
+0127     <span class="comment">%       char data_type[10];              /*  4 + 10         */</span>
+0128     <span class="comment">%       char db_name[18];                /* 14 + 18         */</span>
+0129     <span class="comment">%       int extents;                     /* 32 +  4         */</span>
+0130     <span class="comment">%       short int session_error;         /* 36 +  2         */</span>
+0131     <span class="comment">%       char regular;                    /* 38 +  1         */</span>
+0132     <span class="comment">%       char hkey_un0;                   /* 39 +  1         */</span>
+0133     <span class="comment">%       };                               /* total=40 bytes  */</span>
+0134     
+0135     fseek(fid,0,<span class="string">'bof'</span>);
+0136     
+0137     hk.sizeof_hdr    = fread(fid, 1,<span class="string">'*int32'</span>);  <span class="comment">% should be 348!</span>
+0138     hk.data_type     = fread(fid,10,<span class="string">'*char'</span>)';
+0139     hk.db_name       = fread(fid,18,<span class="string">'*char'</span>)';
+0140     hk.extents       = fread(fid, 1,<span class="string">'*int32'</span>);
+0141     hk.session_error = fread(fid, 1,<span class="string">'*int16'</span>);
+0142     hk.regular       = fread(fid, 1,<span class="string">'*char'</span>)'; <span class="comment">% might be uint8</span>
+0143     hk.hkey_un0      = fread(fid, 1,<span class="string">'*uint8'</span>)';
+0144     
+0145     <span class="comment">% check if this value was a char zero</span>
+0146     <span class="keyword">if</span> hk.hkey_un0 == 48,
+0147         hk.hkey_un0 = 0;
+0148     <span class="keyword">end</span>
+0149     
+0150 <span class="keyword">return</span>
+0151 
+0152 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0153 <a name="_sub3" href="#_subfunctions" class="code">function [ dime ] = image_dimension(fid)</a>
+0154     
+0155     <span class="comment">%struct image_dimension</span>
+0156     <span class="comment">%       {                                /* off + size      */</span>
+0157     <span class="comment">%       short int dim[8];                /* 0 + 16          */</span>
+0158     <span class="comment">%           /*</span>
+0159     <span class="comment">%           dim[0]      Number of dimensions in database; usually 4.</span>
+0160     <span class="comment">%           dim[1]      Image X dimension;  number of *pixels* in an image row.</span>
+0161     <span class="comment">%           dim[2]      Image Y dimension;  number of *pixel rows* in slice.</span>
+0162     <span class="comment">%           dim[3]      Volume Z dimension; number of *slices* in a volume.</span>
+0163     <span class="comment">%           dim[4]      Time points; number of volumes in database</span>
+0164     <span class="comment">%           */</span>
+0165     <span class="comment">%       char vox_units[4];               /* 16 + 4          */</span>
+0166     <span class="comment">%       char cal_units[8];               /* 20 + 8          */</span>
+0167     <span class="comment">%       short int unused1;               /* 28 + 2          */</span>
+0168     <span class="comment">%       short int datatype;              /* 30 + 2          */</span>
+0169     <span class="comment">%       short int bitpix;                /* 32 + 2          */</span>
+0170     <span class="comment">%       short int dim_un0;               /* 34 + 2          */</span>
+0171     <span class="comment">%       float pixdim[8];                 /* 36 + 32         */</span>
+0172     <span class="comment">%            /*</span>
+0173     <span class="comment">%                pixdim[] specifies the voxel dimensions:</span>
+0174     <span class="comment">%                pixdim[1] - voxel width, mm</span>
+0175     <span class="comment">%                pixdim[2] - voxel height, mm</span>
+0176     <span class="comment">%                pixdim[3] - slice thickness, mm</span>
+0177     <span class="comment">%               pixdim[4] - volume timing, in msec</span>
+0178     <span class="comment">%                    ..etc</span>
+0179     <span class="comment">%            */</span>
+0180     <span class="comment">%       float vox_offset;                /* 68 + 4          */</span>
+0181     <span class="comment">%       float roi_scale;                 /* 72 + 4          */</span>
+0182     <span class="comment">%       float funused1;                  /* 76 + 4          */</span>
+0183     <span class="comment">%       float funused2;                  /* 80 + 4          */</span>
+0184     <span class="comment">%       float cal_max;                   /* 84 + 4          */</span>
+0185     <span class="comment">%       float cal_min;                   /* 88 + 4          */</span>
+0186     <span class="comment">%       int compressed;                  /* 92 + 4          */</span>
+0187     <span class="comment">%       int verified;                    /* 96 + 4          */</span>
+0188     <span class="comment">%       int glmax;                       /* 100 + 4         */</span>
+0189     <span class="comment">%       int glmin;                       /* 104 + 4         */</span>
+0190     <span class="comment">%       };                               /* total=108 bytes */</span>
+0191     
+0192     dime.dim        = fread(fid,8,<span class="string">'*int16'</span>)';
+0193     dime.vox_units  = fread(fid,4,<span class="string">'*char'</span>)';
+0194     dime.cal_units  = fread(fid,8,<span class="string">'*char'</span>)';
+0195     dime.unused1    = fread(fid,1,<span class="string">'*int16'</span>);
+0196     dime.datatype   = fread(fid,1,<span class="string">'*int16'</span>);
+0197     dime.bitpix     = fread(fid,1,<span class="string">'*int16'</span>);
+0198     dime.dim_un0    = fread(fid,1,<span class="string">'*int16'</span>);
+0199     dime.pixdim     = fread(fid,8,<span class="string">'*float'</span>)';
+0200     dime.vox_offset = fread(fid,1,<span class="string">'*float'</span>);
+0201     dime.roi_scale  = fread(fid,1,<span class="string">'*float'</span>);
+0202     dime.funused1   = fread(fid,1,<span class="string">'*float'</span>);
+0203     dime.funused2   = fread(fid,1,<span class="string">'*float'</span>);
+0204     dime.cal_max    = fread(fid,1,<span class="string">'*float'</span>);
+0205     dime.cal_min    = fread(fid,1,<span class="string">'*float'</span>);
+0206     dime.compressed = fread(fid,1,<span class="string">'*int32'</span>);
+0207     dime.verified   = fread(fid,1,<span class="string">'*int32'</span>);
+0208     dime.glmax      = fread(fid,1,<span class="string">'*int32'</span>);
+0209     dime.glmin      = fread(fid,1,<span class="string">'*int32'</span>);
+0210     
+0211     <span class="keyword">if</span> dime.dim(1) &lt; 4, <span class="comment">% Number of dimensions in database; usually 4.</span>
+0212         fprintf(<span class="string">'...ensuring 4 dimensions in avw.hdr.dime.dim\n'</span>);
+0213         dime.dim(1) = int16(4);
+0214     <span class="keyword">end</span>
+0215     <span class="keyword">if</span> dime.dim(5) &lt; 1, <span class="comment">% Time points; number of volumes in database</span>
+0216         fprintf(<span class="string">'...ensuring at least 1 volume in avw.hdr.dime.dim(5)\n'</span>);
+0217         dime.dim(5) = int16(1);
+0218     <span class="keyword">end</span>
+0219     
+0220 <span class="keyword">return</span>
+0221 
+0222 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0223 <a name="_sub4" href="#_subfunctions" class="code">function [ hist ] = data_history(fid)</a>
+0224     
+0225     <span class="comment">% Original header structures - ANALYZE 7.5</span>
+0226     <span class="comment">%struct data_history</span>
+0227     <span class="comment">%       {                                /* off + size      */</span>
+0228     <span class="comment">%       char descrip[80];                /* 0 + 80          */</span>
+0229     <span class="comment">%       char aux_file[24];               /* 80 + 24         */</span>
+0230     <span class="comment">%       char orient;                     /* 104 + 1         */</span>
+0231     <span class="comment">%       char originator[10];             /* 105 + 10        */</span>
+0232     <span class="comment">%       char generated[10];              /* 115 + 10        */</span>
+0233     <span class="comment">%       char scannum[10];                /* 125 + 10        */</span>
+0234     <span class="comment">%       char patient_id[10];             /* 135 + 10        */</span>
+0235     <span class="comment">%       char exp_date[10];               /* 145 + 10        */</span>
+0236     <span class="comment">%       char exp_time[10];               /* 155 + 10        */</span>
+0237     <span class="comment">%       char hist_un0[3];                /* 165 + 3         */</span>
+0238     <span class="comment">%       int views                        /* 168 + 4         */</span>
+0239     <span class="comment">%       int vols_added;                  /* 172 + 4         */</span>
+0240     <span class="comment">%       int start_field;                 /* 176 + 4         */</span>
+0241     <span class="comment">%       int field_skip;                  /* 180 + 4         */</span>
+0242     <span class="comment">%       int omax;                        /* 184 + 4         */</span>
+0243     <span class="comment">%       int omin;                        /* 188 + 4         */</span>
+0244     <span class="comment">%       int smax;                        /* 192 + 4         */</span>
+0245     <span class="comment">%       int smin;                        /* 196 + 4         */</span>
+0246     <span class="comment">%       };                               /* total=200 bytes */</span>
+0247     
+0248     hist.descrip     = fread(fid,80,<span class="string">'*char'</span>)';
+0249     hist.aux_file    = fread(fid,24,<span class="string">'*char'</span>)';
+0250     hist.orient      = fread(fid, 1,<span class="string">'*uint8'</span>);  <span class="comment">% see note below on char</span>
+0251     hist.originator  = fread(fid,10,<span class="string">'*char'</span>)';
+0252     hist.generated   = fread(fid,10,<span class="string">'*char'</span>)';
+0253     hist.scannum     = fread(fid,10,<span class="string">'*char'</span>)';
+0254     hist.patient_id  = fread(fid,10,<span class="string">'*char'</span>)';
+0255     hist.exp_date    = fread(fid,10,<span class="string">'*char'</span>)';
+0256     hist.exp_time    = fread(fid,10,<span class="string">'*char'</span>)';
+0257     hist.hist_un0    = fread(fid, 3,<span class="string">'*char'</span>)';
+0258     hist.views       = fread(fid, 1,<span class="string">'*int32'</span>);
+0259     hist.vols_added  = fread(fid, 1,<span class="string">'*int32'</span>);
+0260     hist.start_field = fread(fid, 1,<span class="string">'*int32'</span>);
+0261     hist.field_skip  = fread(fid, 1,<span class="string">'*int32'</span>);
+0262     hist.omax        = fread(fid, 1,<span class="string">'*int32'</span>);
+0263     hist.omin        = fread(fid, 1,<span class="string">'*int32'</span>);
+0264     hist.smax        = fread(fid, 1,<span class="string">'*int32'</span>);
+0265     hist.smin        = fread(fid, 1,<span class="string">'*int32'</span>);
+0266     
+0267     <span class="comment">% check if hist.orient was saved as ascii char value</span>
+0268     <span class="keyword">switch</span> hist.orient,
+0269         <span class="keyword">case</span> 48, hist.orient = uint8(0);
+0270         <span class="keyword">case</span> 49, hist.orient = uint8(1);
+0271         <span class="keyword">case</span> 50, hist.orient = uint8(2);
+0272         <span class="keyword">case</span> 51, hist.orient = uint8(3);
+0273         <span class="keyword">case</span> 52, hist.orient = uint8(4);
+0274         <span class="keyword">case</span> 53, hist.orient = uint8(5);
+0275     <span class="keyword">end</span>
+0276     
+0277 <span class="keyword">return</span>
+0278 
+0279 
+0280 <span class="comment">% Note on using char:</span>
+0281 <span class="comment">% The 'char orient' field in the header is intended to</span>
+0282 <span class="comment">% hold simply an 8-bit unsigned integer value, not the ASCII representation</span>
+0283 <span class="comment">% of the character for that value.  A single 'char' byte is often used to</span>
+0284 <span class="comment">% represent an integer value in Analyze if the known value range doesn't</span>
+0285 <span class="comment">% go beyond 0-255 - saves a byte over a short int, which may not mean</span>
+0286 <span class="comment">% much in today's computing environments, but given that this format</span>
+0287 <span class="comment">% has been around since the early 1980's, saving bytes here and there on</span>
+0288 <span class="comment">% older systems was important!  In this case, 'char' simply provides the</span>
+0289 <span class="comment">% byte of storage - not an indicator of the format for what is stored in</span>
+0290 <span class="comment">% this byte.  Generally speaking, anytime a single 'char' is used, it is</span>
+0291 <span class="comment">% probably meant to hold an 8-bit integer value, whereas if this has</span>
+0292 <span class="comment">% been dimensioned as an array, then it is intended to hold an ASCII</span>
+0293 <span class="comment">% character string, even if that was only a single character.</span>
+0294 <span class="comment">% Denny  &lt;hanson.dennis2@mayo.edu&gt;</span>
+0295 
+0296 
+0297 <span class="comment">% Comments</span>
+0298 <span class="comment">% The header format is flexible and can be extended for new</span>
+0299 <span class="comment">% user-defined data types. The essential structures of the header</span>
+0300 <span class="comment">% are the header_key and the image_dimension.</span>
+0301 <span class="comment">%</span>
+0302 
+0303 <span class="comment">% The required elements in the header_key substructure are:</span>
+0304 <span class="comment">%</span>
+0305 <span class="comment">% int sizeof_header   Must indicate the byte size of the header file.</span>
+0306 <span class="comment">% int extents         Should be 16384, the image file is created as</span>
+0307 <span class="comment">%                     contiguous with a minimum extent size.</span>
+0308 <span class="comment">% char regular        Must be 'r' to indicate that all images and</span>
+0309 <span class="comment">%                     volumes are the same size.</span>
+0310 <span class="comment">%</span>
+0311 
+0312 <span class="comment">% The image_dimension substructure describes the organization and</span>
+0313 <span class="comment">% size of the images. These elements enable the database to reference</span>
+0314 <span class="comment">% images by volume and slice number. Explanation of each element follows:</span>
+0315 <span class="comment">%</span>
+0316 <span class="comment">% short int dim[ ];      /* Array of the image dimensions */</span>
+0317 <span class="comment">%</span>
+0318 <span class="comment">% dim[0]      Number of dimensions in database; usually 4.</span>
+0319 <span class="comment">% dim[1]      Image X dimension; number of pixels in an image row.</span>
+0320 <span class="comment">% dim[2]      Image Y dimension; number of pixel rows in slice.</span>
+0321 <span class="comment">% dim[3]      Volume Z dimension; number of slices in a volume.</span>
+0322 <span class="comment">% dim[4]      Time points; number of volumes in database.</span>
+0323 <span class="comment">% dim[5]      Undocumented.</span>
+0324 <span class="comment">% dim[6]      Undocumented.</span>
+0325 <span class="comment">% dim[7]      Undocumented.</span>
+0326 <span class="comment">%</span>
+0327 <span class="comment">% char vox_units[4]     Specifies the spatial units of measure for a voxel.</span>
+0328 <span class="comment">% char cal_units[8]      Specifies the name of the calibration unit.</span>
+0329 <span class="comment">% short int unused1      /* Unused */</span>
+0330 <span class="comment">% short int datatype      /* Datatype for this image set */</span>
+0331 <span class="comment">% /*Acceptable values for datatype are*/</span>
+0332 <span class="comment">% #define DT_NONE             0</span>
+0333 <span class="comment">% #define DT_UNKNOWN          0    /*Unknown data type*/</span>
+0334 <span class="comment">% #define DT_BINARY           1    /*Binary             ( 1 bit per voxel)*/</span>
+0335 <span class="comment">% #define DT_UNSIGNED_CHAR    2    /*Unsigned character ( 8 bits per voxel)*/</span>
+0336 <span class="comment">% #define DT_SIGNED_SHORT     4    /*Signed short       (16 bits per voxel)*/</span>
+0337 <span class="comment">% #define DT_SIGNED_INT       8    /*Signed integer     (32 bits per voxel)*/</span>
+0338 <span class="comment">% #define DT_FLOAT           16    /*Floating point     (32 bits per voxel)*/</span>
+0339 <span class="comment">% #define DT_COMPLEX         32    /*Complex (64 bits per voxel; 2 floating point numbers)/*</span>
+0340 <span class="comment">% #define DT_DOUBLE          64    /*Double precision   (64 bits per voxel)*/</span>
+0341 <span class="comment">% #define DT_RGB            128    /*A Red-Green-Blue datatype*/</span>
+0342 <span class="comment">% #define DT_ALL            255    /*Undocumented*/</span>
+0343 <span class="comment">%</span>
+0344 <span class="comment">% short int bitpix;    /* Number of bits per pixel; 1, 8, 16, 32, or 64. */</span>
+0345 <span class="comment">% short int dim_un0;   /* Unused */</span>
+0346 <span class="comment">%</span>
+0347 <span class="comment">% float pixdim[];     Parallel array to dim[], giving real world measurements in mm and ms.</span>
+0348 <span class="comment">%       pixdim[0];    Pixel dimensions?</span>
+0349 <span class="comment">%       pixdim[1];    Voxel width in mm.</span>
+0350 <span class="comment">%       pixdim[2];    Voxel height in mm.</span>
+0351 <span class="comment">%       pixdim[3];    Slice thickness in mm.</span>
+0352 <span class="comment">%       pixdim[4];    timeslice in ms (ie, TR in fMRI).</span>
+0353 <span class="comment">%       pixdim[5];    Undocumented.</span>
+0354 <span class="comment">%       pixdim[6];    Undocumented.</span>
+0355 <span class="comment">%       pixdim[7];    Undocumented.</span>
+0356 <span class="comment">%</span>
+0357 <span class="comment">% float vox_offset;   Byte offset in the .img file at which voxels start. This value can be</span>
+0358 <span class="comment">%                     negative to specify that the absolute value is applied for every image</span>
+0359 <span class="comment">%                     in the file.</span>
+0360 <span class="comment">%</span>
+0361 <span class="comment">% float roi_scale; Specifies the Region Of Interest scale?</span>
+0362 <span class="comment">% float funused1; Undocumented.</span>
+0363 <span class="comment">% float funused2; Undocumented.</span>
+0364 <span class="comment">%</span>
+0365 <span class="comment">% float cal_max; Specifies the upper bound of the range of calibration values.</span>
+0366 <span class="comment">% float cal_min; Specifies the lower bound of the range of calibration values.</span>
+0367 <span class="comment">%</span>
+0368 <span class="comment">% int compressed; Undocumented.</span>
+0369 <span class="comment">% int verified;   Undocumented.</span>
+0370 <span class="comment">%</span>
+0371 <span class="comment">% int glmax;    The maximum pixel value for the entire database.</span>
+0372 <span class="comment">% int glmin;    The minimum pixel value for the entire database.</span>
+0373 <span class="comment">%</span>
+0374 <span class="comment">%</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

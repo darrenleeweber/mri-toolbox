@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_roi</title>
+  <meta name="keywords" content="avw_roi">
+  <meta name="description" content="avw_roi - extract a region of interest from avw.img">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_roi.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_roi
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>avw_roi - extract a region of interest from avw.img</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [roi] = avw_roi(avw,position,shape) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> avw_roi - extract a region of interest from avw.img
+
+ [roi] = avw_roi(avw,[position],[shape])
+
+ avw - the analyze struct with avw.hdr and avw.img
+
+ position - the centroid voxel for the roi, the default is the volume
+ center.  For example, 256^3 voxels would have a center at [128,128,128].
+
+ shape - the shape of the roi.  This is a struct:
+
+            shape.type = 'block'
+            shape.size = [X,Y,Z] voxels
+
+ The default is 'block' and the whole volume.  Note that the block type
+ encompasses any 3D square or rectangle.  Further development may include
+ sphere and ellipse shapes, with mm parameters.
+
+ roi.index - The volume indices into avw.img that comprise the region of
+ interest (roi).
+ roi.value - The values at the voxels in avw.img that comprise the roi.
+ The returned value can be used with avw_stats.  The default is the entire
+ volume, ie: roi.value = avw.img;
+
+ see also:  <a href="avw_stats.html" class="code" title="function [stat] = avw_stats(stat)">avw_stats</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_roi.html" class="code" title="function [roi] = avw_roi(avw,position,shape)">avw_roi</a>	avw_roi - extract a region of interest from avw.img</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_roi.html" class="code" title="function [roi] = avw_roi(avw,position,shape)">avw_roi</a>	avw_roi - extract a region of interest from avw.img</li><li><a href="avw_view.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">avw_view</a>	avw_view - create and navigate ortho views of Analyze 7.5 volume</li><li><a href="avw_view_new.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">avw_view_new</a>	avw_view - create and navigate ortho views of Analyze 7.5 volume</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [roi] = avw_roi(avw,position,shape)</a>
+0002 
+0003 <span class="comment">% avw_roi - extract a region of interest from avw.img</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% [roi] = avw_roi(avw,[position],[shape])</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% avw - the analyze struct with avw.hdr and avw.img</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% position - the centroid voxel for the roi, the default is the volume</span>
+0010 <span class="comment">% center.  For example, 256^3 voxels would have a center at [128,128,128].</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% shape - the shape of the roi.  This is a struct:</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%            shape.type = 'block'</span>
+0015 <span class="comment">%            shape.size = [X,Y,Z] voxels</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% The default is 'block' and the whole volume.  Note that the block type</span>
+0018 <span class="comment">% encompasses any 3D square or rectangle.  Further development may include</span>
+0019 <span class="comment">% sphere and ellipse shapes, with mm parameters.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% roi.index - The volume indices into avw.img that comprise the region of</span>
+0022 <span class="comment">% interest (roi).</span>
+0023 <span class="comment">% roi.value - The values at the voxels in avw.img that comprise the roi.</span>
+0024 <span class="comment">% The returned value can be used with avw_stats.  The default is the entire</span>
+0025 <span class="comment">% volume, ie: roi.value = avw.img;</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% see also:  avw_stats</span>
+0028 <span class="comment">%</span>
+0029 
+0030 <span class="comment">% $Revision: 1.1 $ $Date: 2004/04/08 20:12:52 $</span>
+0031 
+0032 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0033 <span class="comment">% History:  08/2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0036 
+0037 
+0038 
+0039 version = <span class="string">'[$Revision: 1.1 $]'</span>;
+0040 fprintf(<span class="string">'\nAVW_ROI [v%s]\n'</span>,version(12:16));  tic;
+0041 
+0042 <span class="keyword">if</span> ~exist(<span class="string">'avw'</span>,<span class="string">'var'</span>),
+0043   doc <a href="avw_roi.html" class="code" title="function [roi] = avw_roi(avw,position,shape)">avw_roi</a>;
+0044   msg = sprintf(<span class="string">'...no input avw\n'</span>);
+0045   error(msg);
+0046 <span class="keyword">elseif</span> isempty(avw),
+0047   doc <a href="avw_roi.html" class="code" title="function [roi] = avw_roi(avw,position,shape)">avw_roi</a>;
+0048   msg = sprintf(<span class="string">'...empty input avw\n'</span>);
+0049   error(msg);
+0050 <span class="keyword">end</span>
+0051 
+0052 <span class="keyword">if</span> ~exist(<span class="string">'shape'</span>,<span class="string">'var'</span>),
+0053   fprintf(<span class="string">'...no input shape, using the whole volume\n'</span>);
+0054   roi.value = avw.img;
+0055   <span class="keyword">return</span>
+0056 <span class="keyword">else</span>
+0057   <span class="keyword">if</span> ~isfield(shape,<span class="string">'type'</span>),
+0058     fprintf(<span class="string">'...no input shape.type, using block\n'</span>);
+0059     shape.type = <span class="string">'block'</span>;
+0060   <span class="keyword">end</span>
+0061   <span class="keyword">if</span> ~isfield(shape,<span class="string">'size'</span>),
+0062     fprintf(<span class="string">'...no input shape.size, using [5,5,5]\n'</span>);
+0063     shape.size = [ 5,5,5 ];
+0064   <span class="keyword">end</span>
+0065 <span class="keyword">end</span>
+0066 
+0067 s = size(avw.img);
+0068 xdim = s(1);
+0069 ydim = s(2);
+0070 <span class="keyword">if</span> length(s) &gt; 2, zdim = s(3);
+0071 <span class="keyword">else</span>              zdim = 1;
+0072 <span class="keyword">end</span>
+0073 
+0074 <span class="keyword">if</span> ~exist(<span class="string">'position'</span>,<span class="string">'var'</span>),
+0075   fprintf(<span class="string">'...no input position, using volume center\n'</span>);
+0076   position = [1,1,1];
+0077   <span class="keyword">if</span> xdim &gt; 1, position(1) = floor(xdim/2); <span class="keyword">end</span>
+0078   <span class="keyword">if</span> ydim &gt; 1, position(2) = floor(ydim/2); <span class="keyword">end</span>
+0079   <span class="keyword">if</span> zdim &gt; 1, position(3) = floor(zdim/2); <span class="keyword">end</span>
+0080 <span class="keyword">end</span>
+0081 
+0082 
+0083 
+0084 <span class="keyword">switch</span> shape.type,
+0085   
+0086   <span class="keyword">case</span> <span class="string">'block'</span>,
+0087     
+0088     fprintf(<span class="string">'...defining [%d,%d,%d] ''block'' region of interest.\n'</span>,<span class="keyword">...</span>
+0089       shape.size(1),shape.size(2),shape.size(3));
+0090     
+0091     xrange = floor(shape.size(1) / 2);
+0092     yrange = floor(shape.size(2) / 2);
+0093     zrange = floor(shape.size(3) / 2);
+0094     
+0095     xroi = [ position(1) - xrange, position(1) + xrange ];
+0096     <span class="keyword">if</span> xroi(1) &lt; 1, xroi(1) = 1; <span class="keyword">end</span>
+0097     <span class="keyword">if</span> xroi(2) &gt; xdim, xroi(2) = xdim; <span class="keyword">end</span>
+0098     roi_xindex = xroi(1):xroi(2);
+0099     
+0100     yroi = [ position(2) - yrange, position(2) + yrange ];
+0101     <span class="keyword">if</span> yroi(1) &lt; 1, yroi(1) = 1; <span class="keyword">end</span>
+0102     <span class="keyword">if</span> yroi(2) &gt; ydim, yroi(2) = ydim; <span class="keyword">end</span>
+0103     roi_yindex = yroi(1):yroi(2);
+0104     
+0105     zroi = [ position(3) - zrange, position(3) + zrange ];
+0106     <span class="keyword">if</span> zroi(1) &lt; 1, zroi(1) = 1; <span class="keyword">end</span>
+0107     <span class="keyword">if</span> zroi(2) &gt; zdim, zroi(2) = zdim; <span class="keyword">end</span>
+0108     roi_zindex = zroi(1):zroi(2);
+0109     
+0110     roi.index = [roi_xindex;roi_yindex;roi_zindex];
+0111     roi.value = avw.img(roi_xindex,roi_yindex,roi_zindex);
+0112     
+0113   <span class="keyword">case</span> <span class="string">'sphere'</span>,
+0114     
+0115     <span class="comment">%fprintf('...defining [%d,%d,%d] ''sphere'' region of interest.\n',...</span>
+0116     <span class="comment">%  position(1),position(2),position(3));</span>
+0117     
+0118     fprintf(<span class="string">'...sorry, sphere shape calculations are not yet available\n'</span>);
+0119     roi.index = [];
+0120     roi.value = [];
+0121     
+0122     <span class="comment">%Rroi = shape.size(1);</span>
+0123     
+0124     
+0125   <span class="keyword">otherwise</span>,
+0126     
+0127     msg = sprintf(<span class="string">'...no support for shape.type = %s'</span>,shape.type);
+0128     error(msg);
+0129     
+0130 <span class="keyword">end</span>
+0131 
+0132 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

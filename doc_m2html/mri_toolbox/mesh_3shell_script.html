@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mesh_3shell_script</title>
+  <meta name="keywords" content="mesh_3shell_script">
+  <meta name="description" content="mesh_3shell_script">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; mesh_3shell_script.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>mesh_3shell_script
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>mesh_3shell_script</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> mesh_3shell_script
+ 
+ Assumes preprocessing of MRI with 
+ FreeSurfer                http://surfer.nmr.mgh.harvard.edu/
+ FSL tools (BET &amp; FAST)    http://fmrib.ox.ac.uk/
+ 
+ An example FSL script can be found at the end of this script</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>	avw_img_read - read Analyze format data image (*.img)</li><li><a href="avw_shrinkwrap.html" class="code" title="function [FV, Edges] = avw_shrinkwrap(avw,FV,smooth,vthresh,interpVal,fitval,fittol,fititer,fitchange,fitvattr)">avw_shrinkwrap</a>	avw_shrinkwrap - Tesselate the surface of a 3D Analyze 7.5 avw struct</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 
+0002 <span class="comment">% mesh_3shell_script</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Assumes preprocessing of MRI with</span>
+0005 <span class="comment">% FreeSurfer                http://surfer.nmr.mgh.harvard.edu/</span>
+0006 <span class="comment">% FSL tools (BET &amp; FAST)    http://fmrib.ox.ac.uk/</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% An example FSL script can be found at the end of this script</span>
+0009 <span class="comment">%</span>
+0010 
+0011 <span class="comment">% Licence:  GNU GPL, no implied or express warranties</span>
+0012 <span class="comment">% History:  08/2002, Darren.Weber@flinders.edu.au</span>
+0013 <span class="comment">%           08/2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0014 <span class="comment">%                    added more control variables and the FSL script</span>
+0015 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0016 
+0017 plot = 0;
+0018 
+0019 doScalp  = 0;
+0020 doIskull = 0;
+0021 doOskull = 0;
+0022 doCortex = 0;
+0023 
+0024 doCorrection = 0;
+0025 
+0026 doOutputEMSE = 0;
+0027 doOutputBrainStorm = 1;
+0028 
+0029 
+0030 <span class="comment">%IMG.path   = 'D:\freesurfer\subjects\ucsf_morgan\mri\analyze';</span>
+0031 IMG.path     = <span class="string">'/data/ucsf/mri/ucsf_morgan/mri/analyze'</span>;
+0032 IMG.meshpath = <span class="string">'/data/ucsf/mri/ucsf_morgan/surf'</span>;
+0033 
+0034 IMG.scalp  = <span class="string">'morgan_orig_axial_las_smooth'</span>;
+0035 IMG.oskull = <span class="string">'morgan_orig_axial_las_skull'</span>;
+0036 IMG.iskull = <span class="string">'morgan_orig_axial_las_brain'</span>;
+0037 
+0038 IMG.intensity.scalp  =  60;
+0039 IMG.tolerance.scalp  =  20;
+0040 IMG.intensity.oskull =  15;
+0041 IMG.tolerance.oskull =  10;
+0042 IMG.intensity.iskull =  80;
+0043 IMG.tolerance.iskull =  40;
+0044 
+0045 
+0046 
+0047 <span class="keyword">if</span> ~exist(<span class="string">'p'</span>,<span class="string">'var'</span>),
+0048     p = eeg_toolbox_defaults;
+0049 <span class="keyword">end</span>
+0050 
+0051 <span class="keyword">if</span> plot,
+0052     
+0053     <span class="comment">% plot scalp surface (index 4), in red</span>
+0054     <span class="keyword">if</span> ~isempty(p.mesh.data.vertices{4}),
+0055         patch(<span class="string">'vertices'</span>,p.mesh.data.vertices{4},<span class="string">'faces'</span>,p.mesh.data.faces{4},<span class="keyword">...</span>
+0056             <span class="string">'FaceColor'</span>,[.6 0 0],<span class="string">'Edgecolor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,.2);
+0057     <span class="keyword">end</span>
+0058     <span class="comment">% plot outer skull surface (index 3), in green</span>
+0059     <span class="keyword">if</span> ~isempty(p.mesh.data.vertices{3}),
+0060         patch(<span class="string">'vertices'</span>,p.mesh.data.vertices{3},<span class="string">'faces'</span>,p.mesh.data.faces{3},<span class="keyword">...</span>
+0061             <span class="string">'FaceColor'</span>,[.0 .6 .0],<span class="string">'Edgecolor'</span>,[.8 .8 .8],<span class="string">'FaceAlpha'</span>,.4);
+0062     <span class="keyword">end</span>
+0063     <span class="comment">% plot inner skull surface (index 2), in blue</span>
+0064     <span class="keyword">if</span> ~isempty(p.mesh.data.vertices{2}),
+0065         patch(<span class="string">'vertices'</span>,p.mesh.data.vertices{2},<span class="string">'faces'</span>,p.mesh.data.faces{2},<span class="keyword">...</span>
+0066             <span class="string">'FaceColor'</span>,[.0 .0 .6],<span class="string">'Edgecolor'</span>,[.8 .8 .8],<span class="string">'FaceAlpha'</span>,.6);
+0067     <span class="keyword">end</span>
+0068     <span class="comment">% plot cortex surface (index 1), in black</span>
+0069     <span class="keyword">if</span> ~isempty(p.mesh.data.vertices{1}),
+0070         patch(<span class="string">'vertices'</span>,p.mesh.data.vertices{1},<span class="string">'faces'</span>,p.mesh.data.faces{1},<span class="keyword">...</span>
+0071             <span class="string">'FaceColor'</span>,[.0 .0 .0],<span class="string">'Edgecolor'</span>,[.8 .8 .8],<span class="string">'FaceAlpha'</span>,1);
+0072     <span class="keyword">end</span>
+0073     
+0074     camlight; mouse_rotate;
+0075     axis tight; hold on
+0076     
+0077 <span class="comment">%     FV = ISkull;</span>
+0078 <span class="comment">%     patch('vertices',FV.vertices,'faces',FV.faces,'FaceColor',[.6 .0 .0],'Edgecolor','none','FaceAlpha',.2); axis tight; hold on</span>
+0079 <span class="comment">%     x = FV.vertices(1,1);</span>
+0080 <span class="comment">%     y = FV.vertices(1,2);</span>
+0081 <span class="comment">%     z = FV.vertices(1,3);</span>
+0082 <span class="comment">%     plot3(x,y,z,'ro')</span>
+0083 <span class="comment">%</span>
+0084     <span class="keyword">return</span>
+0085 <span class="keyword">end</span>
+0086 
+0087 
+0088 
+0089 <span class="comment">% TESSELATE SKULL/SCALP SURFACES</span>
+0090 
+0091 
+0092 <span class="comment">% Image files to process</span>
+0093 
+0094 <span class="comment">% These images were created with the freesurfer mri_convert command, eg:</span>
+0095 <span class="comment">% mri_convert -oid -1 0 0 -ojd 0 1 0 -okd 0 0 1 orig mri\analyze\morgan_orig_axial_las.img</span>
+0096 <span class="comment">% These Analyze files were then processed with the FSL tools to find the</span>
+0097 <span class="comment">% skull.</span>
+0098 
+0099 cd(IMG.path)
+0100 
+0101 <span class="keyword">if</span> doScalp,
+0102     
+0103     <span class="comment">% --- Tesselate Scalp ---</span>
+0104     fprintf(<span class="string">'\n\n**************************************\nProcessing Scalp\n\n'</span>);
+0105     Nsurf = 4;
+0106     intensity = IMG.intensity.scalp;
+0107     tolerance = IMG.tolerance.scalp;
+0108     avw = <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>(IMG.scalp);
+0109 <span class="comment">% [FV, Edges] = mesh_shrinkwrap(vol,FV,smooth,vthresh,interpVal,...</span>
+0110 <span class="comment">%               fitval,fittol,fititer,fitchange,fitvattr)</span>
+0111 <span class="comment">%    scalp = mesh_shrinkwrap(avw.img,[],0,0,[],intensity,tolerance,50,0.5,0.4);</span>
+0112     scalp = <a href="avw_shrinkwrap.html" class="code" title="function [FV, Edges] = avw_shrinkwrap(avw,FV,smooth,vthresh,interpVal,fitval,fittol,fititer,fitchange,fitvattr)">avw_shrinkwrap</a>(avw,[],0,0,[],intensity,tolerance,50,0.5,0.4);
+0113     <span class="keyword">if</span> isfield(scalp,<span class="string">'vertices'</span>),
+0114         p.mesh.data.meshtype{Nsurf} = <span class="string">'scalp'</span>;
+0115         p.mesh.data.vertices{Nsurf} = scalp.vertices ./ 1000; <span class="comment">% convert to meters</span>
+0116         p.mesh.data.faces{Nsurf}    = scalp.faces;
+0117     <span class="keyword">end</span>
+0118 <span class="keyword">end</span>
+0119 
+0120 
+0121 <span class="keyword">if</span> doIskull,
+0122     
+0123     <span class="comment">% --- Tesselate Inner skull</span>
+0124     fprintf(<span class="string">'\n\n**************************************\nProcessing &quot;Inner Skull&quot;\n\n'</span>);
+0125     Nsurf = 2;
+0126     intensity = IMG.intensity.iskull;
+0127     tolerance = IMG.tolerance.iskull;
+0128     avw = <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>(IMG.iskull);
+0129 <span class="comment">% [FV, Edges] = mesh_shrinkwrap(vol,FV,smooth,vthresh,interpVal,...</span>
+0130 <span class="comment">%               fitval,fittol,fititer,fitchange,fitvattr)</span>
+0131     ISkull = mesh_shrinkwrap(avw.img,[],0,0,[],intensity,tolerance,50,0.5,0.4);
+0132     <span class="keyword">if</span> isfield(ISkull,<span class="string">'vertices'</span>),
+0133         p.mesh.data.meshtype{Nsurf} = <span class="string">'inner_skull'</span>;
+0134         p.mesh.data.vertices{Nsurf} = ISkull.vertices ./ 1000; <span class="comment">% convert to meters</span>
+0135         p.mesh.data.faces{Nsurf}    = ISkull.faces;
+0136     <span class="keyword">end</span>
+0137 <span class="keyword">end</span>
+0138 
+0139 
+0140 <span class="keyword">if</span> doOskull,
+0141     
+0142     <span class="comment">% --- Tesselate Outer skull</span>
+0143     fprintf(<span class="string">'\n\n**************************************\nProcessing &quot;Outer Skull&quot;\n\n'</span>);
+0144     Nsurf = 3;
+0145     intensity = IMG.intensity.oskull;
+0146     tolerance = IMG.tolerance.oskull;
+0147     avw = <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>(IMG.oskull);
+0148 <span class="comment">% [FV, Edges] = mesh_shrinkwrap(vol,FV,smooth,vthresh,interpVal,...</span>
+0149 <span class="comment">%               fitval,fittol,fititer,fitchange,fitvattr)</span>
+0150     OSkull = <a href="avw_shrinkwrap.html" class="code" title="function [FV, Edges] = avw_shrinkwrap(avw,FV,smooth,vthresh,interpVal,fitval,fittol,fititer,fitchange,fitvattr)">avw_shrinkwrap</a>(avw,[],0,0,0,intensity,tolerance,50,0.05,0.1);
+0151     <span class="keyword">if</span> isfield(OSkull,<span class="string">'vertices'</span>),
+0152         p.mesh.data.meshtype{Nsurf} = <span class="string">'outer_skull'</span>;
+0153         p.mesh.data.vertices{Nsurf} = OSkull.vertices ./ 1000; <span class="comment">% convert to meters</span>
+0154         p.mesh.data.faces{Nsurf}    = OSkull.faces;
+0155         <span class="comment">%patch('vertices',OSkull.vertices,'faces',OSkull.faces,...</span>
+0156         <span class="comment">%      'FaceColor',[.6 .0 .0],'Edgecolor',[.8 .8 .8],...</span>
+0157         <span class="comment">%      'FaceAlpha',.2); axis tight; hold on</span>
+0158     <span class="keyword">end</span>
+0159 <span class="keyword">end</span>
+0160 
+0161 <span class="keyword">if</span> doCortex,
+0162     
+0163     <span class="comment">% LOAD FREESURFER CORTEX</span>
+0164     <span class="comment">% Freesurfer surface to process</span>
+0165     <span class="comment">% This freesurfer surface contains the whole brain surface, after</span>
+0166     <span class="comment">% altering the freesurfer pons/corpus callosum cutting positions.</span>
+0167     p.mesh.path   = IMG.meshpath;
+0168     p.mesh.file   = <span class="string">'rh.pial'</span>;
+0169     p.mesh.type   = <span class="string">'fs_surf'</span>;
+0170     
+0171     p = mesh_open(p);
+0172     
+0173 <span class="keyword">end</span>
+0174 
+0175 <span class="keyword">if</span> doCorrection,
+0176     
+0177     dist.four2three = 6;    <span class="comment">% scalp to outer skull</span>
+0178     dist.four2two   = 8;    <span class="comment">% scalp to inner skull</span>
+0179     dist.three2two  = 5;    <span class="comment">% outer skull to inner skull</span>
+0180     dist.two2one    = 2;    <span class="comment">% inner skull to cortex</span>
+0181     
+0182     cortex = 1; <span class="comment">% process cortex (1 = yes, 0 = no)</span>
+0183     p = mesh_bem_correct(p, [], dist, 1, cortex);
+0184     
+0185 <span class="keyword">end</span>
+0186 
+0187 
+0188 <span class="keyword">if</span> doOutputEMSE,
+0189     mesh_write_emse(p);
+0190 <span class="keyword">end</span>
+0191 <span class="keyword">if</span> doOutputBrainStorm,
+0192     mesh_write_brainstorm(p);
+0193 <span class="keyword">end</span>
+0194 
+0195 
+0196 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0197 <span class="comment">% Example FSL script</span>
+0198 <span class="comment">% Copy this text into a text file and chmod a+x that file.</span>
+0199 <span class="comment">% Remove the % matlab comments and everything before the next line,</span>
+0200 <span class="comment">% including these instructions.</span>
+0201 <span class="comment">% #! /bin/bash</span>
+0202 <span class="comment">%</span>
+0203 <span class="comment">%</span>
+0204 <span class="comment">% imagepath=&quot;.&quot;</span>
+0205 <span class="comment">% imagetype=&quot;_orig_axial_las&quot;</span>
+0206 <span class="comment">%</span>
+0207 <span class="comment">% sub=&quot;subject&quot;;</span>
+0208 <span class="comment">% img=`echo $sub$imagetype`;</span>
+0209 <span class="comment">%</span>
+0210 <span class="comment">% printf &quot;\nprocessing $img\n&quot;;</span>
+0211 <span class="comment">%</span>
+0212 <span class="comment">% printf &quot;\n5mm Guassian spatial smoothing: ${img}_smooth.*\n&quot;;</span>
+0213 <span class="comment">% /usr/local/fsl/bin/ip ${img} ${img}_smooth 0 -s 5</span>
+0214 <span class="comment">%</span>
+0215 <span class="comment">% printf &quot;\nUsing BET for brain extraction: ${img}_brain.*\n&quot;;</span>
+0216 <span class="comment">% bet ${img} ${img}_brain -s</span>
+0217 <span class="comment">%</span>
+0218 <span class="comment">% # Binarise the bet skull</span>
+0219 <span class="comment">% #avwmaths ${img}_brain_skull -bin BETskull</span>
+0220 <span class="comment">% # Dilate bet skull and add a constant</span>
+0221 <span class="comment">% #avwmaths_32R BETskull -dil -add 10000 BETskull</span>
+0222 <span class="comment">%</span>
+0223 <span class="comment">% printf &quot;\nSkull extraction and 2mm Guassian spatial smoothing: ${img}_skull.*\n&quot;;</span>
+0224 <span class="comment">% /usr/local/fsl/bin/ip ${img}_brain_skull ${img}_skull 0 -s 2</span>
+0225 <span class="comment">%</span>
+0226 <span class="comment">% printf &quot;\nSpatial normalization\n&quot;;</span>
+0227 <span class="comment">% flirt -in ${img}_brain.hdr -ref /usr/local/fsl/etc/standard/avg152T1_brain.hdr -out ${img}_brain_reg.hdr -omat %{img}_brain_reg.mat -bins 256 -cost corratio -searchrx -180 180 -searchry -180 180 -searchrz -180 180 -dof 12  -interp trilinear</span>
+0228 <span class="comment">% convert_xfm -matonly -omat ${img}_brain_reginv.mat -inverse ${img}_brain_reg.mat</span>
+0229 <span class="comment">%</span>
+0230 <span class="comment">% printf &quot;\nBrain segmentation\n&quot;;</span>
+0231 <span class="comment">% fast -t 1 -c 3 -op -e -ov -od $img ${img}_brain</span>
+0232 <span class="comment">%</span>
+0233 <span class="comment">% exit</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_view_test</title>
+  <meta name="keywords" content="avw_view_test">
+  <meta name="description" content="AVW_VIEW: Create and navigate ortho views of Analyze file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_view_test.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_view_test
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>AVW_VIEW: Create and navigate ortho views of Analyze file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function avw_view(avw), </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> AVW_VIEW: Create and navigate ortho views of Analyze file
+
+ avw_view(avw)
+
+ avw    -  a struct, created by avw_img_read
+
+ The navigation is by sliders and mouse clicks on the
+ images in any of the ortho views.
+ Fiducial points can be selected, which are returned
+ into mriFID or p.mriFID in the base workspace.  These
+ points are given in meters, with an origin translated 
+ from the center of the MRI volume to (0,0,0).  +X is
+ right, +Y is anterior, +Z is superior, the default RAS
+ orientation of Analyze MRI files.
+
+ See also, <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">AVW_IMG_READ</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function avw_view(avw),</a>
+0002 
+0003 <span class="comment">% AVW_VIEW: Create and navigate ortho views of Analyze file</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% avw_view(avw)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% avw    -  a struct, created by avw_img_read</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% The navigation is by sliders and mouse clicks on the</span>
+0010 <span class="comment">% images in any of the ortho views.</span>
+0011 <span class="comment">% Fiducial points can be selected, which are returned</span>
+0012 <span class="comment">% into mriFID or p.mriFID in the base workspace.  These</span>
+0013 <span class="comment">% points are given in meters, with an origin translated</span>
+0014 <span class="comment">% from the center of the MRI volume to (0,0,0).  +X is</span>
+0015 <span class="comment">% right, +Y is anterior, +Z is superior, the default RAS</span>
+0016 <span class="comment">% orientation of Analyze MRI files.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% See also, AVW_IMG_READ</span>
+0019 <span class="comment">%</span>
+0020 
+0021 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0022 
+0023 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0024 <span class="comment">% History:  06/2002, Darren.Weber@flinders.edu.au</span>
+0025 <span class="comment">%           10/2002, Darren.Weber@flinders.edu.au</span>
+0026 <span class="comment">%                    added fiducial point determination</span>
+0027 <span class="comment">%                    changed plots from surf to imagesc commands</span>
+0028 <span class="comment">%                    added initial handling of datatype for avw.img</span>
+0029 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0030 
+0031 
+0032 <span class="keyword">if</span> ~exist(<span class="string">'avw'</span>,<span class="string">'var'</span>),
+0033     msg = sprintf(<span class="string">'...no input avw - see help avw_view\n'</span>);
+0034     error(msg);
+0035 <span class="keyword">end</span>
+0036 
+0037 
+0038 <span class="comment">% use the correct datatype of avw.img</span>
+0039 <span class="keyword">switch</span> double(avw.hdr.dime.bitpix),
+0040 <span class="keyword">case</span> 1,
+0041     fprintf(<span class="string">'...converting avw.img to uint8\n'</span>);
+0042     avw.img = uint8(avw.img);
+0043 <span class="keyword">case</span> 8,
+0044     fprintf(<span class="string">'...converting avw.img to uint8\n'</span>);
+0045     avw.img = uint8(avw.img);
+0046 <span class="keyword">case</span> 16,
+0047     fprintf(<span class="string">'...converting avw.img to uint16\n'</span>);
+0048     avw.img = uint16(avw.img);
+0049 <span class="keyword">case</span> {32,64},
+0050     fprintf(<span class="string">'...ensuring avw.img is double\n'</span>);
+0051     <span class="comment">% make sure it is double</span>
+0052     avw.img = double(avw.img);
+0053 <span class="keyword">otherwise</span>,
+0054     <span class="comment">% do nothing, leave it as is</span>
+0055 <span class="keyword">end</span>
+0056 
+0057 
+0058 
+0059 <span class="comment">% GUI General Parameters</span>
+0060 GUIwidth  = 150;
+0061 GUIheight = 50;
+0062 <span class="keyword">if</span> isfield(avw,<span class="string">'fileprefix'</span>),
+0063     <span class="keyword">if</span> isempty(avw.fileprefix),
+0064         name = <span class="string">'AVW View'</span>;
+0065     <span class="keyword">else</span>
+0066         format = strcat(<span class="string">'%+'</span>,sprintf(<span class="string">'%d'</span>,length(avw.fileprefix)+1),<span class="string">'s'</span>);
+0067         name = strcat(<span class="string">'AVW View - '</span>,sprintf(format,avw.fileprefix));
+0068     <span class="keyword">end</span>
+0069 <span class="keyword">else</span>
+0070     name = <span class="string">'AVW View'</span>;
+0071 <span class="keyword">end</span>
+0072 
+0073 GUI = figure(<span class="string">'Name'</span>,name,<span class="string">'Tag'</span>,<span class="string">'AVWVIEW'</span>,<span class="string">'units'</span>,<span class="string">'characters'</span>,<span class="keyword">...</span>
+0074              <span class="string">'NumberTitle'</span>,<span class="string">'off'</span>,<span class="keyword">...</span>
+0075              <span class="string">'MenuBar'</span>,<span class="string">'figure'</span>,<span class="string">'Position'</span>,[1 1 GUIwidth GUIheight]);
+0076 movegui(GUI,<span class="string">'center'</span>);
+0077 
+0078 AVWVIEW.gui = GUI;
+0079 
+0080 
+0081 Font.FontName   = <span class="string">'Helvetica'</span>;
+0082 Font.FontUnits  = <span class="string">'Pixels'</span>;
+0083 Font.FontSize   = 12;
+0084 Font.FontWeight = <span class="string">'normal'</span>;
+0085 Font.FontAngle  = <span class="string">'normal'</span>;
+0086 
+0087 
+0088 shading flat
+0089 
+0090 
+0091 <span class="comment">% Determine image size and origin (center)</span>
+0092 
+0093 xdim = size(avw.img,1);
+0094 ydim = size(avw.img,2);
+0095 zdim = size(avw.img,3);
+0096 
+0097 SagSlice = 1;
+0098 CorSlice = 1;
+0099 AxiSlice = 1;
+0100 <span class="keyword">if</span> xdim &gt; 1, SagSlice = floor(xdim/2); <span class="keyword">end</span>
+0101 <span class="keyword">if</span> ydim &gt; 1, CorSlice = floor(ydim/2); <span class="keyword">end</span>
+0102 <span class="keyword">if</span> zdim &gt; 1, AxiSlice = floor(zdim/2); <span class="keyword">end</span>
+0103 
+0104 AVWVIEW.origin = [SagSlice,CorSlice,AxiSlice];             <span class="comment">% vol origin</span>
+0105 AVWVIEW.scale  = double(avw.hdr.dime.pixdim(2:4)) ./ 1000; <span class="comment">% vol scale in meters</span>
+0106 
+0107 
+0108 <span class="comment">% Initialise some window handles, useful if the input image is only 2D</span>
+0109 G.Ha = 0;
+0110 G.Hc = 0;
+0111 G.Hs = 0;
+0112 
+0113 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0114 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0115 
+0116 <span class="comment">% Axial Slice</span>
+0117 <span class="keyword">if</span> xdim &gt; 1 &amp; ydim &gt; 1,
+0118     
+0119     G.Aa = subplot(<span class="string">'position'</span>,[0.05 0.56 0.4 0.4]);
+0120     colormap(<span class="string">'gray'</span>);
+0121     
+0122     Saxial = squeeze(avw.img(:,:,AxiSlice));
+0123     G.Ha = imagesc([0,xdim],[0,ydim],Saxial');
+0124     set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>)
+0125     
+0126     axis square, daspect([1,1,1]);
+0127     xlabel(<span class="string">'(Left &lt;&lt;) X (&gt;&gt; Right)'</span>)
+0128     ylabel(<span class="string">'Y'</span>)
+0129     title(<span class="string">'Axial'</span>)
+0130     
+0131     <span class="comment">% This callback navigates with left click</span>
+0132     set(G.Ha,<span class="string">'ButtonDownFcn'</span>,<span class="keyword">...</span>
+0133         strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0134         <span class="string">'currentpoint = get(get(AVWVIEW.handles.Ha,''Parent''),''CurrentPoint''); '</span>,<span class="keyword">...</span>
+0135         <span class="string">'SagSlice = round(currentpoint(2,1)); '</span>,<span class="keyword">...</span>
+0136         <span class="string">'CorSlice = round(currentpoint(2,2)); '</span>,<span class="keyword">...</span>
+0137         <span class="string">'AxiSlice = round(str2num(get(AVWVIEW.handles.Taxi,''String''))); '</span>,<span class="keyword">...</span>
+0138         <span class="string">'imgvalue = double(AVWVIEW.avw.img(SagSlice,CorSlice,AxiSlice)); '</span>,<span class="keyword">...</span>
+0139         <span class="string">'set(AVWVIEW.handles.imval,''String'',sprintf(''%8.2f'',imgvalue));'</span>,<span class="keyword">...</span>
+0140         <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0141         <span class="string">'if ishandle(AVWVIEW.handles.Hs) &amp; AVWVIEW.handles.Hs, '</span>,<span class="keyword">...</span>
+0142         <span class="string">'   Ssag = squeeze(AVWVIEW.avw.img(SagSlice,:,:));'</span>,<span class="keyword">...</span>
+0143         <span class="string">'   set(AVWVIEW.handles.Hs,''CData'',Ssag''); '</span>,<span class="keyword">...</span>
+0144         <span class="string">'   set(AVWVIEW.handles.Tsag,''String'',num2str(SagSlice));'</span>,<span class="keyword">...</span>
+0145         <span class="string">'   set(AVWVIEW.handles.Ssag,''Value'',SagSlice);'</span>,<span class="keyword">...</span>
+0146         <span class="string">'   clear Ssag; '</span>,<span class="keyword">...</span>
+0147         <span class="string">'   set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0148         <span class="string">'end; '</span>,<span class="keyword">...</span>
+0149         <span class="string">'if ishandle(AVWVIEW.handles.Hc) &amp; AVWVIEW.handles.Hc, '</span>,<span class="keyword">...</span>
+0150         <span class="string">'   Scor = squeeze(AVWVIEW.avw.img(:,CorSlice,:));'</span>,<span class="keyword">...</span>
+0151         <span class="string">'   set(AVWVIEW.handles.Hc,''CData'',Scor''); '</span>,<span class="keyword">...</span>
+0152         <span class="string">'   set(AVWVIEW.handles.Tcor,''String'',num2str(CorSlice));'</span>,<span class="keyword">...</span>
+0153         <span class="string">'   set(AVWVIEW.handles.Scor,''Value'',CorSlice);'</span>,<span class="keyword">...</span>
+0154         <span class="string">'   clear Scor; '</span>,<span class="keyword">...</span>
+0155         <span class="string">'   set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0156         <span class="string">'end; '</span>,<span class="keyword">...</span>
+0157         <span class="string">'clear currentpoint imgvalue AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0158     
+0159     <span class="keyword">if</span> zdim &gt; 1,
+0160         slider_step(1) = 1/(zdim);
+0161         slider_step(2) = 1/(zdim);
+0162         G.Saxi = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0163             <span class="string">'Position'</span>,[.45 .56 .03 .40], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+0164             <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0165             <span class="string">'Min'</span>,1,<span class="string">'Max'</span>,zdim,<span class="string">'SliderStep'</span>,slider_step,<span class="string">'Value'</span>,AxiSlice,<span class="keyword">...</span>
+0166             <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0167             <span class="string">'AxiSlice = round(get(AVWVIEW.handles.Saxi,''Value''));'</span>,<span class="keyword">...</span>
+0168             <span class="string">'set(AVWVIEW.handles.Saxi,''Value'',AxiSlice);'</span>,<span class="keyword">...</span>
+0169             <span class="string">'Saxi = squeeze(AVWVIEW.avw.img(:,:,AxiSlice));'</span>,<span class="keyword">...</span>
+0170             <span class="string">'set(AVWVIEW.handles.Ha,''CData'',Saxi''); '</span>,<span class="keyword">...</span>
+0171             <span class="string">'set(AVWVIEW.handles.Taxi,''String'',num2str(AxiSlice));'</span>,<span class="keyword">...</span>
+0172             <span class="string">'CorSlice = round(get(AVWVIEW.handles.Scor,''Value''));'</span>,<span class="keyword">...</span>
+0173             <span class="string">'SagSlice = round(get(AVWVIEW.handles.Ssag,''Value''));'</span>,<span class="keyword">...</span>
+0174             <span class="string">'imgvalue = double(AVWVIEW.avw.img(SagSlice,CorSlice,AxiSlice)); '</span>,<span class="keyword">...</span>
+0175             <span class="string">'set(AVWVIEW.handles.imval,''String'',sprintf(''%8.2f'',imgvalue));'</span>,<span class="keyword">...</span>
+0176             <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0177             <span class="string">'clear imgvalue Saxi AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0178     <span class="keyword">end</span>
+0179     G.Taxi = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0180         <span class="string">'Position'</span>,[.45 .51 .03 .05], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+0181         <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0182         <span class="string">'String'</span>,num2str(AxiSlice));
+0183 <span class="keyword">end</span>
+0184 
+0185 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0186 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0187 
+0188 <span class="comment">% Coronal Slice</span>
+0189 <span class="keyword">if</span> xdim &gt; 1 &amp; zdim &gt; 1,
+0190     
+0191     subplot(<span class="string">'position'</span>,[0.55 0.56 0.4 0.4])
+0192     colormap(<span class="string">'gray'</span>);
+0193     
+0194     Scor = squeeze(avw.img(:,CorSlice,:));
+0195     G.Hc = imagesc([0,ydim],[0,zdim],Scor');
+0196     set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>)
+0197     
+0198     axis square, daspect([1,1,1]);
+0199     xlabel(<span class="string">'(Left &lt;&lt;) X (&gt;&gt; Right)'</span>)
+0200     ylabel(<span class="string">'Z'</span>)
+0201     title(<span class="string">'Coronal'</span>)
+0202     
+0203     <span class="comment">% This callback navigates with left click</span>
+0204     set(G.Hc,<span class="string">'ButtonDownFcn'</span>,<span class="keyword">...</span>
+0205         strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0206         <span class="string">'currentpoint = get(get(AVWVIEW.handles.Hc,''Parent''),''CurrentPoint''); '</span>,<span class="keyword">...</span>
+0207         <span class="string">'SagSlice = round(currentpoint(2,1)); '</span>,<span class="keyword">...</span>
+0208         <span class="string">'AxiSlice = round(currentpoint(2,2)); '</span>,<span class="keyword">...</span>
+0209         <span class="string">'CorSlice = round(str2num(get(AVWVIEW.handles.Tcor,''String''))); '</span>,<span class="keyword">...</span>
+0210         <span class="string">'imgvalue = double(AVWVIEW.avw.img(SagSlice,CorSlice,AxiSlice)); '</span>,<span class="keyword">...</span>
+0211         <span class="string">'set(AVWVIEW.handles.imval,''String'',sprintf(''%8.2f'',imgvalue));'</span>,<span class="keyword">...</span>
+0212         <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0213         <span class="string">'if ishandle(AVWVIEW.handles.Hs) &amp; AVWVIEW.handles.Hs, '</span>,<span class="keyword">...</span>
+0214         <span class="string">'   Ssag = squeeze(AVWVIEW.avw.img(SagSlice,:,:));'</span>,<span class="keyword">...</span>
+0215         <span class="string">'   set(AVWVIEW.handles.Hs,''CData'',Ssag''); '</span>,<span class="keyword">...</span>
+0216         <span class="string">'   set(AVWVIEW.handles.Tsag,''String'',num2str(SagSlice));'</span>,<span class="keyword">...</span>
+0217         <span class="string">'   set(AVWVIEW.handles.Ssag,''Value'',SagSlice);'</span>,<span class="keyword">...</span>
+0218         <span class="string">'   clear Ssag; '</span>,<span class="keyword">...</span>
+0219         <span class="string">'   set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0220         <span class="string">'end; '</span>,<span class="keyword">...</span>
+0221         <span class="string">'if ishandle(AVWVIEW.handles.Ha) &amp; AVWVIEW.handles.Ha, '</span>,<span class="keyword">...</span>
+0222         <span class="string">'   Saxi = squeeze(AVWVIEW.avw.img(:,:,AxiSlice));'</span>,<span class="keyword">...</span>
+0223         <span class="string">'   set(AVWVIEW.handles.Ha,''CData'',Saxi''); '</span>,<span class="keyword">...</span>
+0224         <span class="string">'   set(AVWVIEW.handles.Taxi,''String'',num2str(AxiSlice));'</span>,<span class="keyword">...</span>
+0225         <span class="string">'   set(AVWVIEW.handles.Saxi,''Value'',AxiSlice);'</span>,<span class="keyword">...</span>
+0226         <span class="string">'   clear Saxi; '</span>,<span class="keyword">...</span>
+0227         <span class="string">'   set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0228         <span class="string">'end; '</span>,<span class="keyword">...</span>
+0229         <span class="string">'clear currentpoint imgvalue AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0230     
+0231     <span class="keyword">if</span> ydim &gt; 1,
+0232         slider_step(1) = 1/(ydim);
+0233         slider_step(2) = 1/(ydim);
+0234         G.Scor = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0235             <span class="string">'Position'</span>,[.95 .56 .03 .40], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+0236             <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0237             <span class="string">'Min'</span>,1,<span class="string">'Max'</span>,ydim,<span class="string">'SliderStep'</span>,slider_step,<span class="string">'Value'</span>,CorSlice,<span class="keyword">...</span>
+0238             <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0239             <span class="string">'CorSlice = round(get(AVWVIEW.handles.Scor,''Value''));'</span>,<span class="keyword">...</span>
+0240             <span class="string">'set(AVWVIEW.handles.Scor,''Value'',CorSlice);'</span>,<span class="keyword">...</span>
+0241             <span class="string">'Scor = squeeze(AVWVIEW.avw.img(:,CorSlice,:));'</span>,<span class="keyword">...</span>
+0242             <span class="string">'set(AVWVIEW.handles.Hc,''CData'',Scor); drawnow;'</span>,<span class="keyword">...</span>
+0243             <span class="string">'set(AVWVIEW.handles.Tcor,''String'',num2str(CorSlice));'</span>,<span class="keyword">...</span>
+0244             <span class="string">'AxiSlice = round(get(AVWVIEW.handles.Saxi,''Value''));'</span>,<span class="keyword">...</span>
+0245             <span class="string">'SagSlice = round(get(AVWVIEW.handles.Ssag,''Value''));'</span>,<span class="keyword">...</span>
+0246             <span class="string">'imgvalue = double(AVWVIEW.avw.img(SagSlice,CorSlice,AxiSlice)); '</span>,<span class="keyword">...</span>
+0247             <span class="string">'set(AVWVIEW.handles.imval,''String'',sprintf(''%8.2f'',imgvalue));'</span>,<span class="keyword">...</span>
+0248             <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0249             <span class="string">'clear imgvalue Scor AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0250     <span class="keyword">end</span>
+0251     G.Tcor = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0252         <span class="string">'Position'</span>,[.95 .51 .03 .05], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+0253         <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0254         <span class="string">'String'</span>,num2str(CorSlice));
+0255 <span class="keyword">end</span>
+0256 
+0257 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0258 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0259 
+0260 <span class="comment">% Sagittal Slice</span>
+0261 <span class="keyword">if</span> ydim &gt; 1 &amp; ydim &gt; 1,
+0262         
+0263     [y,z] = meshgrid(1:ydim,1:zdim);
+0264     Ysag = y'; clear y;
+0265     Zsag = z'; clear z;
+0266     Xsag = zeros(ydim,zdim);
+0267     
+0268     subplot(<span class="string">'position'</span>,[0.05 0.06 0.4 0.4])
+0269     colormap(<span class="string">'gray'</span>);
+0270     
+0271     Ssag = squeeze(avw.img(SagSlice,:,:));
+0272     G.Hs = imagesc([0,ydim],[0,zdim],Ssag');
+0273     set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>)
+0274     
+0275     axis square, daspect([1,1,1]);
+0276     xlabel(<span class="string">'Y'</span>)
+0277     ylabel(<span class="string">'Z'</span>)
+0278     title(<span class="string">'Sagittal'</span>)
+0279     
+0280     <span class="comment">% This callback navigates with mouse click</span>
+0281     set(G.Hs,<span class="string">'ButtonDownFcn'</span>,<span class="keyword">...</span>
+0282         strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0283         <span class="string">'currentpoint = get(get(AVWVIEW.handles.Hs,''Parent''),''CurrentPoint''); '</span>,<span class="keyword">...</span>
+0284         <span class="string">'CorSlice = round(currentpoint(1,1)); '</span>,<span class="keyword">...</span>
+0285         <span class="string">'AxiSlice = round(currentpoint(1,2)); '</span>,<span class="keyword">...</span>
+0286         <span class="string">'SagSlice = round(str2num(get(AVWVIEW.handles.Tsag,''String'')));'</span>,<span class="keyword">...</span>
+0287         <span class="string">'imgvalue = double(AVWVIEW.avw.img(SagSlice,CorSlice,AxiSlice)); '</span>,<span class="keyword">...</span>
+0288         <span class="string">'set(AVWVIEW.handles.imval,''String'',sprintf(''%8.2f'',imgvalue));'</span>,<span class="keyword">...</span>
+0289         <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0290         <span class="string">'if ishandle(AVWVIEW.handles.Hc) &amp; AVWVIEW.handles.Hc, '</span>,<span class="keyword">...</span>
+0291         <span class="string">'   Scor = squeeze(AVWVIEW.avw.img(:,CorSlice,:));'</span>,<span class="keyword">...</span>
+0292         <span class="string">'   set(AVWVIEW.handles.Hc,''CData'',Scor''); '</span>,<span class="keyword">...</span>
+0293         <span class="string">'   set(AVWVIEW.handles.Tcor,''String'',num2str(CorSlice));'</span>,<span class="keyword">...</span>
+0294         <span class="string">'   set(AVWVIEW.handles.Scor,''Value'',CorSlice);'</span>,<span class="keyword">...</span>
+0295         <span class="string">'   clear Scor; '</span>,<span class="keyword">...</span>
+0296         <span class="string">'   set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0297         <span class="string">'end; '</span>,<span class="keyword">...</span>
+0298         <span class="string">'if ishandle(AVWVIEW.handles.Ha) &amp; AVWVIEW.handles.Ha, '</span>,<span class="keyword">...</span>
+0299         <span class="string">'   Saxi = squeeze(AVWVIEW.avw.img(:,:,AxiSlice));'</span>,<span class="keyword">...</span>
+0300         <span class="string">'   set(AVWVIEW.handles.Ha,''CData'',Saxi''); '</span>,<span class="keyword">...</span>
+0301         <span class="string">'   set(AVWVIEW.handles.Taxi,''String'',num2str(AxiSlice));'</span>,<span class="keyword">...</span>
+0302         <span class="string">'   set(AVWVIEW.handles.Saxi,''Value'',AxiSlice);'</span>,<span class="keyword">...</span>
+0303         <span class="string">'   clear Saxi; '</span>,<span class="keyword">...</span>
+0304         <span class="string">'   set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0305         <span class="string">'end; '</span>,<span class="keyword">...</span>
+0306         <span class="string">'clear currentpoint imgvalue AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0307 
+0308     
+0309     <span class="keyword">if</span> xdim &gt; 1,
+0310         slider_step(1) = 1/(xdim);
+0311         slider_step(2) = 1/(xdim);
+0312         G.Ssag = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0313             <span class="string">'Position'</span>,[.45 .06 .03 .4], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+0314             <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0315             <span class="string">'Min'</span>,1,<span class="string">'Max'</span>,xdim,<span class="string">'SliderStep'</span>,slider_step,<span class="string">'Value'</span>,SagSlice,<span class="keyword">...</span>
+0316             <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0317             <span class="string">'SagSlice = round(get(AVWVIEW.handles.Ssag,''Value''));'</span>,<span class="keyword">...</span>
+0318             <span class="string">'set(AVWVIEW.handles.Ssag,''Value'',SagSlice);'</span>,<span class="keyword">...</span>
+0319             <span class="string">'Ssag = squeeze(AVWVIEW.avw.img(SagSlice,:,:));'</span>,<span class="keyword">...</span>
+0320             <span class="string">'set(AVWVIEW.handles.Hs,''CData'',Ssag); drawnow;'</span>,<span class="keyword">...</span>
+0321             <span class="string">'set(AVWVIEW.handles.Tsag,''String'',num2str(SagSlice));'</span>,<span class="keyword">...</span>
+0322             <span class="string">'AxiSlice = round(get(AVWVIEW.handles.Saxi,''Value''));'</span>,<span class="keyword">...</span>
+0323             <span class="string">'CorSlice = round(get(AVWVIEW.handles.Scor,''Value''));'</span>,<span class="keyword">...</span>
+0324             <span class="string">'imgvalue = double(AVWVIEW.avw.img(SagSlice,CorSlice,AxiSlice)); '</span>,<span class="keyword">...</span>
+0325             <span class="string">'set(AVWVIEW.handles.imval,''String'',sprintf(''%8.2f'',imgvalue));'</span>,<span class="keyword">...</span>
+0326             <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0327             <span class="string">'clear imgvalue Ssag AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0328     <span class="keyword">end</span>
+0329     G.Tsag = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0330         <span class="string">'Position'</span>,[.45 .01 .03 .05], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+0331         <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0332         <span class="string">'String'</span>,num2str(SagSlice));
+0333 <span class="keyword">end</span>
+0334 
+0335 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0336 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0337 
+0338 <span class="comment">% Intensity Value at Mouse Click</span>
+0339 
+0340 G.Timval = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0341     <span class="string">'Position'</span>,[.575 .40 .20 .05], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+0342     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0343     <span class="string">'String'</span>,<span class="string">'Image Intensity'</span>);
+0344 G.imval = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0345     <span class="string">'Position'</span>,[.775 .40 .20 .05], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+0346     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0347     <span class="string">'String'</span>,<span class="string">'x'</span>);
+0348 
+0349 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0350 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0351 
+0352 <span class="comment">% Fiducial Markers</span>
+0353 
+0354 <span class="comment">% Nasion Location</span>
+0355 G.Tnasion = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0356     <span class="string">'Position'</span>,[.575 .35 .20 .04], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+0357     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0358     <span class="string">'TooltipString'</span>,<span class="string">'Update Nasion - should be toward +Y'</span>,<span class="keyword">...</span>
+0359     <span class="string">'String'</span>,<span class="string">'Fiducial: Nasion'</span>,<span class="keyword">...</span>
+0360     <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0361             <span class="string">'SagSlice = get(AVWVIEW.handles.Ssag,''Value'');'</span>,<span class="keyword">...</span>
+0362             <span class="string">'CorSlice = get(AVWVIEW.handles.Scor,''Value'');'</span>,<span class="keyword">...</span>
+0363             <span class="string">'AxiSlice = get(AVWVIEW.handles.Saxi,''Value'');'</span>,<span class="keyword">...</span>
+0364             <span class="string">'imgXYZ   = [SagSlice,CorSlice,AxiSlice]; '</span>,<span class="keyword">...</span>
+0365             <span class="string">'imgXYZ = (imgXYZ - AVWVIEW.origin) .* AVWVIEW.scale; '</span>,<span class="keyword">...</span>
+0366             <span class="string">'set(AVWVIEW.handles.nasion,''String'',sprintf(''%6.3f %6.3f %6.3f'',imgXYZ));'</span>,<span class="keyword">...</span>
+0367             <span class="string">'AVWVIEW.p.mriFID(1,:) = imgXYZ; '</span>,<span class="keyword">...</span>
+0368             <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0369             <span class="string">'clear imgXYZ AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0370 G.nasion = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0371     <span class="string">'Position'</span>,[.775 .35 .20 .04], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+0372     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0373     <span class="string">'TooltipString'</span>,<span class="string">'Should be toward +Y; values in meters, origin translated from center of volume to (0,0,0).'</span>,<span class="keyword">...</span>
+0374     <span class="string">'String'</span>,<span class="string">'x,y,z'</span>);
+0375 
+0376 <span class="comment">% Right Preauricular Location</span>
+0377 G.Trpa = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0378     <span class="string">'Position'</span>,[.575 .30 .20 .04], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+0379     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0380     <span class="string">'TooltipString'</span>,<span class="string">'Update Right Preauricular - should be toward +X'</span>,<span class="keyword">...</span>
+0381     <span class="string">'String'</span>,<span class="string">'Fiducial: RPA'</span>,<span class="keyword">...</span>
+0382     <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0383             <span class="string">'SagSlice = get(AVWVIEW.handles.Ssag,''Value'');'</span>,<span class="keyword">...</span>
+0384             <span class="string">'CorSlice = get(AVWVIEW.handles.Scor,''Value'');'</span>,<span class="keyword">...</span>
+0385             <span class="string">'AxiSlice = get(AVWVIEW.handles.Saxi,''Value'');'</span>,<span class="keyword">...</span>
+0386             <span class="string">'imgXYZ   = [SagSlice,CorSlice,AxiSlice]; '</span>,<span class="keyword">...</span>
+0387             <span class="string">'imgXYZ = (imgXYZ - AVWVIEW.origin) .* AVWVIEW.scale; '</span>,<span class="keyword">...</span>
+0388             <span class="string">'set(AVWVIEW.handles.rpa,''String'',sprintf(''%6.3f %6.3f %6.3f'',imgXYZ));'</span>,<span class="keyword">...</span>
+0389             <span class="string">'AVWVIEW.p.mriFID(2,:) = imgXYZ; '</span>,<span class="keyword">...</span>
+0390             <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0391             <span class="string">'clear imgXYZ AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0392 G.rpa = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0393     <span class="string">'Position'</span>,[.775 .30 .20 .04], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+0394     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0395     <span class="string">'TooltipString'</span>,<span class="string">'Should be toward +X; values in meters, origin translated from center of volume to (0,0,0).'</span>,<span class="keyword">...</span>
+0396     <span class="string">'String'</span>,<span class="string">'x,y,z'</span>);
+0397 
+0398 <span class="comment">% Left Preauricular Location</span>
+0399 G.Tlpa = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0400     <span class="string">'Position'</span>,[.575 .25 .20 .04], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+0401     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0402     <span class="string">'TooltipString'</span>,<span class="string">'Update Left Preauricular - should be toward -X'</span>,<span class="keyword">...</span>
+0403     <span class="string">'String'</span>,<span class="string">'Fiducial: LPA'</span>,<span class="keyword">...</span>
+0404     <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0405             <span class="string">'SagSlice = get(AVWVIEW.handles.Ssag,''Value'');'</span>,<span class="keyword">...</span>
+0406             <span class="string">'CorSlice = get(AVWVIEW.handles.Scor,''Value'');'</span>,<span class="keyword">...</span>
+0407             <span class="string">'AxiSlice = get(AVWVIEW.handles.Saxi,''Value'');'</span>,<span class="keyword">...</span>
+0408             <span class="string">'imgXYZ   = [SagSlice,CorSlice,AxiSlice]; '</span>,<span class="keyword">...</span>
+0409             <span class="string">'imgXYZ = (imgXYZ - AVWVIEW.origin) .* AVWVIEW.scale; '</span>,<span class="keyword">...</span>
+0410             <span class="string">'set(AVWVIEW.handles.lpa,''String'',sprintf(''%6.3f %6.3f %6.3f'',imgXYZ));'</span>,<span class="keyword">...</span>
+0411             <span class="string">'AVWVIEW.p.mriFID(3,:) = imgXYZ; '</span>,<span class="keyword">...</span>
+0412             <span class="string">'set(AVWVIEW.gui,''UserData'',AVWVIEW);'</span>,<span class="keyword">...</span>
+0413             <span class="string">'clear imgXYZ AxiSlice CorSlice SagSlice AVWVIEW;'</span>));
+0414 G.lpa = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0415     <span class="string">'Position'</span>,[.775 .25 .20 .04], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+0416     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0417     <span class="string">'TooltipString'</span>,<span class="string">'Should be toward -X; values in meters, origin translated from center of volume to (0,0,0).'</span>,<span class="keyword">...</span>
+0418     <span class="string">'String'</span>,<span class="string">'x,y,z'</span>);
+0419 
+0420 
+0421 
+0422 
+0423 
+0424 
+0425 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0426 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0427 
+0428 <span class="comment">% Control Buttons at Bottom Right of GUI</span>
+0429 
+0430 
+0431 Font.FontWeight = <span class="string">'bold'</span>;
+0432 
+0433 <span class="comment">% OK: Return the avw!</span>
+0434 G.Bhdr = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0435     <span class="string">'Position'</span>,[.8 .01 .08 .04],<span class="keyword">...</span>
+0436     <span class="string">'String'</span>,<span class="string">'HDR'</span>,<span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0437     <span class="string">'TooltipString'</span>,<span class="string">'Save the hdr parameters.'</span>,<span class="keyword">...</span>
+0438     <span class="string">'BackgroundColor'</span>,[0.0 0.0 0.5],<span class="keyword">...</span>
+0439     <span class="string">'ForegroundColor'</span>,[1 1 1], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+0440     <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0441         <span class="string">'avw_view_hdr(AVWVIEW.avw);'</span>,<span class="keyword">...</span>
+0442         <span class="string">'clear AVWVIEW;'</span>));
+0443 
+0444 <span class="comment">% Cancel</span>
+0445 G.Bquit = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+0446     <span class="string">'Position'</span>,[.9 .01 .08 .04],<span class="keyword">...</span>
+0447     <span class="string">'String'</span>,<span class="string">'RETURN'</span>,<span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+0448     <span class="string">'BackgroundColor'</span>,[0.75 0.0 0.0],<span class="keyword">...</span>
+0449     <span class="string">'ForegroundColor'</span>, [1 1 1], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+0450     <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0451         <span class="string">'if isfield(AVWVIEW,''p''), '</span>,<span class="keyword">...</span>
+0452         <span class="string">'  if isfield(AVWVIEW.p,''mriFID''), '</span>,<span class="keyword">...</span>
+0453         <span class="string">'    if exist(''p'',''var''), '</span>,<span class="keyword">...</span>
+0454         <span class="string">'      p.mriFID = AVWVIEW.p.mriFID; '</span>,<span class="keyword">...</span>
+0455         <span class="string">'    else, '</span>,<span class="keyword">...</span>
+0456         <span class="string">'      mriFID = AVWVIEW.p.mriFID;'</span>,<span class="keyword">...</span>
+0457         <span class="string">'    end; '</span>,<span class="keyword">...</span>
+0458         <span class="string">'  end; '</span>,<span class="keyword">...</span>
+0459         <span class="string">'end; '</span>,<span class="keyword">...</span>
+0460         <span class="string">'clear AVWVIEW; close gcbf;'</span>));
+0461 
+0462 
+0463 <span class="comment">% Update the gui_struct handles for this gui</span>
+0464 AVWVIEW.avw = avw;
+0465 AVWVIEW.handles = G;
+0466 set(AVWVIEW.gui,<span class="string">'Userdata'</span>,AVWVIEW);
+0467 set(AVWVIEW.gui,<span class="string">'HandleVisibility'</span>,<span class="string">'callback'</span>);
+0468 
+0469 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

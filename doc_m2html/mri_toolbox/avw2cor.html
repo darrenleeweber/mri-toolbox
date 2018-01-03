@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw2cor</title>
+  <meta name="keywords" content="avw2cor">
+  <meta name="description" content="avw2cor - converts an avw struct to FreeSurfer COR-* files">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw2cor.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw2cor
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>avw2cor - converts an avw struct to FreeSurfer COR-* files</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function avw2cor(avw,CORpath) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> avw2cor - converts an avw struct to FreeSurfer COR-* files
+ 
+ avw2cor(avw,CORpath)
+
+ avw - Analyze volume, see avw_read
+
+ CORpath - full path to FreeSurfer directory
+
+ This function will translate an 8-bit
+ uchar AVW file to a series of MGH-style 
+ COR files that also have an 8-bit uchar 
+ datatype.
+
+ Example: avw2cor(avw,'/data/subjects/bert/mri/orig')
+ will use the workspace avw struct and output files
+ named /data/subjects/bert/mri/orig/COR-[0-256]
+
+ However, it is probably best to use the FreeSurfer
+ command line tool, mri_convert, as it will handle
+ various datatypes and it will reslice Analyze
+ volumes that are not 256^3 mm FOV and 1^3 mm 
+ voxels.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw2cor.html" class="code" title="function avw2cor(avw,CORpath)">avw2cor</a>	avw2cor - converts an avw struct to FreeSurfer COR-* files</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw2cor.html" class="code" title="function avw2cor(avw,CORpath)">avw2cor</a>	avw2cor - converts an avw struct to FreeSurfer COR-* files</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function avw2cor(avw,CORpath)</a>
+0002 
+0003 <span class="comment">% avw2cor - converts an avw struct to FreeSurfer COR-* files</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% avw2cor(avw,CORpath)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% avw - Analyze volume, see avw_read</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% CORpath - full path to FreeSurfer directory</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% This function will translate an 8-bit</span>
+0012 <span class="comment">% uchar AVW file to a series of MGH-style</span>
+0013 <span class="comment">% COR files that also have an 8-bit uchar</span>
+0014 <span class="comment">% datatype.</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Example: avw2cor(avw,'/data/subjects/bert/mri/orig')</span>
+0017 <span class="comment">% will use the workspace avw struct and output files</span>
+0018 <span class="comment">% named /data/subjects/bert/mri/orig/COR-[0-256]</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% However, it is probably best to use the FreeSurfer</span>
+0021 <span class="comment">% command line tool, mri_convert, as it will handle</span>
+0022 <span class="comment">% various datatypes and it will reslice Analyze</span>
+0023 <span class="comment">% volumes that are not 256^3 mm FOV and 1^3 mm</span>
+0024 <span class="comment">% voxels.</span>
+0025 <span class="comment">%</span>
+0026 
+0027 <span class="comment">% An AFNI BRIK volume may be formed from the resulting</span>
+0028 <span class="comment">% COR files by using the AFNI command:</span>
+0029 <span class="comment">% to3d -anat -prefix raw -session $SUBJECTS_DIR/$subjname/afni \</span>
+0030 <span class="comment">%      -view orig -datum byte -orient LSP \</span>
+0031 <span class="comment">%      $SUBJECTS_DIR/$subjname/mri/orig/COR-\[0-256]\*</span>
+0032 
+0033 
+0034 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0035 
+0036 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0037 <span class="comment">% History:  1/21/99: Timothy M. Ellmore, LBC/NIMH</span>
+0038 <span class="comment">%           Aug 2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0039 <span class="comment">%                     Adapted to mri_toolbox</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0042 
+0043 version = <span class="string">'[$Revision: 1.2 $]'</span>;
+0044 fprintf(<span class="string">'\nAVW2COR [v%s]\n'</span>,version(12:16));  tic;
+0045 
+0046 <span class="keyword">if</span> ~exist(<span class="string">'avw'</span>,<span class="string">'var'</span>),
+0047   doc <a href="avw2cor.html" class="code" title="function avw2cor(avw,CORpath)">avw2cor</a>;
+0048   msg = sprintf(<span class="string">'...no input avw\n'</span>);
+0049   error(msg);
+0050 <span class="keyword">elseif</span> isempty(avw),
+0051   doc <a href="avw2cor.html" class="code" title="function avw2cor(avw,CORpath)">avw2cor</a>;
+0052   msg = sprintf(<span class="string">'...empty input avw\n'</span>);
+0053   error(msg);
+0054 <span class="keyword">end</span>
+0055 
+0056 <span class="comment">% MGH COR files have these dimensions</span>
+0057 xdim = 256;
+0058 ydim = 256;
+0059 zdim = 256;
+0060 
+0061 <span class="comment">% datatype is always 8-bit uchar for MGH COR files</span>
+0062 type = <span class="string">'uchar'</span>;
+0063 
+0064 <span class="comment">% this function used to read in an avwfile, but</span>
+0065 <span class="comment">% it now takes a workspace avw struct, so the</span>
+0066 <span class="comment">% conversion process requires avw_read first</span>
+0067 <span class="comment">%avw = avw_read(AVWfile);</span>
+0068 
+0069 
+0070 <span class="comment">% check that avw.img is the right dimensions</span>
+0071 dim = avw.hdr.dime.dim(2:4);
+0072 <span class="keyword">if</span> (dim(1) == xdim) &amp; (dim(2) == ydim) &amp; (dim(3) == zdim),
+0073     <span class="comment">% OK we have the right dimensions</span>
+0074 <span class="keyword">else</span>
+0075     <span class="comment">%should try to reslice the volume, but not sure if</span>
+0076     <span class="comment">%this works properly, as meshgrid is a strange beast.</span>
+0077     <span class="comment">%[xi,yi,zi] = meshgrid(1:1:256,1:1:256,1:1:256);</span>
+0078     <span class="comment">%reslice = interp3(avw.img,xi,yi,zi);</span>
+0079     error(<span class="string">'...avw.img is not 256x256x256 voxels, reslice it.\n'</span>);
+0080 <span class="keyword">end</span>
+0081 
+0082 
+0083 <span class="comment">% extract sliceplanes and write COR files</span>
+0084 
+0085 <span class="keyword">for</span> i = 1:ydim,
+0086     
+0087     <span class="comment">% COR files are coronal slices, so we assume</span>
+0088     <span class="comment">% the analyze file was read correctly by avw_read</span>
+0089     <span class="comment">% and we use the ydim to loop over coronal slices</span>
+0090     
+0091     <span class="comment">% create zero sliceplane</span>
+0092     CORfile = zeros(xdim,zdim);
+0093     
+0094     <span class="comment">% extract the current sliceplane</span>
+0095     CORfile(:,:) = avw.img(:,i,:);
+0096     
+0097     <span class="comment">% create the CORfile name</span>
+0098     CORfname = [CORpath,filesep,sprintf(<span class="string">'COR-%03d'</span>,i)];
+0099     
+0100     <span class="keyword">if</span> i &gt; 1,
+0101         backspaces = repmat(<span class="string">'\b'</span>,1,7);
+0102     <span class="keyword">else</span>
+0103         backspaces = <span class="string">''</span>;
+0104     <span class="keyword">end</span>
+0105     fprintf([backspaces,<span class="string">'%s image.'</span>],sprintf(<span class="string">'COR-%03d'</span>,i));
+0106     
+0107     fid = fopen(CORfname, <span class="string">'w'</span>);
+0108     fwrite(fid, CORfile(:), type);
+0109     fclose(fid);
+0110     
+0111 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

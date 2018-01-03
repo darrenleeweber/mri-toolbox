@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_converter_script</title>
+  <meta name="keywords" content="avw_converter_script">
+  <meta name="description" content="avw_converter_script - convert byte order of .img files">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_converter_script.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_converter_script
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>avw_converter_script - convert byte order of .img files</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> avw_converter_script - convert byte order of .img files</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>	avw_img_read - read Analyze format data image (*.img)</li><li><a href="avw_img_write.html" class="code" title="function avw_img_write(avw, fileprefix, IMGorient, machine)">avw_img_write</a>	avw_img_write - write Analyze image files (*.img)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% avw_converter_script - convert byte order of .img files</span>
+0002 
+0003 <span class="comment">% This function will convert byte order of Analyze files</span>
+0004 <span class="comment">% This example uses SPM example data, so</span>
+0005 <span class="comment">% cd to that data directory before calling this script</span>
+0006 
+0007 stat = mkdir(pwd,<span class="string">'tmp'</span>);
+0008 <span class="keyword">if</span> stat,
+0009     files = {<span class="string">'T1'</span> <span class="string">'T2'</span>}; <span class="comment">% list of file prefixes</span>
+0010     Ibyte = <span class="string">'ieee-be'</span>;
+0011     Obyte = <span class="string">'ieee-le'</span>;
+0012     Iorient = []; <span class="comment">% auto determine orientation</span>
+0013     Oorient = 0;  <span class="comment">% output axial unflipped</span>
+0014     <span class="keyword">for</span> f = 1:length(files),
+0015         avw = <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>(files{f},Iorient,Ibyte);
+0016         <span class="comment">% create new file in tmp subdirectory</span>
+0017         newfile = [pwd filesep <span class="string">'tmp'</span> filesep files{f}];
+0018         <span class="comment">% to write out header and image...</span>
+0019         <a href="avw_img_write.html" class="code" title="function avw_img_write(avw, fileprefix, IMGorient, machine)">avw_img_write</a>(avw,newfile,Oorient,Obyte);
+0020         <span class="comment">% to write image only...</span>
+0021         <span class="comment">% avw.hdr = [];</span>
+0022         <span class="comment">% avw_img_write(avw,newfile,Oorient,Obyte);</span>
+0023         <span class="comment">% to write header only, see avw_hdr_write</span>
+0024     <span class="keyword">end</span>
+0025 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

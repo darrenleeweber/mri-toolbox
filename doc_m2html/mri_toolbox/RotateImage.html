@@ -1,0 +1,442 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of RotateImage</title>
+  <meta name="keywords" content="RotateImage">
+  <meta name="description" content="RotateImage - Rotates an image by X degrees">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; RotateImage.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>RotateImage
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>RotateImage - Rotates an image by X degrees</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function[Image] = RotateImage(Image, degrees) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> RotateImage - Rotates an image by X degrees
+ 
+  Image_Rotated = RotateImage(Image, degrees)
+
+  Rotates an image by the angle degrees in the 
+  CCW direction.  Degrees may be any number.  
+  The function will put degrees in the range 0 
+  to 360 degrees and then into a range of -45 to 45
+  degrees after performing elementary 90 degree rotations.
+
+  The rotation performed is the 3 Pass Separable rotation
+  using FFT-based methods to perform the skews.  Aliased spectral 
+  components are masked after EACH skew using the MaskImage function.
+
+  Normal Rotation
+
+  |x'| = | cos(a) -sin(a) ||x|
+  |y'|   | sin(a)  cos(a) ||y|
+
+  3 Pass Rotation
+
+  |x'| = | 1  -tan(a/2) || 1       0 || 1  -tan(a/2) ||x|
+  |y'|   | 0     1      || sin(a)  1 || 0     1      ||y|
+
+  This function pads images during the rotation process.  Images 
+  can be non-square, but odd dimensions will cause incorrect padding
+  Therefore an error is returned, if a dimension is odd.
+
+  Dimensions need not be powers of 2 and will not necessarily be padded
+  to a power of 2.  The Matlab fft functions are capable of non-power of 2
+  transforms.
+
+  Note: The results often display some Gibbs ringing.
+
+  Example:
+
+  load mri
+  img = double( squeeze(D(:,:,1,16)) );
+  img_rot = real( RotateImage(img,45) );
+  figure;
+  subplot(1,2,1); imagesc(img,[0 88]); axis image; 
+  subplot(1,2,2); imagesc(img_rot,[0 88]); axis image;</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function[Image] = MaskImage(Image, a, b, c, d)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function[Image] = RotateImage(Image, degrees)</a>
+0002 <span class="comment">% RotateImage - Rotates an image by X degrees</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  Image_Rotated = RotateImage(Image, degrees)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  Rotates an image by the angle degrees in the</span>
+0007 <span class="comment">%  CCW direction.  Degrees may be any number.</span>
+0008 <span class="comment">%  The function will put degrees in the range 0</span>
+0009 <span class="comment">%  to 360 degrees and then into a range of -45 to 45</span>
+0010 <span class="comment">%  degrees after performing elementary 90 degree rotations.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%  The rotation performed is the 3 Pass Separable rotation</span>
+0013 <span class="comment">%  using FFT-based methods to perform the skews.  Aliased spectral</span>
+0014 <span class="comment">%  components are masked after EACH skew using the MaskImage function.</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  Normal Rotation</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  |x'| = | cos(a) -sin(a) ||x|</span>
+0019 <span class="comment">%  |y'|   | sin(a)  cos(a) ||y|</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%  3 Pass Rotation</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  |x'| = | 1  -tan(a/2) || 1       0 || 1  -tan(a/2) ||x|</span>
+0024 <span class="comment">%  |y'|   | 0     1      || sin(a)  1 || 0     1      ||y|</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%  This function pads images during the rotation process.  Images</span>
+0027 <span class="comment">%  can be non-square, but odd dimensions will cause incorrect padding</span>
+0028 <span class="comment">%  Therefore an error is returned, if a dimension is odd.</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  Dimensions need not be powers of 2 and will not necessarily be padded</span>
+0031 <span class="comment">%  to a power of 2.  The Matlab fft functions are capable of non-power of 2</span>
+0032 <span class="comment">%  transforms.</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">%  Note: The results often display some Gibbs ringing.</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">%  Example:</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">%  load mri</span>
+0039 <span class="comment">%  img = double( squeeze(D(:,:,1,16)) );</span>
+0040 <span class="comment">%  img_rot = real( RotateImage(img,45) );</span>
+0041 <span class="comment">%  figure;</span>
+0042 <span class="comment">%  subplot(1,2,1); imagesc(img,[0 88]); axis image;</span>
+0043 <span class="comment">%  subplot(1,2,2); imagesc(img_rot,[0 88]); axis image;</span>
+0044 
+0045 <span class="comment">%</span>
+0046 <span class="comment">%************************************************************************</span>
+0047 <span class="comment">%*                    (c) Copyright 1998                                *</span>
+0048 <span class="comment">%*                  Biomathematics Resource                                *</span>
+0049 <span class="comment">%*                      Mayo Foundation                                  *</span>
+0050 <span class="comment">%************************************************************************</span>
+0051 <span class="comment">%</span>
+0052 <span class="comment">% 11/22/98  Implemented by Edward Brian Welch, edwardbrianwelch@yahoo.com</span>
+0053 <span class="comment">%</span>
+0054 
+0055 
+0056 <span class="comment">% NOTE:</span>
+0057 <span class="comment">% This function is partially vectorized (only single loops,</span>
+0058 <span class="comment">% no double loops) to gain some benefit in speed.  The tradeoff</span>
+0059 <span class="comment">% is that more memory is required to hold the large matrices.</span>
+0060 <span class="comment">% It would be possible to completely vectorize certain parts</span>
+0061 <span class="comment">% of the mfile, but that would require large amounts of memory</span>
+0062 <span class="comment">% and would also make the code less readable.</span>
+0063 
+0064 [xdim ydim] = size(Image);
+0065 
+0066 <span class="keyword">if</span> mod(xdim,2)==1 | mod(ydim,2)==1,
+0067    error(<span class="string">'RotateImage() can only rotate images with even dimensions.'</span>);
+0068 <span class="keyword">end</span>
+0069 
+0070 <span class="comment">% Determine type of image to return</span>
+0071 <span class="keyword">if</span> isreal(Image),
+0072    real_flag = 1;
+0073 <span class="keyword">else</span>
+0074    real_flag = 0;
+0075 <span class="keyword">end</span>
+0076 
+0077 <span class="comment">% Put degrees into the range [0,360]</span>
+0078 <span class="keyword">while</span> degrees&lt;0,
+0079    degrees = degrees + 360;
+0080 <span class="keyword">end</span>
+0081 
+0082 <span class="keyword">while</span> degrees&gt;360,
+0083    degrees = degrees - 360;
+0084 <span class="keyword">end</span>
+0085 
+0086 <span class="comment">% Count number of elementary 90 degree rotations</span>
+0087 <span class="comment">% to put rotation into range [-45,45]</span>
+0088 count=0;
+0089 <span class="keyword">while</span> degrees&gt;45,
+0090    degrees = degrees - 90;
+0091    count = count + 1;
+0092 <span class="keyword">end</span>
+0093 
+0094 Image = rot90(Image, count);
+0095 
+0096 <span class="comment">% Calculate Trigonometric Values</span>
+0097 <span class="comment">% Not Necessary in Matlab implementation to Negate degrees</span>
+0098 <span class="comment">% so that CCW rotations are positive</span>
+0099 theta = (degrees/360)*2*pi;
+0100 sin_theta = sin(theta);
+0101 negtan_thetadiv2 = -tan(theta/2);
+0102 
+0103 <span class="comment">%---------------------------</span>
+0104 <span class="comment">% FIRST SKEW</span>
+0105 <span class="comment">% |x1| = | 1  -tan(a/2) ||x|</span>
+0106 <span class="comment">% |y1| = | 0     1      ||y|</span>
+0107 <span class="comment">%---------------------------</span>
+0108 
+0109 <span class="comment">% Pad image rows to double the row size</span>
+0110 Image2 = zeros(2*xdim,ydim);
+0111 Image2( (xdim/2+1):(xdim/2+xdim),:)=Image;
+0112 
+0113 <span class="comment">% Forward FFT image rows</span>
+0114 Image2 = fft(Image2, 2*xdim, 1);
+0115 
+0116 <span class="comment">% Calculate image's center coordinates</span>
+0117 xno = (2*xdim-1)/2;
+0118 yno = (ydim-1)/2;
+0119 
+0120 <span class="comment">% Prepare to use the Fourier Shift Theorem</span>
+0121 <span class="comment">% f(x-deltax) &lt;=&gt; exp(-j*2*pi*deltax*k/N)*F(k)</span>
+0122 
+0123 <span class="comment">% Initialize constant part of the exponent</span>
+0124 <span class="comment">% expression.  The skew is row dependent.</span>
+0125 cons1 = (-2.0*pi/(2*xdim))*negtan_thetadiv2;
+0126 
+0127 <span class="comment">% Calculate k values (Nyquist is at x=xno)</span>
+0128 k_array = zeros((2*xdim),1);
+0129 
+0130 <span class="keyword">for</span> x=1:(2*xdim),    
+0131       <span class="keyword">if</span> (x-1)&lt;=xno,
+0132          k_array(x) = (x-1);
+0133       <span class="keyword">else</span>
+0134          k_array(x) = (x-1-2*xdim);
+0135       <span class="keyword">end</span>
+0136 <span class="keyword">end</span>
+0137 
+0138 <span class="keyword">for</span> y=1:ydim,
+0139    <span class="comment">% Skew dependent part of expression</span>
+0140     cons2 = cons1 * (y-1-yno);
+0141    
+0142    <span class="comment">% Calculate the angles</span>
+0143    angle_array = cons2*k_array;
+0144    
+0145    <span class="comment">% Rotate the complex numbers by those angles</span>
+0146    sin_ang = sin(angle_array);
+0147    cos_ang = cos(angle_array);
+0148    newr = real(Image2(:,y)).*cos_ang - imag(Image2(:,y)).*sin_ang;
+0149    newi = real(Image2(:,y)).*sin_ang + imag(Image2(:,y)).*cos_ang;
+0150    Image2(:,y) = newr + newi*i;
+0151 <span class="keyword">end</span>
+0152 
+0153 <span class="comment">%---------------------------</span>
+0154 <span class="comment">% SECOND SKEW</span>
+0155 <span class="comment">% |x2| = | 1       0 ||x1|</span>
+0156 <span class="comment">% |y2| = | sin(a)  1 ||y1|</span>
+0157 <span class="comment">%---------------------------</span>
+0158 
+0159 <span class="comment">% Pad the image columns in hybrid space</span>
+0160 Image22 = zeros(2*xdim, 2*ydim);
+0161 Image22(:,(ydim/2+1):(ydim/2+ydim) )=Image2;
+0162 
+0163 <span class="comment">% Perform a Forward FFT on the image columns</span>
+0164 Image22 = fft(Image22, 2*ydim, 2);
+0165 
+0166 <span class="comment">% Mask aliased components from SKEW 1</span>
+0167 Image22 = fftshift(Image22);
+0168 Image22 = <a href="#_sub1" class="code" title="subfunction[Image] = MaskImage(Image, a, b, c, d)">MaskImage</a>( Image22, 1, 0, negtan_thetadiv2, 1);
+0169 Image22 = fftshift(Image22);
+0170 
+0171 <span class="comment">%  Inverse FFT the image rows</span>
+0172 Image22 = ifft(Image22, 2*xdim, 1);
+0173 
+0174 <span class="comment">% Calculate image's center coordinates</span>
+0175 xno = (2*xdim-1)/2;
+0176 yno = (2*ydim-1)/2;
+0177 
+0178 <span class="comment">% Initialize constant part of the exponent</span>
+0179 <span class="comment">% expression.  The skew is column dependent.</span>
+0180 cons1 = (-2.0*pi/(2*ydim))*sin_theta;
+0181 
+0182 <span class="comment">% Calculate k values (Nyquist is at y=yno)</span>
+0183 k_array = zeros(1,(2*ydim));
+0184 <span class="keyword">for</span> y=1:(2*ydim),
+0185       <span class="keyword">if</span> (y-1)&lt;=yno,
+0186       k_array(y) = (y-1);
+0187    <span class="keyword">else</span>
+0188       k_array(y) = (y-1-2*ydim);
+0189    <span class="keyword">end</span>
+0190 <span class="keyword">end</span>
+0191 
+0192 <span class="keyword">for</span> x=1:(2*xdim),  
+0193    <span class="comment">% Skew dependent part of expression</span>
+0194    cons2 = cons1 * (x-1-xno);
+0195    
+0196    <span class="comment">% Calculate the angles</span>
+0197    angle_array = cons2*k_array;
+0198    
+0199    <span class="comment">% Rotate the complex numbers by those angles</span>
+0200    sin_ang = sin(angle_array);
+0201    cos_ang = cos(angle_array);
+0202    newr = real(Image22(x,:)).*cos_ang - imag(Image22(x,:)).*sin_ang;
+0203    newi = real(Image22(x,:)).*sin_ang + imag(Image22(x,:)).*cos_ang;
+0204    Image22(x,:) = newr + newi*i;
+0205 <span class="keyword">end</span>
+0206 
+0207 <span class="comment">%---------------------------</span>
+0208 <span class="comment">% THIRD SKEW</span>
+0209 <span class="comment">% |x3| = | 1  -tan(a/2) ||x2|</span>
+0210 <span class="comment">% |y3| = | 0     1      ||y2|</span>
+0211 <span class="comment">%---------------------------</span>
+0212 
+0213 <span class="comment">% Forward FFT image rows</span>
+0214 Image22 = fft(Image22, 2*xdim, 1);
+0215 
+0216 <span class="comment">% Mask aliased components from SKEW 2</span>
+0217 Image22 = fftshift(Image22);
+0218 Image22 = <a href="#_sub1" class="code" title="subfunction[Image] = MaskImage(Image, a, b, c, d)">MaskImage</a>( Image22, 1, sin_theta, 0,  1);
+0219 Image22 = fftshift(Image22);
+0220 
+0221 <span class="comment">% Inverse FFT the image columns</span>
+0222 Image22 = ifft(Image22, 2*ydim, 2);
+0223 
+0224 <span class="comment">% Crop image columns</span>
+0225 Image2 = Image22(:,(ydim/2+1):(ydim/2+ydim) );
+0226 
+0227 <span class="comment">% Calculate image's center coordinates</span>
+0228 xno = (2*xdim-1)/2;
+0229 yno = (ydim-1)/2;
+0230 
+0231 <span class="comment">% Initialize constant part of the exponent</span>
+0232 <span class="comment">% expression.  The skew is row dependent.</span>
+0233 cons1 = (-2.0*pi/(2*xdim))*negtan_thetadiv2;
+0234 
+0235 <span class="comment">% Calculate k values (Nyquist is at x=xno)</span>
+0236 k_array = zeros((2*xdim),1);
+0237 
+0238 <span class="keyword">for</span> x=1:(2*xdim),
+0239       
+0240       <span class="keyword">if</span> (x-1)&lt;=xno,
+0241          k_array(x) = (x-1);
+0242       <span class="keyword">else</span>
+0243          k_array(x) = (x-1-2*xdim);
+0244       <span class="keyword">end</span>
+0245 <span class="keyword">end</span>
+0246 
+0247 <span class="keyword">for</span> y=1:ydim,
+0248    <span class="comment">% Skew dependent part of expression</span>
+0249     cons2 = cons1 * (y-1-yno);
+0250    
+0251    <span class="comment">% Calculate the angles</span>
+0252    angle_array = cons2*k_array;
+0253    
+0254    <span class="comment">% Rotate the complex numbers by those angles</span>
+0255    sin_ang = sin(angle_array);
+0256    cos_ang = cos(angle_array);
+0257    newr = real(Image2(:,y)).*cos_ang - imag(Image2(:,y)).*sin_ang;
+0258    newi = real(Image2(:,y)).*sin_ang + imag(Image2(:,y)).*cos_ang;
+0259    Image2(:,y) = newr + newi*i;
+0260 <span class="keyword">end</span>
+0261 
+0262 <span class="comment">% Forward FFT the image columns</span>
+0263 Image2 = fft(Image2, ydim, 2);
+0264 
+0265 <span class="comment">% Mask aliased components from SKEW 3</span>
+0266 <span class="comment">% The /2.0 factor is there because columns have been cropped in half</span>
+0267 Image2 = fftshift(Image2);
+0268 Image2 = <a href="#_sub1" class="code" title="subfunction[Image] = MaskImage(Image, a, b, c, d)">MaskImage</a>( Image2, 1, 0, negtan_thetadiv2/2.0, 1);
+0269 Image2 = fftshift(Image2);
+0270 
+0271 <span class="comment">% Inverse 2D FFT the image</span>
+0272 Image2 = ifft2(Image2);
+0273 
+0274 <span class="comment">% Crop the rows to obtain final result</span>
+0275 Image = Image2( (xdim/2+1):(xdim/2+xdim),:) ;
+0276 
+0277 <span class="comment">% Return a Real image if original Image was Real</span>
+0278 <span class="keyword">if</span> real_flag==1,
+0279    Image = real(Image);
+0280 <span class="keyword">end</span>
+0281 
+0282 <span class="comment">%</span>
+0283 <span class="comment">%  Image_Masked = MaskImage(Image, a, b, c, d)</span>
+0284 <span class="comment">%</span>
+0285 <span class="comment">%  Masks an image according to the (x,y) coordinate</span>
+0286 <span class="comment">%  transform matrix:  |x'| = | a  b | * |x|</span>
+0287 <span class="comment">%                     |y'|   | c  d |   |y|</span>
+0288 <span class="comment">%</span>
+0289 <span class="comment">%  (x,y) positions that become (x',y') outside the boundary</span>
+0290 <span class="comment">%  of the original image will be set to 0.</span>
+0291 <span class="comment">%</span>
+0292 <span class="comment">%  The masking is softened at the edges by a convolution.</span>
+0293 <span class="comment">%</span>
+0294 
+0295 <span class="comment">%</span>
+0296 <span class="comment">%************************************************************************</span>
+0297 <span class="comment">%*                    (c) Copyright 1998                                *</span>
+0298 <span class="comment">%*                  Biomathematics Resource                                *</span>
+0299 <span class="comment">%*                      Mayo Foundation                                  *</span>
+0300 <span class="comment">%************************************************************************</span>
+0301 <span class="comment">%</span>
+0302 <span class="comment">% 11/22/98  Implemented by Edward Brian Welch, edwardbrianwelch@yahoo.com</span>
+0303 <span class="comment">%</span>
+0304 <a name="_sub1" href="#_subfunctions" class="code">function[Image] = MaskImage(Image, a, b, c, d)</a>
+0305 
+0306 <span class="comment">% NOTE:</span>
+0307 <span class="comment">% This function is highly vectorized (no loops)</span>
+0308 <span class="comment">% to gain some benefit in speed.  The tradeoff is that</span>
+0309 <span class="comment">% more memory is required to hold the large matrices</span>
+0310 
+0311 [xdim ydim] = size(Image);
+0312 
+0313 <span class="comment">% Calculate center of the image</span>
+0314 xno = (xdim-1)/2;
+0315 yno = (ydim-1)/2;
+0316 
+0317 x_values = 1:1:xdim;
+0318 x_values = x_values - 1 - xno;
+0319 x_mat = repmat(x_values',1,ydim);
+0320 
+0321 y_values = 1:1:ydim;
+0322 y_values = y_values - 1 - yno;
+0323 y_mat = repmat(y_values,xdim,1);
+0324 
+0325 <span class="comment">% Calculate new x values for this column</span>
+0326 new_x_mat = a*x_mat + b*y_mat;
+0327 
+0328 <span class="comment">% Calculate new y values for this column</span>
+0329 new_y_mat = c*x_mat + d*y_mat;
+0330 
+0331 <span class="comment">% Points whos x or y position is greater than</span>
+0332 <span class="comment">% absolute value of xno or yno respectively</span>
+0333 <span class="comment">% should be masked (set to zero).</span>
+0334 new_x_mat = abs(new_x_mat) - xno;
+0335 new_y_mat = abs(new_y_mat) - yno;
+0336 
+0337 <span class="comment">% Only valid points will have a non-zero value after</span>
+0338 <span class="comment">% the operation below</span>
+0339 new_x_mat = sign(new_x_mat)-1;
+0340 new_y_mat = sign(new_y_mat)-1;
+0341 
+0342 <span class="comment">% ANDing the matrices shows good points</span>
+0343 mask = new_x_mat &amp; new_y_mat;
+0344 
+0345 <span class="comment">% Soften mask edges</span>
+0346 Nx=ceil(xdim*.2);
+0347 Ny=ceil(ydim*.2);
+0348 mask = conv2(mask,ones(Nx,Ny)/(Nx*Ny),<span class="string">'same'</span>);
+0349 
+0350 Image = Image.*mask;
+0351   
+0352 
+0353</pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

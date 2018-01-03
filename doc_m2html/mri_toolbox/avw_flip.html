@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_flip</title>
+  <meta name="keywords" content="avw_flip">
+  <meta name="description" content="AVW_FLIP - ortho-flip Analyze data image (avw.img)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_flip.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_flip
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>AVW_FLIP - ortho-flip Analyze data image (avw.img)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ avw ] = avw_flip(avw,dims) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> AVW_FLIP - ortho-flip Analyze data image (avw.img)
+ 
+ [ avw ] = avw_flip(avw,dims)
+ 
+ where avw is the data struct returned from avw_img_read
+ and dims is a cell array of strings, eg: dims = {'x','y','z'}
+ with any number of cells, in any order.
+ 
+ For each cell of dims, the dimension of avw.img is flipped, 
+ independently of all other dimensions and the order in which
+ they are specified.  There are no 3D rotations, which are 
+ not orthogonal flips.
+ 
+ This function will most likely invalidate the .img orientation, 
+ so use of it is not recommended.  There is no attempt in this 
+ function to maintain the validity of the avw.hdr.hist.orient 
+ field.  In fact, this will be set to an invalid value (9).
+ 
+ see also <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">AVW_IMG_READ</a>, <a href="avw_view.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">AVW_VIEW</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ avw ] = avw_flip(avw,dims)</a>
+0002 
+0003 <span class="comment">% AVW_FLIP - ortho-flip Analyze data image (avw.img)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% [ avw ] = avw_flip(avw,dims)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% where avw is the data struct returned from avw_img_read</span>
+0008 <span class="comment">% and dims is a cell array of strings, eg: dims = {'x','y','z'}</span>
+0009 <span class="comment">% with any number of cells, in any order.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% For each cell of dims, the dimension of avw.img is flipped,</span>
+0012 <span class="comment">% independently of all other dimensions and the order in which</span>
+0013 <span class="comment">% they are specified.  There are no 3D rotations, which are</span>
+0014 <span class="comment">% not orthogonal flips.</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% This function will most likely invalidate the .img orientation,</span>
+0017 <span class="comment">% so use of it is not recommended.  There is no attempt in this</span>
+0018 <span class="comment">% function to maintain the validity of the avw.hdr.hist.orient</span>
+0019 <span class="comment">% field.  In fact, this will be set to an invalid value (9).</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% see also AVW_IMG_READ, AVW_VIEW</span>
+0022 <span class="comment">%</span>
+0023 
+0024 
+0025 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0026 
+0027 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0028 <span class="comment">% History:  01/2003, Darren.Weber@flinders.edu.au</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0031 
+0032 version = <span class="string">'[$Revision: 1.2 $]'</span>;
+0033 fprintf(<span class="string">'\nAVW_FLIP [v%s]\n'</span>,version(12:16));
+0034 
+0035 fprintf(<span class="string">'...warning, this function can invalidate the .img orientation,\n'</span>);
+0036 fprintf(<span class="string">'...setting avw.hdr.hist.orient to invalid value = 9.\n'</span>);
+0037 avw.hdr.hist.orient = uint8(9);
+0038 
+0039 <span class="keyword">for</span> i = 1:length(dims),
+0040     dim = lower(dims{i});
+0041     <span class="keyword">switch</span> dim,
+0042     <span class="keyword">case</span> <span class="string">'x'</span>,
+0043         fprintf(<span class="string">'...flipping X\n'</span>);
+0044         xdim = size(avw.img,1);
+0045         avw.img = avw.img(xdim:-1:1,:,:);
+0046     <span class="keyword">case</span> <span class="string">'y'</span>,
+0047         fprintf(<span class="string">'...flipping Y\n'</span>);
+0048         ydim = size(avw.img,2);
+0049         avw.img = avw.img(:,ydim:-1:1,:);
+0050     <span class="keyword">case</span> <span class="string">'z'</span>,
+0051         fprintf(<span class="string">'...flipping Z\n'</span>);
+0052         zdim = size(avw.img,3);
+0053         avw.img = avw.img(:,:,zdim:-1:1);
+0054     <span class="keyword">end</span>
+0055 <span class="keyword">end</span>
+0056 
+0057 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

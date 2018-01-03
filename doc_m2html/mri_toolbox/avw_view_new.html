@@ -1,0 +1,1859 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_view_new</title>
+  <meta name="keywords" content="avw_view_new">
+  <meta name="description" content="avw_view - create and navigate ortho views of Analyze 7.5 volume">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_view_new.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_view_new
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>avw_view - create and navigate ortho views of Analyze 7.5 volume</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ varargout ] = avw_view(avw,parent,command), </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> avw_view - create and navigate ortho views of Analyze 7.5 volume
+ 
+ [ avw ] = avw_view([avw], [parent], [command])
+ 
+ avw - a struct, created by avw_read; if omitted, a gui file locator will
+ prompt for a .hdr file.
+ 
+ parent  - an optional handle to the gui that calls this gui, useful for
+ updating the UserData field of the parent. The avw structure may be
+ returned to the parent, if possible.
+ 
+ command - an optional string, such as 'init' or various callback
+ commands, 'init' is the default.
+ 
+ The navigation is by sliders, mouse clicks and arrow keys.  Right mouse
+ clicks on any ortho-view will show a command menu, for simple block
+ region of interest (ROI) calculations, image zoom, and save image.  The
+ ROI calculations are returned into avw.stats.
+ 
+ Fiducial points can be selected, which are returned into 'avw.fiducials'
+ in the base workspace. These points are given in several coordinate
+ frameworks (voxels, mm, and meters), with values given relative to an
+ origin located at the &quot;center&quot; of the MRI volume (see avw_center, which
+ returns abs and corner values, abs used here).
+ 
+ The AC location can be selected and the values are returned into 'avw.ac'
+ in the base workspace. These points are given in voxels, mm &amp; meters; for
+ the latter, the values are given as offsets from the &quot;center&quot; of the MRI
+ volume (see avw_center).
+ 
+ +X is left (L), +Y is anterior (A), +Z is superior (S), the default LAS
+ orientation of the Analyze 7.5 format.  The coordinate system is left
+ handed.  This is the radiological convention, as opposed to the
+ neurological convention (RAS).  The latter can be emulated by using the
+ 'Flip L/R' button.
+ 
+ Example of loading and viewing the SPM T1 template:
+ avw = avw_read('T1')
+ avw = avw_view(avw);
+ 
+ Similarly, just 'avw_view' can be typed at the command prompt and you can
+ use the gui file locator to select any .hdr file.
+
+ See also, <a href="avw_read.html" class="code" title="function [ avw, machine ] = avw_read(fileprefix,IMGorient,machine)">avw_read</a>, <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>, <a href="avw_hdr_read.html" class="code" title="function [ avw, machine ] = avw_hdr_read(fileprefix, machine)">avw_hdr_read</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_center.html" class="code" title="function center = avw_center(avw)">avw_center</a>	avw_center - find center of a volume</li><li><a href="avw_read.html" class="code" title="function [ avw, machine ] = avw_read(fileprefix,IMGorient,machine)">avw_read</a>	avw_read - read Analyze format data image (*.img)</li><li><a href="avw_roi.html" class="code" title="function [roi] = avw_roi(avw,position,shape)">avw_roi</a>	avw_roi - extract a region of interest from avw.img</li><li><a href="avw_stats.html" class="code" title="function [stat] = avw_stats(stat)">avw_stats</a>	avw_stats - calculate region of interest stats for avw data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function axial_update(AVWVIEW)</a></li><li><a href="#_sub2" class="code">function coronal_update(AVWVIEW)</a></li><li><a href="#_sub3" class="code">function sagittal_update(AVWVIEW)</a></li><li><a href="#_sub4" class="code">function AVWVIEW = set_crosshairs(AVWVIEW)</a></li><li><a href="#_sub5" class="code">function AVWVIEW = set_coordinates(AVWVIEW)</a></li><li><a href="#_sub6" class="code">function AVWVIEW = get_current_position(AVWVIEW),</a></li><li><a href="#_sub7" class="code">function AVWVIEW = get_slider_position(AVWVIEW),</a></li><li><a href="#_sub8" class="code">function AVWVIEW = check_slices(AVWVIEW),</a></li><li><a href="#_sub9" class="code">function set_display_values(AVWVIEW),</a></li><li><a href="#_sub10" class="code">function [AVWVIEW,metric] = slices2metric(AVWVIEW),</a></li><li><a href="#_sub11" class="code">function AVWVIEW = metric2slices(AVWVIEW,metric),</a></li><li><a href="#_sub12" class="code">function AVWVIEW = init(avw,invarname),</a></li><li><a href="#_sub13" class="code">function slice_img(avw),</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ varargout ] = avw_view(avw,parent,command),</a>
+0002 
+0003 <span class="comment">% avw_view - create and navigate ortho views of Analyze 7.5 volume</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% [ avw ] = avw_view([avw], [parent], [command])</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% avw - a struct, created by avw_read; if omitted, a gui file locator will</span>
+0008 <span class="comment">% prompt for a .hdr file.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% parent  - an optional handle to the gui that calls this gui, useful for</span>
+0011 <span class="comment">% updating the UserData field of the parent. The avw structure may be</span>
+0012 <span class="comment">% returned to the parent, if possible.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% command - an optional string, such as 'init' or various callback</span>
+0015 <span class="comment">% commands, 'init' is the default.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% The navigation is by sliders, mouse clicks and arrow keys.  Right mouse</span>
+0018 <span class="comment">% clicks on any ortho-view will show a command menu, for simple block</span>
+0019 <span class="comment">% region of interest (ROI) calculations, image zoom, and save image.  The</span>
+0020 <span class="comment">% ROI calculations are returned into avw.stats.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% Fiducial points can be selected, which are returned into 'avw.fiducials'</span>
+0023 <span class="comment">% in the base workspace. These points are given in several coordinate</span>
+0024 <span class="comment">% frameworks (voxels, mm, and meters), with values given relative to an</span>
+0025 <span class="comment">% origin located at the &quot;center&quot; of the MRI volume (see avw_center, which</span>
+0026 <span class="comment">% returns abs and corner values, abs used here).</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">% The AC location can be selected and the values are returned into 'avw.ac'</span>
+0029 <span class="comment">% in the base workspace. These points are given in voxels, mm &amp; meters; for</span>
+0030 <span class="comment">% the latter, the values are given as offsets from the &quot;center&quot; of the MRI</span>
+0031 <span class="comment">% volume (see avw_center).</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">% +X is left (L), +Y is anterior (A), +Z is superior (S), the default LAS</span>
+0034 <span class="comment">% orientation of the Analyze 7.5 format.  The coordinate system is left</span>
+0035 <span class="comment">% handed.  This is the radiological convention, as opposed to the</span>
+0036 <span class="comment">% neurological convention (RAS).  The latter can be emulated by using the</span>
+0037 <span class="comment">% 'Flip L/R' button.</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">% Example of loading and viewing the SPM T1 template:</span>
+0040 <span class="comment">% avw = avw_read('T1')</span>
+0041 <span class="comment">% avw = avw_view(avw);</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">% Similarly, just 'avw_view' can be typed at the command prompt and you can</span>
+0044 <span class="comment">% use the gui file locator to select any .hdr file.</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% See also, avw_read, avw_img_read, avw_hdr_read</span>
+0047 <span class="comment">%</span>
+0048 
+0049 <span class="comment">% $Revision: 1.1 $ $Date: 2004/04/08 20:12:52 $</span>
+0050 
+0051 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0052 <span class="comment">% History:  06/2002, Darren.Weber_at_flinders.edu.au</span>
+0053 <span class="comment">%           10/2002, Darren.Weber_at_flinders.edu.au</span>
+0054 <span class="comment">%                    added fiducial point determination</span>
+0055 <span class="comment">%                    changed plots from surf to imagesc commands</span>
+0056 <span class="comment">%                    added handling of datatype for avw.img</span>
+0057 <span class="comment">%                    altered daspect to use avw.hdr.dime.pixdim</span>
+0058 <span class="comment">%                    altered color scheme</span>
+0059 <span class="comment">%           01/2003, Darren.Weber_at_flinders.edu.au</span>
+0060 <span class="comment">%                    added parent GUI handling</span>
+0061 <span class="comment">%           10/2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0062 <span class="comment">%                    added right click options, including simple block ROI</span>
+0063 <span class="comment">%                    functions, zoom and save image</span>
+0064 <span class="comment">%           11/2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0065 <span class="comment">%                    added arrow key navigation</span>
+0066 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0067 
+0068 <span class="keyword">if</span> gcbf,
+0069     AVWVIEW = get(gcbf,<span class="string">'Userdata'</span>);
+0070 <span class="keyword">end</span>
+0071 
+0072 <span class="keyword">if</span> ~exist(<span class="string">'command'</span>,<span class="string">'var'</span>), command = <span class="string">'init'</span>; <span class="keyword">end</span>
+0073 
+0074 command = lower(command);
+0075 
+0076 <span class="comment">% Check for specific keys and assign command</span>
+0077 <span class="keyword">if</span> strcmp(command, <span class="string">'keypress'</span>),
+0078   
+0079   cc = get(AVWVIEW.gui,<span class="string">'CurrentCharacter'</span>);
+0080   cc = double(cc);
+0081   <span class="keyword">if</span> cc,
+0082     <span class="keyword">switch</span> cc,
+0083       <span class="keyword">case</span> 27, command = <span class="string">'quit'</span>;  <span class="comment">% ESC</span>
+0084       <span class="keyword">case</span> 28, command = <span class="string">'left'</span>;  <span class="comment">% left</span>
+0085       <span class="keyword">case</span> 29, command = <span class="string">'right'</span>; <span class="comment">% right</span>
+0086       <span class="keyword">case</span> 30, command = <span class="string">'up'</span>;    <span class="comment">% up</span>
+0087       <span class="keyword">case</span> 31, command = <span class="string">'down'</span>;  <span class="comment">% down</span>
+0088       <span class="keyword">otherwise</span>, <span class="keyword">return</span>;  <span class="comment">% all other keys</span>
+0089     <span class="keyword">end</span>
+0090   <span class="keyword">end</span>
+0091 <span class="keyword">end</span>
+0092 
+0093 <span class="keyword">switch</span> command,
+0094     
+0095   <span class="keyword">case</span> <span class="string">'init'</span>,
+0096     
+0097     <span class="keyword">if</span> ~exist(<span class="string">'avw'</span>,<span class="string">'var'</span>),
+0098       avw = <a href="avw_read.html" class="code" title="function [ avw, machine ] = avw_read(fileprefix,IMGorient,machine)">avw_read</a>;
+0099     <span class="keyword">end</span>
+0100     
+0101     <span class="keyword">if</span> nargin == 0,
+0102       AVWVIEW = <a href="#_sub12" class="code" title="subfunction AVWVIEW = init(avw,invarname),">init</a>(avw);
+0103     <span class="keyword">elseif</span> isempty(inputname(1)),
+0104       AVWVIEW = <a href="#_sub12" class="code" title="subfunction AVWVIEW = init(avw,invarname),">init</a>(avw);
+0105     <span class="keyword">else</span>
+0106       AVWVIEW = <a href="#_sub12" class="code" title="subfunction AVWVIEW = init(avw,invarname),">init</a>(avw,inputname(1));
+0107     <span class="keyword">end</span>
+0108     
+0109     AVWVIEW = <a href="#_sub5" class="code" title="subfunction AVWVIEW = set_coordinates(AVWVIEW)">set_coordinates</a>(AVWVIEW);
+0110     
+0111     
+0112     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0113     
+0114   <span class="keyword">case</span> <span class="string">'coordinates'</span>,
+0115     
+0116     AVWVIEW = <a href="#_sub5" class="code" title="subfunction AVWVIEW = set_coordinates(AVWVIEW)">set_coordinates</a>(AVWVIEW);
+0117     
+0118     
+0119     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0120     
+0121   <span class="keyword">case</span> <span class="string">'crosshairs'</span>,
+0122     
+0123     AVWVIEW = <a href="#_sub4" class="code" title="subfunction AVWVIEW = set_crosshairs(AVWVIEW)">set_crosshairs</a>(AVWVIEW);
+0124     
+0125     
+0126   <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0127   
+0128   <span class="keyword">case</span> {<span class="string">'axial_image'</span>,<span class="string">'coronal_image'</span>,<span class="string">'sagittal_image'</span>},
+0129     
+0130     <span class="keyword">switch</span> command,
+0131       <span class="keyword">case</span> <span class="string">'axial_image'</span>,    AVWVIEW.view = <span class="string">'axi'</span>; axi_update = 0; cor_update = 1; sag_update = 1;
+0132       <span class="keyword">case</span> <span class="string">'coronal_image'</span>,  AVWVIEW.view = <span class="string">'cor'</span>; axi_update = 1; cor_update = 0; sag_update = 1;
+0133       <span class="keyword">case</span> <span class="string">'sagittal_image'</span>, AVWVIEW.view = <span class="string">'sag'</span>; axi_update = 1; cor_update = 1; sag_update = 0;
+0134     <span class="keyword">end</span>
+0135     
+0136     AVWVIEW = <a href="#_sub6" class="code" title="subfunction AVWVIEW = get_current_position(AVWVIEW),">get_current_position</a>(AVWVIEW);
+0137     
+0138     <span class="keyword">if</span> axi_update,
+0139         <a href="#_sub1" class="code" title="subfunction axial_update(AVWVIEW)">axial_update</a>(AVWVIEW);
+0140     <span class="keyword">end</span>
+0141     <span class="keyword">if</span> cor_update,
+0142         <a href="#_sub2" class="code" title="subfunction coronal_update(AVWVIEW)">coronal_update</a>(AVWVIEW);
+0143     <span class="keyword">end</span>;
+0144     <span class="keyword">if</span> sag_update,
+0145         <a href="#_sub3" class="code" title="subfunction sagittal_update(AVWVIEW)">sagittal_update</a>(AVWVIEW);
+0146     <span class="keyword">end</span>;
+0147     
+0148     <a href="#_sub9" class="code" title="subfunction set_display_values(AVWVIEW),">set_display_values</a>(AVWVIEW);
+0149     
+0150     AVWVIEW = <a href="#_sub4" class="code" title="subfunction AVWVIEW = set_crosshairs(AVWVIEW)">set_crosshairs</a>(AVWVIEW);
+0151     
+0152     
+0153     
+0154     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0155     
+0156   <span class="keyword">case</span> {<span class="string">'axial_slider'</span>,<span class="string">'coronal_slider'</span>,<span class="string">'sagittal_slider'</span>},
+0157     
+0158     <span class="keyword">switch</span> command,
+0159       
+0160       <span class="keyword">case</span> <span class="string">'axial_slider'</span>,
+0161         AVWVIEW.view = <span class="string">'axi'</span>;
+0162         AVWVIEW = <a href="#_sub7" class="code" title="subfunction AVWVIEW = get_slider_position(AVWVIEW),">get_slider_position</a>(AVWVIEW);
+0163         <a href="#_sub1" class="code" title="subfunction axial_update(AVWVIEW)">axial_update</a>(AVWVIEW);
+0164         
+0165       <span class="keyword">case</span> <span class="string">'coronal_slider'</span>,
+0166         AVWVIEW.view = <span class="string">'cor'</span>;
+0167         AVWVIEW = <a href="#_sub7" class="code" title="subfunction AVWVIEW = get_slider_position(AVWVIEW),">get_slider_position</a>(AVWVIEW);
+0168         <a href="#_sub2" class="code" title="subfunction coronal_update(AVWVIEW)">coronal_update</a>(AVWVIEW);
+0169         
+0170       <span class="keyword">case</span> <span class="string">'sagittal_slider'</span>,
+0171         AVWVIEW.view = <span class="string">'sag'</span>;
+0172         AVWVIEW = <a href="#_sub7" class="code" title="subfunction AVWVIEW = get_slider_position(AVWVIEW),">get_slider_position</a>(AVWVIEW);
+0173         <a href="#_sub3" class="code" title="subfunction sagittal_update(AVWVIEW)">sagittal_update</a>(AVWVIEW);
+0174     <span class="keyword">end</span>
+0175     
+0176     <a href="#_sub9" class="code" title="subfunction set_display_values(AVWVIEW),">set_display_values</a>(AVWVIEW);
+0177     
+0178     AVWVIEW = <a href="#_sub4" class="code" title="subfunction AVWVIEW = set_crosshairs(AVWVIEW)">set_crosshairs</a>(AVWVIEW);
+0179     
+0180     
+0181     
+0182     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0183     
+0184   <span class="keyword">case</span> {<span class="string">'left'</span>,<span class="string">'right'</span>,<span class="string">'up'</span>,<span class="string">'down'</span>},
+0185     
+0186     AVWVIEW = <a href="#_sub7" class="code" title="subfunction AVWVIEW = get_slider_position(AVWVIEW),">get_slider_position</a>(AVWVIEW);
+0187     
+0188     <span class="comment">% what axes are we in?</span>
+0189     <span class="keyword">if</span> isequal(gca, AVWVIEW.handles.axial_axes),
+0190       <span class="keyword">switch</span> command,
+0191         <span class="keyword">case</span> <span class="string">'left'</span>,
+0192           <span class="comment">% decrease sagittal slice</span>
+0193           <span class="keyword">if</span> AVWVIEW.slices.sag &gt; 1,
+0194             AVWVIEW.slices.sag = AVWVIEW.slices.sag - 1;
+0195           <span class="keyword">end</span>
+0196         <span class="keyword">case</span> <span class="string">'right'</span>,
+0197           <span class="comment">% increase sagittal slice</span>
+0198           <span class="keyword">if</span> AVWVIEW.slices.sag &lt; AVWVIEW.xdim,
+0199             AVWVIEW.slices.sag = AVWVIEW.slices.sag + 1;
+0200           <span class="keyword">end</span>
+0201         <span class="keyword">case</span> <span class="string">'up'</span>,
+0202           <span class="comment">% increase coronal slice</span>
+0203           <span class="keyword">if</span> AVWVIEW.slices.cor &lt; AVWVIEW.ydim,
+0204             AVWVIEW.slices.cor = AVWVIEW.slices.cor + 1;
+0205           <span class="keyword">end</span>
+0206         <span class="keyword">case</span> <span class="string">'down'</span>,
+0207           <span class="comment">% decrease coronal slice</span>
+0208           <span class="keyword">if</span> AVWVIEW.slices.cor &gt; 1,
+0209             AVWVIEW.slices.cor = AVWVIEW.slices.cor - 1;
+0210           <span class="keyword">end</span>
+0211       <span class="keyword">end</span>
+0212       <span class="keyword">switch</span> command,
+0213         <span class="keyword">case</span> {<span class="string">'left'</span>,<span class="string">'right'</span>}
+0214           set(AVWVIEW.handles.sagittal_slider,<span class="string">'Value'</span>,AVWVIEW.slices.sag);
+0215           Ssag = squeeze(AVWVIEW.avw.img(AVWVIEW.slices.sag,:,:));
+0216           set(AVWVIEW.handles.sagittal_image,<span class="string">'CData'</span>,Ssag');
+0217           set(AVWVIEW.handles.sagittal_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.sag));
+0218           set(AVWVIEW.handles.sagittal_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.sag);
+0219         <span class="keyword">case</span> {<span class="string">'up'</span>,<span class="string">'down'</span>},
+0220           set(AVWVIEW.handles.coronal_slider,<span class="string">'Value'</span>,AVWVIEW.slices.cor);
+0221           Scor = squeeze(AVWVIEW.avw.img(:,AVWVIEW.slices.cor,:));
+0222           set(AVWVIEW.handles.coronal_image,<span class="string">'CData'</span>,Scor');
+0223           set(AVWVIEW.handles.coronal_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.cor));
+0224           set(AVWVIEW.handles.coronal_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.cor);
+0225       <span class="keyword">end</span>
+0226     <span class="keyword">end</span>
+0227     
+0228     <span class="keyword">if</span> isequal(gca, AVWVIEW.handles.coronal_axes),
+0229       <span class="keyword">switch</span> command,
+0230         <span class="keyword">case</span> <span class="string">'left'</span>,
+0231           <span class="comment">% decrease sagittal slice</span>
+0232           <span class="keyword">if</span> AVWVIEW.slices.sag &gt; 1,
+0233             AVWVIEW.slices.sag = AVWVIEW.slices.sag - 1;
+0234           <span class="keyword">end</span>
+0235         <span class="keyword">case</span> <span class="string">'right'</span>,
+0236           <span class="comment">% increase sagittal slice</span>
+0237           <span class="keyword">if</span> AVWVIEW.slices.sag &lt; AVWVIEW.xdim,
+0238             AVWVIEW.slices.sag = AVWVIEW.slices.sag + 1;
+0239           <span class="keyword">end</span>
+0240         <span class="keyword">case</span> <span class="string">'up'</span>,
+0241           <span class="comment">% increase axial slice</span>
+0242           <span class="keyword">if</span> AVWVIEW.slices.axi &lt; AVWVIEW.zdim,
+0243             AVWVIEW.slices.axi = AVWVIEW.slices.axi + 1;
+0244           <span class="keyword">end</span>
+0245         <span class="keyword">case</span> <span class="string">'down'</span>,
+0246           <span class="comment">% decrease axial slice</span>
+0247           <span class="keyword">if</span> AVWVIEW.slices.axi &gt; 1,
+0248             AVWVIEW.slices.axi = AVWVIEW.slices.axi - 1;
+0249           <span class="keyword">end</span>
+0250       <span class="keyword">end</span>
+0251       <span class="keyword">switch</span> command,
+0252         <span class="keyword">case</span> {<span class="string">'left'</span>,<span class="string">'right'</span>}
+0253           set(AVWVIEW.handles.sagittal_slider,<span class="string">'Value'</span>,AVWVIEW.slices.sag);
+0254           Ssag = squeeze(AVWVIEW.avw.img(AVWVIEW.slices.sag,:,:));
+0255           set(AVWVIEW.handles.sagittal_image,<span class="string">'CData'</span>,Ssag');
+0256           set(AVWVIEW.handles.sagittal_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.sag));
+0257           set(AVWVIEW.handles.sagittal_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.sag);
+0258         <span class="keyword">case</span> {<span class="string">'up'</span>,<span class="string">'down'</span>},
+0259           set(AVWVIEW.handles.axial_slider,<span class="string">'Value'</span>,AVWVIEW.slices.axi);
+0260           Saxi = squeeze(AVWVIEW.avw.img(:,:,AVWVIEW.slices.axi));
+0261           set(AVWVIEW.handles.axial_image,<span class="string">'CData'</span>,Saxi');
+0262           set(AVWVIEW.handles.axial_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.axi));
+0263           set(AVWVIEW.handles.axial_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.axi);
+0264       <span class="keyword">end</span>
+0265     <span class="keyword">end</span>
+0266     
+0267     <span class="keyword">if</span> isequal(gca, AVWVIEW.handles.sagittal_axes),
+0268       <span class="keyword">switch</span> command,
+0269         <span class="keyword">case</span> <span class="string">'left'</span>,
+0270           <span class="comment">% decrease sagittal slice</span>
+0271           <span class="keyword">if</span> AVWVIEW.slices.cor &gt; 1,
+0272             AVWVIEW.slices.cor = AVWVIEW.slices.cor - 1;
+0273           <span class="keyword">end</span>
+0274         <span class="keyword">case</span> <span class="string">'right'</span>,
+0275           <span class="comment">% increase sagittal slice</span>
+0276           <span class="keyword">if</span> AVWVIEW.slices.cor &lt; AVWVIEW.ydim,
+0277             AVWVIEW.slices.cor = AVWVIEW.slices.cor + 1;
+0278           <span class="keyword">end</span>
+0279         <span class="keyword">case</span> <span class="string">'up'</span>,
+0280           <span class="comment">% increase axial slice</span>
+0281           <span class="keyword">if</span> AVWVIEW.slices.axi &lt; AVWVIEW.zdim,
+0282             AVWVIEW.slices.axi = AVWVIEW.slices.axi + 1;
+0283           <span class="keyword">end</span>
+0284         <span class="keyword">case</span> <span class="string">'down'</span>,
+0285           <span class="comment">% decrease axial slice</span>
+0286           <span class="keyword">if</span> AVWVIEW.slices.axi &gt; 1,
+0287             AVWVIEW.slices.axi = AVWVIEW.slices.axi - 1;
+0288           <span class="keyword">end</span>
+0289       <span class="keyword">end</span>
+0290       <span class="keyword">switch</span> command,
+0291         <span class="keyword">case</span> {<span class="string">'left'</span>,<span class="string">'right'</span>}
+0292           set(AVWVIEW.handles.coronal_slider,<span class="string">'Value'</span>,AVWVIEW.slices.cor);
+0293           Scor = squeeze(AVWVIEW.avw.img(:,AVWVIEW.slices.cor,:));
+0294           set(AVWVIEW.handles.coronal_image,<span class="string">'CData'</span>,Scor');
+0295           set(AVWVIEW.handles.coronal_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.cor));
+0296           set(AVWVIEW.handles.coronal_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.cor);
+0297         <span class="keyword">case</span> {<span class="string">'up'</span>,<span class="string">'down'</span>},
+0298           set(AVWVIEW.handles.axial_slider,<span class="string">'Value'</span>,AVWVIEW.slices.axi);
+0299           Saxi = squeeze(AVWVIEW.avw.img(:,:,AVWVIEW.slices.axi));
+0300           set(AVWVIEW.handles.axial_image,<span class="string">'CData'</span>,Saxi');
+0301           set(AVWVIEW.handles.axial_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.axi));
+0302           set(AVWVIEW.handles.axial_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.axi);
+0303       <span class="keyword">end</span>
+0304     <span class="keyword">end</span>
+0305     
+0306     AVWVIEW = <a href="#_sub4" class="code" title="subfunction AVWVIEW = set_crosshairs(AVWVIEW)">set_crosshairs</a>(AVWVIEW);
+0307     
+0308     
+0309     
+0310     
+0311     
+0312     
+0313     
+0314     
+0315     
+0316     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0317     
+0318   <span class="keyword">case</span> {<span class="string">'roi_9'</span>,<span class="string">'roi_7'</span>,<span class="string">'roi_5'</span>,<span class="string">'roi_3'</span>},
+0319     
+0320     position = [ AVWVIEW.slices.sag, AVWVIEW.slices.cor, AVWVIEW.slices.axi ];
+0321     
+0322     shape.type = <span class="string">'block'</span>;
+0323     <span class="keyword">if</span> findstr(command,<span class="string">'9'</span>), shape.size = [9,9,9]; <span class="keyword">end</span>
+0324     <span class="keyword">if</span> findstr(command,<span class="string">'7'</span>), shape.size = [7,7,7]; <span class="keyword">end</span>
+0325     <span class="keyword">if</span> findstr(command,<span class="string">'5'</span>), shape.size = [5,5,5]; <span class="keyword">end</span>
+0326     <span class="keyword">if</span> findstr(command,<span class="string">'3'</span>), shape.size = [3,3,3]; <span class="keyword">end</span>
+0327     
+0328     stats.roi = <a href="avw_roi.html" class="code" title="function [roi] = avw_roi(avw,position,shape)">avw_roi</a>(AVWVIEW.avw,position,shape);
+0329     
+0330     AVWVIEW.avw.stats = <a href="avw_stats.html" class="code" title="function [stat] = avw_stats(stat)">avw_stats</a>(stats);
+0331     
+0332     
+0333     
+0334     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0335     
+0336   <span class="keyword">case</span> {<span class="string">'nasion'</span>,<span class="string">'rpa'</span>,<span class="string">'lpa'</span>,<span class="string">'ac'</span>},
+0337     
+0338     <span class="comment">% return voxel coordinates into AVWVIEW.imgXYZ</span>
+0339     AVWVIEW = <a href="#_sub10" class="code" title="subfunction [AVWVIEW,metric] = slices2metric(AVWVIEW),">slices2metric</a>(AVWVIEW);
+0340     
+0341     <span class="keyword">if</span> get(AVWVIEW.handles.coord,<span class="string">'value'</span>) == 2,
+0342       format = <span class="string">'%7.3f %7.3f %7.3f'</span>;
+0343       imgXYZ = AVWVIEW.imgXYZ.mm;
+0344       string = sprintf(<span class="string">'%7.3f %7.3f %7.3f'</span>,imgXYZ);
+0345     <span class="keyword">elseif</span> get(AVWVIEW.handles.coord,<span class="string">'value'</span>) == 3,
+0346       format = <span class="string">'%7.3f %7.3f %7.3f'</span>;
+0347       imgXYZ = AVWVIEW.imgXYZ.meters;
+0348       string = sprintf(<span class="string">'%7.3f %7.3f %7.3f'</span>,imgXYZ);
+0349     <span class="keyword">else</span>
+0350       imgXYZ = AVWVIEW.imgXYZ.voxels;
+0351       string = sprintf(<span class="string">'%7.0f %7.0f %7.0f'</span>,imgXYZ);
+0352     <span class="keyword">end</span>;
+0353     
+0354     <span class="keyword">switch</span> command,
+0355       <span class="keyword">case</span> <span class="string">'nasion'</span>,
+0356         set(AVWVIEW.handles.nasion,<span class="string">'String'</span>,string);
+0357         AVWVIEW.avw.fiducials.nasion.voxels(1,:) = AVWVIEW.imgXYZ.voxels;
+0358         AVWVIEW.avw.fiducials.nasion.meters(1,:) = AVWVIEW.imgXYZ.meters;
+0359         AVWVIEW.avw.fiducials.nasion.mm(1,:)     = AVWVIEW.imgXYZ.mm;
+0360       <span class="keyword">case</span> <span class="string">'rpa'</span>,
+0361         set(AVWVIEW.handles.rpa,<span class="string">'String'</span>,string);
+0362         AVWVIEW.avw.fiducials.rpa.voxels(1,:) = AVWVIEW.imgXYZ.voxels;
+0363         AVWVIEW.avw.fiducials.rpa.meters(1,:) = AVWVIEW.imgXYZ.meters;
+0364         AVWVIEW.avw.fiducials.rpa.mm(1,:)     = AVWVIEW.imgXYZ.mm;
+0365       <span class="keyword">case</span> <span class="string">'lpa'</span>,
+0366         set(AVWVIEW.handles.lpa,<span class="string">'String'</span>,string);
+0367         AVWVIEW.avw.fiducials.lpa.voxels(1,:) = AVWVIEW.imgXYZ.voxels;
+0368         AVWVIEW.avw.fiducials.lpa.meters(1,:) = AVWVIEW.imgXYZ.meters;
+0369         AVWVIEW.avw.fiducials.lpa.mm(1,:)     = AVWVIEW.imgXYZ.mm;
+0370       <span class="keyword">case</span> <span class="string">'ac'</span>,
+0371         set(AVWVIEW.handles.ac,<span class="string">'String'</span>,string);
+0372         AVWVIEW.avw.ac.voxels(1,:) = AVWVIEW.imgXYZ.voxels;
+0373         AVWVIEW.avw.ac.meters(1,:) = AVWVIEW.imgXYZ.meters;
+0374         AVWVIEW.avw.ac.mm(1,:) = AVWVIEW.imgXYZ.mm;
+0375     <span class="keyword">end</span>
+0376     
+0377     
+0378     
+0379     
+0380     
+0381     
+0382     
+0383     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0384     
+0385   <span class="keyword">case</span> <span class="string">'flip'</span>,
+0386     
+0387     <span class="comment">% flip X dim here...</span>
+0388     AVWVIEW.avw.img = flipdim(AVWVIEW.avw.img,1);
+0389     
+0390     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_image'</span>),
+0391       Saxi = squeeze(AVWVIEW.avw.img(:,:,AVWVIEW.slices.axi));
+0392       set(AVWVIEW.handles.axial_image,<span class="string">'CData'</span>,Saxi');
+0393     <span class="keyword">end</span>;
+0394     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_image'</span>),
+0395       Scor = squeeze(AVWVIEW.avw.img(:,AVWVIEW.slices.cor,:));
+0396       set(AVWVIEW.handles.coronal_image,<span class="string">'CData'</span>,Scor');
+0397     <span class="keyword">end</span>;
+0398     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_image'</span>),
+0399       Ssag = squeeze(AVWVIEW.avw.img(AVWVIEW.slices.sag,:,:));
+0400       set(AVWVIEW.handles.sagittal_image,<span class="string">'CData'</span>,Ssag');
+0401     <span class="keyword">end</span>;
+0402     
+0403     flipStatus = get(AVWVIEW.handles.flipStatus,<span class="string">'string'</span>);
+0404     <span class="keyword">if</span> strmatch(flipStatus,<span class="string">'R&gt;&gt;L (radiological)'</span>),
+0405       flipStatus = <span class="string">'L&gt;&gt;R (neurological)'</span>;
+0406     <span class="keyword">else</span>,
+0407       flipStatus = <span class="string">'R&gt;&gt;L (radiological)'</span>;
+0408     <span class="keyword">end</span>;
+0409     set(AVWVIEW.handles.flipStatus,<span class="string">'string'</span>,flipStatus);
+0410     
+0411     
+0412     
+0413     
+0414     
+0415     
+0416     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0417     
+0418   <span class="keyword">case</span> {<span class="string">'brighter'</span>,<span class="string">'dimmer'</span>,<span class="string">'setclimit'</span>},
+0419     
+0420     <span class="keyword">switch</span> command,
+0421       <span class="keyword">case</span> <span class="string">'brighter'</span>,
+0422         AVWVIEW.clim = AVWVIEW.clim .* 0.9;
+0423       <span class="keyword">case</span> <span class="string">'dimmer'</span>,
+0424         AVWVIEW.clim = AVWVIEW.clim .* 1.1;
+0425       <span class="keyword">case</span> <span class="string">'setclimit'</span>,
+0426         clim = get(AVWVIEW.handles.clim,<span class="string">'string'</span>);
+0427         AVWVIEW.clim(2) = str2num(clim);
+0428     <span class="keyword">end</span>
+0429     climString = sprintf(<span class="string">'%05.2f'</span>,AVWVIEW.clim(2));
+0430     set(AVWVIEW.handles.clim,<span class="string">'string'</span>,climString);
+0431     
+0432     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_image'</span>),
+0433       set(AVWVIEW.handles.axial_axes,<span class="string">'Clim'</span>,AVWVIEW.clim);
+0434     <span class="keyword">end</span>;
+0435     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_image'</span>),
+0436       set(AVWVIEW.handles.coronal_axes,<span class="string">'Clim'</span>,AVWVIEW.clim);
+0437     <span class="keyword">end</span>;
+0438     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_image'</span>),
+0439       set(AVWVIEW.handles.sagittal_axes,<span class="string">'Clim'</span>,AVWVIEW.clim);
+0440     <span class="keyword">end</span>;
+0441     
+0442     
+0443     
+0444     
+0445     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0446     
+0447   <span class="keyword">case</span> <span class="string">'contrast'</span>
+0448     
+0449     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_image'</span>),
+0450       X = squeeze(AVWVIEW.avw.img(:,:,AVWVIEW.slices.axi));
+0451       AVWVIEW.cmap = contrast(X);
+0452       colormap(AVWVIEW.handles.axial_axes,AVWVIEW.cmap);
+0453     <span class="keyword">end</span>;
+0454     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_image'</span>),
+0455       X = squeeze(AVWVIEW.avw.img(:,AVWVIEW.slices.cor,:));
+0456       AVWVIEW.cmap = contrast(X);
+0457       colormap(AVWVIEW.handles.axial_axes,AVWVIEW.cmap);
+0458     <span class="keyword">end</span>;
+0459     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_image'</span>),
+0460       X = squeeze(AVWVIEW.avw.img(AVWVIEW.slices.sag,:,:));
+0461       AVWVIEW.cmap = contrast(X);
+0462       colormap(AVWVIEW.handles.axial_axes,AVWVIEW.cmap);
+0463     <span class="keyword">end</span>;
+0464     
+0465     
+0466     
+0467     
+0468     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0469     
+0470   <span class="keyword">case</span> <span class="string">'setcmap'</span>
+0471     
+0472     cmapIndex = get(AVWVIEW.handles.cmap,<span class="string">'value'</span>);
+0473     cmapString = get(AVWVIEW.handles.cmap,<span class="string">'string'</span>);
+0474     
+0475     AVWVIEW.cmapString = cmapString{cmapIndex};
+0476     
+0477     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_image'</span>),
+0478       AVWVIEW.cmap = colormap(AVWVIEW.handles.axial_axes,AVWVIEW.cmapString);
+0479     <span class="keyword">end</span>;
+0480     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_image'</span>),
+0481       AVWVIEW.cmap = colormap(AVWVIEW.handles.coronal_axes,AVWVIEW.cmapString);
+0482     <span class="keyword">end</span>;
+0483     <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_image'</span>),
+0484       AVWVIEW.cmap = colormap(AVWVIEW.handles.sagittal_axes,AVWVIEW.cmapString);
+0485     <span class="keyword">end</span>;
+0486     
+0487     
+0488     
+0489     
+0490     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0491     
+0492   <span class="keyword">case</span> <span class="string">'histogram'</span>,
+0493     
+0494     avw = AVWVIEW.avw;
+0495     
+0496     <span class="comment">% would be nice to use bins that reflect</span>
+0497     <span class="comment">% the bits per pixel, but it seems to take</span>
+0498     <span class="comment">% forever for a 16 bit image, otherwise</span>
+0499     <span class="comment">% use this code:</span>
+0500     <span class="comment">%     %check the bits per pixel of avw</span>
+0501     <span class="comment">%     bitpix = avw.hdr.dime.bitpix;</span>
+0502     <span class="comment">%     % set the bins according to the data type</span>
+0503     <span class="comment">%     if bitpix &lt;= 8, bins = 0:255; end</span>
+0504     <span class="comment">%     if bitpix &gt; 8,  bins = 0:65535; end</span>
+0505     
+0506     <span class="comment">%bins = linspace(0,intensity_max,255);</span>
+0507     
+0508     intensity_min = min(min(min(avw.img)));
+0509     intensity_max = max(max(max(avw.img)));
+0510     
+0511     bins = intensity_min:intensity_max;
+0512     
+0513     fprintf(<span class="string">'...calculating histogram for %d bins.\n'</span>,length(bins));
+0514     
+0515     <span class="keyword">for</span> i=1:size(avw.img,3),
+0516       n = hist(avw.img(:,:,i), bins);
+0517       <span class="keyword">if</span> i == 1,
+0518         intensity_volume = sum(n,2);
+0519       <span class="keyword">else</span>
+0520         intensity_slice = sum(n,2);
+0521         intensity_volume = intensity_volume + intensity_slice;
+0522       <span class="keyword">end</span>
+0523     <span class="keyword">end</span>
+0524     figure(<span class="string">'name'</span>,<span class="string">'intensity histogram'</span>);
+0525     bar(bins,intensity_volume);
+0526     
+0527     
+0528     
+0529     
+0530     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0531     
+0532   <span class="keyword">case</span> <span class="string">'zoom'</span>
+0533     
+0534     x = AVWVIEW.slices.sag;
+0535     y = AVWVIEW.slices.cor;
+0536     z = AVWVIEW.slices.axi;
+0537     
+0538     <span class="keyword">switch</span> AVWVIEW.view,
+0539       <span class="keyword">case</span> <span class="string">'axi'</span>,
+0540         slice = rot90(AVWVIEW.avw.img(:,:,z));
+0541       <span class="keyword">case</span> <span class="string">'cor'</span>,
+0542         slice = rot90(squeeze(AVWVIEW.avw.img(:,y,:)));
+0543       <span class="keyword">case</span> <span class="string">'sag'</span>,
+0544         slice = rot90(squeeze(AVWVIEW.avw.img(x,:,:)));
+0545     <span class="keyword">end</span>
+0546     
+0547     figure;
+0548     imagesc(slice,AVWVIEW.clim); 
+0549     colormap(gray); axis off; zoom on;
+0550     daspect(AVWVIEW.daspect);
+0551     
+0552     
+0553     
+0554     
+0555     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0556     
+0557   <span class="keyword">case</span> <span class="string">'save_image'</span>,
+0558     
+0559     [filename, pathname] = uiputfile(<span class="keyword">...</span>
+0560       { <span class="string">'*.png'</span>,<span class="string">'PNG Files (*.png)'</span>; <span class="keyword">...</span>
+0561         <span class="string">'*.jpg'</span>,<span class="string">'JPG Files (*.jpg)'</span>; <span class="keyword">...</span>
+0562         <span class="string">'*.ppm;*.pgm;*.pbm'</span>,<span class="string">'Portable Anymap (*.ppm,*.pgm,*.pbm)'</span>; <span class="keyword">...</span>
+0563         <span class="string">'*.*'</span>,  <span class="string">'All Files (*.*)'</span>}, <span class="keyword">...</span>
+0564       <span class="string">'IMWrite to file'</span>);
+0565     
+0566     <span class="keyword">if</span> filename,
+0567       
+0568       x = AVWVIEW.slices.sag;
+0569       y = AVWVIEW.slices.cor;
+0570       z = AVWVIEW.slices.axi;
+0571       
+0572       pixelsPerMM = 1 ./ double(AVWVIEW.avw.hdr.dime.pixdim(2:4));
+0573       pixelsPerMeter = pixelsPerMM .* 1000;
+0574       
+0575       <span class="keyword">switch</span> AVWVIEW.view,
+0576         <span class="keyword">case</span> <span class="string">'axi'</span>,
+0577           slice = rot90(AVWVIEW.avw.img(:,:,z));
+0578           xresolution = pixelsPerMeter(1);
+0579           yresolution = pixelsPerMeter(2);
+0580         <span class="keyword">case</span> <span class="string">'cor'</span>,
+0581           slice = rot90(squeeze(AVWVIEW.avw.img(:,y,:)));
+0582           xresolution = pixelsPerMeter(1);
+0583           yresolution = pixelsPerMeter(3);
+0584         <span class="keyword">case</span> <span class="string">'sag'</span>,
+0585           slice = rot90(squeeze(AVWVIEW.avw.img(x,:,:)));
+0586           xresolution = pixelsPerMeter(2);
+0587           yresolution = pixelsPerMeter(3);
+0588       <span class="keyword">end</span>
+0589       
+0590       <span class="comment">% scale the image values to between 0-1 for imwrite</span>
+0591       <span class="comment">% (initially used max of slice, but actually want to</span>
+0592       <span class="comment">% use the scaled intensity from the gui).</span>
+0593       <span class="comment">%maxValue = max(max(slice));</span>
+0594       <span class="comment">%scaledSlice = slice ./ maxValue;</span>
+0595       scaledSlice = slice ./ AVWVIEW.clim(2);
+0596       
+0597       <span class="comment">% RGB = ind2rgb(X,map) converts the matrix X and corresponding</span>
+0598       <span class="comment">% colormap map to RGB (truecolor)</span>
+0599       
+0600       file = [pathname,filename];
+0601       fprintf(<span class="string">'saving to:...%s\n'</span>,file);
+0602       
+0603       <span class="comment">%Most of the supported image file formats store uint8 data.</span>
+0604       <span class="comment">%PNG and TIFF formats additionally support uint16 data. For</span>
+0605       <span class="comment">%grayscale and RGB images, if the data array is double, the</span>
+0606       <span class="comment">%assumed dynamic range is [0,1]. The data array is automatically</span>
+0607       <span class="comment">%scaled by 255 before being written as uint8. If the data array</span>
+0608       <span class="comment">%is uint8 or uint16, it is written without scaling as uint8 or</span>
+0609       <span class="comment">%uint16, respectively.</span>
+0610       
+0611       [pathname,filename,ext] = fileparts([pathname,filename]);
+0612       
+0613       <span class="keyword">switch</span> ext,
+0614       
+0615         <span class="keyword">case</span> <span class="string">'.png'</span>,
+0616           <span class="comment">%imwrite(uint8(image),colormap,file,format);</span>
+0617           <span class="comment">%imwrite(slice,colormap(gray),file,format,...</span>
+0618           
+0619           <span class="comment">%     'XResolution'  A scalar indicating the number of</span>
+0620           <span class="comment">%                    pixels/unit in the horizontal direction</span>
+0621           <span class="comment">%</span>
+0622           <span class="comment">%     'YResolution'  A scalar indicating the number of</span>
+0623           <span class="comment">%                    pixels/unit in the vertical direction</span>
+0624           <span class="comment">%</span>
+0625           <span class="comment">%     'ResolutionUnit' Either 'unknown' or 'meter'</span>
+0626           format = <span class="string">'png'</span>;
+0627           imwrite(scaledSlice,file,format,<span class="keyword">...</span>
+0628             <span class="string">'BitDepth'</span>,16,<span class="string">'ResolutionUnit'</span>,<span class="string">'meter'</span>,<span class="keyword">...</span>
+0629             <span class="string">'XResolution'</span>,xresolution,<span class="keyword">...</span>
+0630             <span class="string">'YResolution'</span>,yresolution);
+0631           
+0632         <span class="keyword">case</span> <span class="string">'.jpg'</span>,
+0633           format = <span class="string">'jpg'</span>;
+0634           imwrite(scaledSlice,file,format);
+0635         <span class="keyword">case</span> {<span class="string">'.ppm'</span>,<span class="string">'.pgm'</span>,<span class="string">'.pbm'</span>},
+0636           format = ext(2:end);
+0637           imwrite(scaledSlice,file,format);
+0638         <span class="keyword">otherwise</span>
+0639           fprintf(<span class="string">'...cannot write %s image files\n'</span>,ext);
+0640       <span class="keyword">end</span>
+0641     <span class="keyword">end</span>
+0642     
+0643     
+0644     
+0645     
+0646     
+0647   <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0648     
+0649   <span class="keyword">case</span> <span class="string">'quit'</span>,
+0650     
+0651     flipStatus = get(AVWVIEW.handles.flipStatus,<span class="string">'string'</span>);
+0652     <span class="keyword">if</span> strmatch(flipStatus,<span class="string">'L&gt;&gt;R (neurological)'</span>),
+0653       fprintf(<span class="string">'...returning avw.img to radiological orientation;\n'</span>);
+0654       fprintf(<span class="string">'...use avw_flip to permanently change the orientation.\n'</span>);
+0655       AVWVIEW.avw.img = flipdim(AVWVIEW.avw.img,1);
+0656     <span class="keyword">end</span>;
+0657     
+0658     <span class="comment">% try to assign back into the input struct</span>
+0659     <span class="keyword">if</span> ~isempty(AVWVIEW.invarname),
+0660       fprintf(<span class="string">'...returning data to base workspace struct ''%s''\n'</span>,AVWVIEW.invarname);
+0661       assignin(<span class="string">'base'</span>,AVWVIEW.invarname,AVWVIEW.avw);
+0662     <span class="keyword">elseif</span> evalin(<span class="string">'base'</span>,<span class="string">'exist(''mri'',''var'')'</span>),
+0663       fprintf(<span class="string">'...returning data to base workspace struct ''mri''\n'</span>);
+0664       string = [<span class="string">'AVWVIEW = get('</span>, num2str(AVWVIEW.gui),<span class="keyword">...</span>
+0665           <span class="string">',''Userdata''); mri.data = AVWVIEW.avw; clear AVWVIEW;'</span>];
+0666       evalin(<span class="string">'base'</span>,string);
+0667     <span class="keyword">else</span>
+0668       fprintf(<span class="string">'...returning data into base workspace struct ''avw''\n'</span>);
+0669       assignin(<span class="string">'base'</span>,<span class="string">'avw'</span>,AVWVIEW.avw);
+0670     <span class="keyword">end</span>
+0671     close gcbf;
+0672     
+0673   <span class="keyword">otherwise</span>,
+0674     
+0675 <span class="keyword">end</span>
+0676 
+0677 
+0678 <span class="keyword">switch</span> command,
+0679   <span class="keyword">case</span> <span class="string">'quit'</span>,
+0680   <span class="keyword">otherwise</span>,
+0681     set(AVWVIEW.gui,<span class="string">'UserData'</span>,AVWVIEW);
+0682 <span class="keyword">end</span>
+0683 
+0684 <span class="keyword">if</span> nargout &gt; 0,
+0685   varargout{1} = AVWVIEW.avw;
+0686 <span class="keyword">end</span>
+0687 
+0688 
+0689 <span class="keyword">return</span>
+0690 
+0691 
+0692 
+0693 
+0694 
+0695 
+0696 
+0697 
+0698 
+0699 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0700 <span class="comment">% SUBFUNCTIONS</span>
+0701 
+0702 
+0703 
+0704 
+0705 
+0706 
+0707 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0708 <a name="_sub1" href="#_subfunctions" class="code">function axial_update(AVWVIEW)</a>
+0709 
+0710 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_image'</span>),
+0711     Saxi = squeeze(AVWVIEW.avw.img(:,:,AVWVIEW.slices.axi));
+0712     set(AVWVIEW.handles.axial_image,<span class="string">'CData'</span>,Saxi');
+0713 <span class="keyword">end</span>
+0714 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_sliderN'</span>),
+0715     set(AVWVIEW.handles.axial_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.axi));
+0716     set(AVWVIEW.handles.axial_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.axi);
+0717 <span class="keyword">end</span>
+0718 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_slider'</span>),
+0719     set(AVWVIEW.handles.axial_slider,<span class="string">'Value'</span>,AVWVIEW.slices.axi);
+0720 <span class="keyword">end</span>;
+0721 
+0722 <span class="keyword">return</span>
+0723 
+0724 
+0725 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0726 <a name="_sub2" href="#_subfunctions" class="code">function coronal_update(AVWVIEW)</a>
+0727 
+0728 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_image'</span>),
+0729     Scor = squeeze(AVWVIEW.avw.img(:,AVWVIEW.slices.cor,:));
+0730     set(AVWVIEW.handles.coronal_image,<span class="string">'CData'</span>,Scor');
+0731 <span class="keyword">end</span>
+0732 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_sliderN'</span>),
+0733     set(AVWVIEW.handles.coronal_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.cor));
+0734     set(AVWVIEW.handles.coronal_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.cor);
+0735 <span class="keyword">end</span>
+0736 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_slider'</span>),
+0737     set(AVWVIEW.handles.coronal_slider,<span class="string">'Value'</span>,AVWVIEW.slices.cor);
+0738 <span class="keyword">end</span>;
+0739 
+0740 <span class="keyword">return</span>
+0741 
+0742 
+0743 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0744 <a name="_sub3" href="#_subfunctions" class="code">function sagittal_update(AVWVIEW)</a>
+0745 
+0746 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_image'</span>),
+0747     Ssag = squeeze(AVWVIEW.avw.img(AVWVIEW.slices.sag,:,:));
+0748     set(AVWVIEW.handles.sagittal_image,<span class="string">'CData'</span>,Ssag');
+0749 <span class="keyword">end</span>
+0750 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_sliderN'</span>),
+0751     set(AVWVIEW.handles.sagittal_sliderN,<span class="string">'String'</span>,num2str(AVWVIEW.slices.sag));
+0752     set(AVWVIEW.handles.sagittal_sliderN,<span class="string">'Value'</span>,AVWVIEW.slices.sag);
+0753 <span class="keyword">end</span>
+0754 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_slider'</span>),
+0755     set(AVWVIEW.handles.sagittal_slider,<span class="string">'Value'</span>,AVWVIEW.slices.sag);
+0756 <span class="keyword">end</span>;
+0757 
+0758 <span class="keyword">return</span>
+0759 
+0760 
+0761 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0762 <a name="_sub4" href="#_subfunctions" class="code">function AVWVIEW = set_crosshairs(AVWVIEW)</a>
+0763 
+0764 current_axes = gca;
+0765 
+0766 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_axes'</span>),
+0767   axes(AVWVIEW.handles.axial_axes);
+0768   <span class="keyword">if</span> ishandle(AVWVIEW.handles.axial_xline),
+0769     delete(AVWVIEW.handles.axial_xline);
+0770   <span class="keyword">end</span>
+0771   <span class="keyword">if</span> ishandle(AVWVIEW.handles.axial_yline),
+0772     delete(AVWVIEW.handles.axial_yline);
+0773   <span class="keyword">end</span>
+0774   
+0775   AVWVIEW.handles.axial_xlim = get(AVWVIEW.handles.axial_axes,<span class="string">'Xlim'</span>);
+0776   AVWVIEW.handles.axial_ylim = get(AVWVIEW.handles.axial_axes,<span class="string">'Ylim'</span>);
+0777   AVWVIEW.handles.axial_xline = line(<span class="string">'Xdata'</span>,[AVWVIEW.slices.sag AVWVIEW.slices.sag],<span class="string">'Ydata'</span>,AVWVIEW.handles.axial_ylim);
+0778   AVWVIEW.handles.axial_yline = line(<span class="string">'Ydata'</span>,[AVWVIEW.slices.cor AVWVIEW.slices.cor],<span class="string">'Xdata'</span>,AVWVIEW.handles.axial_xlim);
+0779   set(AVWVIEW.handles.axial_xline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'XLINE'</span>);
+0780   set(AVWVIEW.handles.axial_yline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'YLINE'</span>);
+0781   
+0782   <span class="keyword">if</span> get(AVWVIEW.handles.crosshairs,<span class="string">'value'</span>),
+0783     set(AVWVIEW.handles.axial_xline,<span class="string">'visible'</span>,<span class="string">'on'</span>);
+0784     set(AVWVIEW.handles.axial_yline,<span class="string">'visible'</span>,<span class="string">'on'</span>);
+0785   <span class="keyword">else</span>
+0786     set(AVWVIEW.handles.axial_xline,<span class="string">'visible'</span>,<span class="string">'off'</span>);
+0787     set(AVWVIEW.handles.axial_yline,<span class="string">'visible'</span>,<span class="string">'off'</span>);
+0788   <span class="keyword">end</span>
+0789   
+0790 <span class="keyword">end</span>
+0791 
+0792 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_axes'</span>),
+0793   
+0794   axes(AVWVIEW.handles.coronal_axes);
+0795   <span class="keyword">if</span> ishandle(AVWVIEW.handles.coronal_xline),
+0796     delete(AVWVIEW.handles.coronal_xline);
+0797   <span class="keyword">end</span>
+0798   <span class="keyword">if</span> ishandle(AVWVIEW.handles.coronal_yline),
+0799     delete(AVWVIEW.handles.coronal_yline);
+0800   <span class="keyword">end</span>
+0801   
+0802   AVWVIEW.handles.coronal_xlim = get(AVWVIEW.handles.coronal_axes,<span class="string">'Xlim'</span>);
+0803   AVWVIEW.handles.coronal_ylim = get(AVWVIEW.handles.coronal_axes,<span class="string">'Ylim'</span>);
+0804   AVWVIEW.handles.coronal_xline = line(<span class="string">'Xdata'</span>,[AVWVIEW.slices.sag AVWVIEW.slices.sag],<span class="string">'Ydata'</span>,AVWVIEW.handles.coronal_ylim);
+0805   AVWVIEW.handles.coronal_yline = line(<span class="string">'Ydata'</span>,[AVWVIEW.slices.axi AVWVIEW.slices.axi],<span class="string">'Xdata'</span>,AVWVIEW.handles.coronal_xlim);
+0806   set(AVWVIEW.handles.coronal_xline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'XLINE'</span>);
+0807   set(AVWVIEW.handles.coronal_yline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'YLINE'</span>);
+0808   
+0809   <span class="keyword">if</span> get(AVWVIEW.handles.crosshairs,<span class="string">'value'</span>),
+0810     set(AVWVIEW.handles.coronal_xline,<span class="string">'visible'</span>,<span class="string">'on'</span>);
+0811     set(AVWVIEW.handles.coronal_yline,<span class="string">'visible'</span>,<span class="string">'on'</span>);
+0812   <span class="keyword">else</span>
+0813     set(AVWVIEW.handles.coronal_xline,<span class="string">'visible'</span>,<span class="string">'off'</span>);
+0814     set(AVWVIEW.handles.coronal_yline,<span class="string">'visible'</span>,<span class="string">'off'</span>);
+0815   <span class="keyword">end</span>
+0816   
+0817 <span class="keyword">end</span>
+0818 
+0819 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_axes'</span>),
+0820   axes(AVWVIEW.handles.sagittal_axes);
+0821   <span class="keyword">if</span> ishandle(AVWVIEW.handles.sagittal_xline),
+0822     delete(AVWVIEW.handles.sagittal_xline);
+0823   <span class="keyword">end</span>
+0824   <span class="keyword">if</span> ishandle(AVWVIEW.handles.sagittal_yline),
+0825     delete(AVWVIEW.handles.sagittal_yline);
+0826   <span class="keyword">end</span>
+0827   
+0828   AVWVIEW.handles.sagittal_xlim = get(AVWVIEW.handles.sagittal_axes,<span class="string">'Xlim'</span>);
+0829   AVWVIEW.handles.sagittal_ylim = get(AVWVIEW.handles.sagittal_axes,<span class="string">'Ylim'</span>);
+0830   AVWVIEW.handles.sagittal_xline = line(<span class="string">'Xdata'</span>,[AVWVIEW.slices.cor AVWVIEW.slices.cor],<span class="string">'Ydata'</span>,AVWVIEW.handles.sagittal_ylim);
+0831   AVWVIEW.handles.sagittal_yline = line(<span class="string">'Ydata'</span>,[AVWVIEW.slices.axi AVWVIEW.slices.axi],<span class="string">'Xdata'</span>,AVWVIEW.handles.sagittal_xlim);
+0832   set(AVWVIEW.handles.sagittal_xline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'XLINE'</span>);
+0833   set(AVWVIEW.handles.sagittal_yline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'YLINE'</span>);
+0834   
+0835   <span class="keyword">if</span> get(AVWVIEW.handles.crosshairs,<span class="string">'value'</span>),
+0836     set(AVWVIEW.handles.sagittal_xline,<span class="string">'visible'</span>,<span class="string">'on'</span>);
+0837     set(AVWVIEW.handles.sagittal_yline,<span class="string">'visible'</span>,<span class="string">'on'</span>);
+0838   <span class="keyword">else</span>
+0839     set(AVWVIEW.handles.sagittal_xline,<span class="string">'visible'</span>,<span class="string">'off'</span>);
+0840     set(AVWVIEW.handles.sagittal_yline,<span class="string">'visible'</span>,<span class="string">'off'</span>);
+0841   <span class="keyword">end</span>
+0842   
+0843 <span class="keyword">end</span>
+0844 
+0845 axes(current_axes);
+0846 
+0847 <span class="keyword">return</span>
+0848 
+0849 
+0850 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0851 <a name="_sub5" href="#_subfunctions" class="code">function AVWVIEW = set_coordinates(AVWVIEW)</a>
+0852 
+0853 <span class="comment">% set the axis coordinates to voxels, mm or meters</span>
+0854 
+0855 s = size(AVWVIEW.avw.img);
+0856 <span class="keyword">if</span> length(s) &gt; 0, xdim = s(1); <span class="keyword">else</span> xdim = 1; <span class="keyword">end</span>
+0857 <span class="keyword">if</span> length(s) &gt; 1, ydim = s(2); <span class="keyword">else</span> ydim = 1; <span class="keyword">end</span>
+0858 <span class="keyword">if</span> length(s) &gt; 2, zdim = s(3); <span class="keyword">else</span> zdim = 1; <span class="keyword">end</span>
+0859 
+0860 <span class="comment">% initialise for voxel coordinates</span>
+0861 xpixdim = double(AVWVIEW.avw.hdr.dime.pixdim(2));
+0862 ypixdim = double(AVWVIEW.avw.hdr.dime.pixdim(3));
+0863 zpixdim = double(AVWVIEW.avw.hdr.dime.pixdim(4));
+0864 xdata = [0 xdim];
+0865 ydata = [0 ydim];
+0866 zdata = [0 zdim];
+0867 
+0868 aspect = 1./AVWVIEW.daspect; <span class="comment">%AVWVIEW.avw.hdr.dime.pixdim(2:4);</span>
+0869 
+0870 
+0871 <span class="keyword">if</span> get(AVWVIEW.handles.coord,<span class="string">'value'</span>) == 2,    <span class="comment">% mm</span>
+0872   xdata = xdata .* xpixdim;
+0873   ydata = ydata .* ypixdim;
+0874   zdata = zdata .* zpixdim;
+0875   aspect = [1 1 1];
+0876 <span class="keyword">end</span>
+0877 
+0878 <span class="keyword">if</span> get(AVWVIEW.handles.coord,<span class="string">'value'</span>) == 3,    <span class="comment">% meters</span>
+0879   xpixdim = xpixdim / 1000;
+0880   ypixdim = ypixdim / 1000;
+0881   zpixdim = zpixdim / 1000;
+0882   xdata = xdata .* xpixdim;
+0883   ydata = ydata .* ypixdim;
+0884   zdata = zdata .* zpixdim;
+0885   aspect = [1 1 1];
+0886 <span class="keyword">end</span>
+0887 
+0888 
+0889 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_image'</span>),
+0890   set(AVWVIEW.handles.axial_axes,<span class="string">'Xlim'</span>,xdata);
+0891   set(AVWVIEW.handles.axial_axes,<span class="string">'Ylim'</span>,ydata);
+0892   set(AVWVIEW.handles.axial_axes,<span class="string">'Zlim'</span>,zdata);
+0893   set(AVWVIEW.handles.axial_image,<span class="string">'Xdata'</span>,xdata);
+0894   set(AVWVIEW.handles.axial_image,<span class="string">'Ydata'</span>,ydata);
+0895   daspect(AVWVIEW.handles.axial_axes,aspect([1 2 3]));
+0896 <span class="keyword">end</span>;
+0897 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_image'</span>),
+0898   set(AVWVIEW.handles.coronal_axes,<span class="string">'Xlim'</span>,xdata);
+0899   set(AVWVIEW.handles.coronal_axes,<span class="string">'Ylim'</span>,zdata);
+0900   set(AVWVIEW.handles.coronal_axes,<span class="string">'Zlim'</span>,ydata);
+0901   set(AVWVIEW.handles.coronal_image,<span class="string">'Xdata'</span>,xdata);
+0902   set(AVWVIEW.handles.coronal_image,<span class="string">'Ydata'</span>,zdata);
+0903   daspect(AVWVIEW.handles.coronal_axes,aspect([1 3 2]));
+0904 <span class="keyword">end</span>;
+0905 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_image'</span>),
+0906   set(AVWVIEW.handles.sagittal_axes,<span class="string">'Xlim'</span>,ydata);
+0907   set(AVWVIEW.handles.sagittal_axes,<span class="string">'Ylim'</span>,zdata);
+0908   set(AVWVIEW.handles.sagittal_axes,<span class="string">'Zlim'</span>,xdata);
+0909   set(AVWVIEW.handles.sagittal_image,<span class="string">'Xdata'</span>,ydata);
+0910   set(AVWVIEW.handles.sagittal_image,<span class="string">'Ydata'</span>,zdata);
+0911   daspect(AVWVIEW.handles.sagittal_axes,aspect([2 3 1]));
+0912 <span class="keyword">end</span>;
+0913 
+0914 <a href="#_sub9" class="code" title="subfunction set_display_values(AVWVIEW),">set_display_values</a>(AVWVIEW);
+0915 
+0916 <span class="keyword">return</span>
+0917 
+0918 
+0919 
+0920 
+0921 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0922 <a name="_sub6" href="#_subfunctions" class="code">function AVWVIEW = get_current_position(AVWVIEW),</a>
+0923 
+0924 <span class="comment">%[AVWVIEW, metric] = slices2metric(AVWVIEW);</span>
+0925 
+0926 <span class="keyword">switch</span> AVWVIEW.view,
+0927   <span class="keyword">case</span> <span class="string">'sag'</span>,
+0928     currentpoint = get(get(AVWVIEW.handles.sagittal_image,<span class="string">'Parent'</span>),<span class="string">'CurrentPoint'</span>);
+0929     metric.cor = currentpoint(1,1);
+0930     metric.axi = currentpoint(1,2);
+0931     metric.sag = get(AVWVIEW.handles.sagittal_slider,<span class="string">'Value'</span>);
+0932   <span class="keyword">case</span> <span class="string">'cor'</span>,
+0933     currentpoint = get(get(AVWVIEW.handles.coronal_image,<span class="string">'Parent'</span>),<span class="string">'CurrentPoint'</span>);
+0934     metric.sag = currentpoint(2,1);
+0935     metric.axi = currentpoint(2,2);
+0936     metric.cor = get(AVWVIEW.handles.coronal_slider,<span class="string">'Value'</span>);
+0937   <span class="keyword">case</span> <span class="string">'axi'</span>,
+0938     currentpoint = get(get(AVWVIEW.handles.axial_image,<span class="string">'Parent'</span>),<span class="string">'CurrentPoint'</span>);
+0939     metric.sag = currentpoint(2,1);
+0940     metric.cor = currentpoint(2,2);
+0941     metric.axi = get(AVWVIEW.handles.axial_slider,<span class="string">'Value'</span>);
+0942 <span class="keyword">end</span>
+0943 
+0944 AVWVIEW = <a href="#_sub11" class="code" title="subfunction AVWVIEW = metric2slices(AVWVIEW,metric),">metric2slices</a>(AVWVIEW,metric);
+0945 AVWVIEW = <a href="#_sub8" class="code" title="subfunction AVWVIEW = check_slices(AVWVIEW),">check_slices</a>(AVWVIEW);
+0946 
+0947 <span class="keyword">return</span>
+0948 
+0949 
+0950 
+0951 
+0952 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0953 <a name="_sub7" href="#_subfunctions" class="code">function AVWVIEW = get_slider_position(AVWVIEW),</a>
+0954 
+0955 [AVWVIEW.slices.sag,AVWVIEW.slices.cor,AVWVIEW.slices.axi] = deal(0);
+0956 
+0957 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_slider'</span>),
+0958   <span class="keyword">if</span> ishandle(AVWVIEW.handles.sagittal_slider),
+0959     AVWVIEW.slices.sag = round(get(AVWVIEW.handles.sagittal_slider,<span class="string">'Value'</span>));
+0960   <span class="keyword">end</span>
+0961 <span class="keyword">end</span>
+0962 <span class="keyword">if</span> AVWVIEW.slices.sag == 0,
+0963   <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'sagittal_sliderN'</span>),
+0964     <span class="keyword">if</span> ishandle(AVWVIEW.handles.sagittal_sliderN),
+0965       AVWVIEW.slices.sag = round(get(AVWVIEW.handles.sagittal_sliderN,<span class="string">'Value'</span>));
+0966     <span class="keyword">end</span>
+0967   <span class="keyword">end</span>
+0968 <span class="keyword">end</span>
+0969 
+0970 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_slider'</span>),
+0971   <span class="keyword">if</span> ishandle(AVWVIEW.handles.coronal_slider),
+0972     AVWVIEW.slices.cor = round(get(AVWVIEW.handles.coronal_slider,<span class="string">'Value'</span>));
+0973   <span class="keyword">end</span>
+0974 <span class="keyword">end</span>
+0975 <span class="keyword">if</span> AVWVIEW.slices.cor == 0,
+0976   <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'coronal_sliderN'</span>),
+0977     <span class="keyword">if</span> ishandle(AVWVIEW.handles.coronal_sliderN),
+0978       AVWVIEW.slices.cor = round(get(AVWVIEW.handles.coronal_sliderN,<span class="string">'Value'</span>));
+0979     <span class="keyword">end</span>
+0980   <span class="keyword">end</span>
+0981 <span class="keyword">end</span>
+0982 
+0983 <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_slider'</span>),
+0984   <span class="keyword">if</span> ishandle(AVWVIEW.handles.axial_slider),
+0985     AVWVIEW.slices.axi = round(get(AVWVIEW.handles.axial_slider,<span class="string">'Value'</span>));
+0986   <span class="keyword">end</span>
+0987 <span class="keyword">end</span>
+0988 <span class="keyword">if</span> AVWVIEW.slices.axi == 0,
+0989   <span class="keyword">if</span> isfield(AVWVIEW.handles,<span class="string">'axial_sliderN'</span>),
+0990     <span class="keyword">if</span> ishandle(AVWVIEW.handles.axial_sliderN),
+0991       AVWVIEW.slices.axi = round(get(AVWVIEW.handles.axial_sliderN,<span class="string">'Value'</span>));
+0992     <span class="keyword">end</span>
+0993   <span class="keyword">end</span>
+0994 <span class="keyword">end</span>
+0995 
+0996 AVWVIEW = <a href="#_sub8" class="code" title="subfunction AVWVIEW = check_slices(AVWVIEW),">check_slices</a>(AVWVIEW);
+0997 
+0998 <span class="keyword">return</span>
+0999 
+1000 
+1001 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1002 <a name="_sub8" href="#_subfunctions" class="code">function AVWVIEW = check_slices(AVWVIEW),</a>
+1003 
+1004 adjust = 0;
+1005 
+1006 [ SagSize, CorSize, AxiSize ] = size(AVWVIEW.avw.img);
+1007 
+1008 <span class="keyword">if</span> AVWVIEW.slices.sag &gt; SagSize,
+1009     AVWVIEW.slices.sag = SagSize;
+1010     adjust = 1;
+1011 <span class="keyword">end</span>;
+1012 <span class="keyword">if</span> AVWVIEW.slices.sag &lt; 1,
+1013     AVWVIEW.slices.sag = 1;
+1014     adjust = 1;
+1015 <span class="keyword">end</span>;
+1016 <span class="keyword">if</span> AVWVIEW.slices.cor &gt; CorSize,
+1017     AVWVIEW.slices.cor = CorSize;
+1018     adjust = 1;
+1019 <span class="keyword">end</span>;
+1020 <span class="keyword">if</span> AVWVIEW.slices.cor &lt; 1,
+1021     AVWVIEW.slices.cor = 1;
+1022     adjust = 1;
+1023 <span class="keyword">end</span>;
+1024 <span class="keyword">if</span> AVWVIEW.slices.axi &gt; AxiSize,
+1025     AVWVIEW.slices.axi = AxiSize;
+1026     adjust = 1;
+1027 <span class="keyword">end</span>;
+1028 <span class="keyword">if</span> AVWVIEW.slices.axi &lt; 1,
+1029     AVWVIEW.slices.axi = 1;
+1030     adjust = 1;
+1031 <span class="keyword">end</span>;
+1032 
+1033 <span class="keyword">if</span> adjust,
+1034     AVWVIEW = <a href="#_sub10" class="code" title="subfunction [AVWVIEW,metric] = slices2metric(AVWVIEW),">slices2metric</a>(AVWVIEW);
+1035 <span class="keyword">end</span>
+1036 
+1037 <span class="keyword">return</span>
+1038 
+1039 
+1040 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1041 <a name="_sub9" href="#_subfunctions" class="code">function set_display_values(AVWVIEW),</a>
+1042 
+1043 <span class="comment">% get coordinates of selected voxel and the image intensity there</span>
+1044 
+1045 sag = AVWVIEW.slices.sag;
+1046 cor = AVWVIEW.slices.cor;
+1047 axi = AVWVIEW.slices.axi;
+1048 
+1049 imgvalue = AVWVIEW.avw.img(sag,cor,axi);
+1050 
+1051 set(AVWVIEW.handles.imval,<span class="string">'String'</span>,sprintf(<span class="string">'%7.2f'</span>,imgvalue));
+1052 set(AVWVIEW.handles.imval,<span class="string">'Value'</span>,imgvalue);
+1053 
+1054 <span class="comment">% Now update the image position text for the selected voxel</span>
+1055 
+1056 [AVWVIEW, metric] = <a href="#_sub10" class="code" title="subfunction [AVWVIEW,metric] = slices2metric(AVWVIEW),">slices2metric</a>(AVWVIEW);
+1057 sag = metric.sag;
+1058 cor = metric.cor;
+1059 axi = metric.axi;
+1060 
+1061 string = sprintf(<span class="string">'%7.3f %7.3f %7.3f'</span>,sag,cor,axi);
+1062 
+1063 set(AVWVIEW.handles.impos,<span class="string">'String'</span>,string);
+1064 set(AVWVIEW.handles.impos,<span class="string">'Value'</span>,[sag,cor,axi]);
+1065 
+1066 <span class="keyword">return</span>
+1067 
+1068 
+1069 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1070 <a name="_sub10" href="#_subfunctions" class="code">function [AVWVIEW,metric] = slices2metric(AVWVIEW),</a>
+1071 
+1072 AVWVIEW.imgXYZ.voxels = [AVWVIEW.slices.sag,AVWVIEW.slices.cor,AVWVIEW.slices.axi];
+1073 AVWVIEW.imgXYZ.meters = AVWVIEW.imgXYZ.voxels .* AVWVIEW.scale2meters;
+1074 AVWVIEW.imgXYZ.mm     = AVWVIEW.imgXYZ.voxels .* AVWVIEW.scale2mm;
+1075 
+1076 coord_value = get(AVWVIEW.handles.coord,<span class="string">'value'</span>);
+1077 
+1078 <span class="keyword">if</span> coord_value == 2,
+1079   <span class="comment">% using mm</span>
+1080   img_mm = AVWVIEW.imgXYZ.voxels .* AVWVIEW.scale2mm;
+1081   metric.axi = img_mm(3);
+1082   metric.cor = img_mm(2);
+1083   metric.sag = img_mm(1);
+1084 <span class="keyword">elseif</span> coord_value == 3,
+1085   <span class="comment">% using meters</span>
+1086   img_meters = AVWVIEW.imgXYZ.voxels .* AVWVIEW.scale2meters;
+1087   metric.axi = img_meters(3);
+1088   metric.cor = img_meters(2);
+1089   metric.sag = img_meters(1);
+1090 <span class="keyword">else</span>
+1091   <span class="comment">% voxels</span>
+1092   metric.axi = AVWVIEW.slices.axi;
+1093   metric.cor = AVWVIEW.slices.cor;
+1094   metric.sag = AVWVIEW.slices.sag;
+1095 <span class="keyword">end</span>;
+1096 
+1097 <span class="keyword">return</span>
+1098 
+1099 
+1100 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1101 <a name="_sub11" href="#_subfunctions" class="code">function AVWVIEW = metric2slices(AVWVIEW,metric),</a>
+1102 
+1103 coord_value = get(AVWVIEW.handles.coord,<span class="string">'value'</span>);
+1104 
+1105 <span class="keyword">if</span> coord_value == 2,
+1106   <span class="comment">% using mm</span>
+1107   xpix = double(AVWVIEW.avw.hdr.dime.pixdim(2));
+1108   ypix = double(AVWVIEW.avw.hdr.dime.pixdim(3));
+1109   zpix = double(AVWVIEW.avw.hdr.dime.pixdim(4));
+1110   AVWVIEW.slices.axi = round(metric.axi / zpix);
+1111   AVWVIEW.slices.cor = round(metric.cor / ypix);
+1112   AVWVIEW.slices.sag = round(metric.sag / xpix);
+1113 <span class="keyword">elseif</span> coord_value == 3,
+1114   <span class="comment">% using meters</span>
+1115   xpix = double(AVWVIEW.avw.hdr.dime.pixdim(2)) / 1000;
+1116   ypix = double(AVWVIEW.avw.hdr.dime.pixdim(3)) / 1000;
+1117   zpix = double(AVWVIEW.avw.hdr.dime.pixdim(4)) / 1000;
+1118   AVWVIEW.slices.axi = round(metric.axi / zpix);
+1119   AVWVIEW.slices.cor = round(metric.cor / ypix);
+1120   AVWVIEW.slices.sag = round(metric.sag / xpix);
+1121 <span class="keyword">else</span>
+1122   <span class="comment">% voxels</span>
+1123   AVWVIEW.slices.axi = round(metric.axi);
+1124   AVWVIEW.slices.cor = round(metric.cor);
+1125   AVWVIEW.slices.sag = round(metric.sag);
+1126 <span class="keyword">end</span>;
+1127 
+1128 <span class="keyword">return</span>
+1129 
+1130 
+1131 
+1132 
+1133 
+1134 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1135 <a name="_sub12" href="#_subfunctions" class="code">function AVWVIEW = init(avw,invarname),</a>
+1136 
+1137 <span class="comment">% try to keep track of the input struct</span>
+1138 <span class="keyword">if</span> exist(<span class="string">'invarname'</span>,<span class="string">'var'</span>),
+1139   <span class="keyword">if</span> ~isempty(invarname),
+1140     AVWVIEW.invarname = invarname;
+1141   <span class="keyword">else</span>
+1142     AVWVIEW.invarname = <span class="string">''</span>;
+1143   <span class="keyword">end</span>
+1144 <span class="keyword">else</span>
+1145   AVWVIEW.invarname = <span class="string">''</span>;
+1146 <span class="keyword">end</span>
+1147 
+1148 <span class="comment">% GUI General Parameters</span>
+1149 GUIwidth  = 150;
+1150 GUIheight = 50;
+1151 
+1152 version = <span class="string">'[$Revision: 1.1 $]'</span>;
+1153 name = sprintf(<span class="string">'AVW View [v%s]'</span>,version(12:16));
+1154 
+1155 <span class="keyword">if</span> isfield(avw,<span class="string">'fileprefix'</span>),
+1156   <span class="keyword">if</span> ~isempty(avw.fileprefix),
+1157     format = strcat(<span class="string">'%+'</span>,sprintf(<span class="string">'%d'</span>,length(avw.fileprefix)+1),<span class="string">'s'</span>);
+1158     name = strcat(name,<span class="string">' - '</span>,sprintf(format,avw.fileprefix));
+1159   <span class="keyword">end</span>
+1160 <span class="keyword">end</span>
+1161 
+1162 GUI = figure(<span class="string">'Name'</span>,name,<span class="string">'Tag'</span>,<span class="string">'AVWVIEW'</span>,<span class="string">'units'</span>,<span class="string">'characters'</span>,<span class="keyword">...</span>
+1163   <span class="string">'BackingStore'</span>,<span class="string">'off'</span>,<span class="keyword">...</span>
+1164   <span class="string">'NumberTitle'</span>,<span class="string">'off'</span>,<span class="string">'color'</span>,[0 0 0],<span class="keyword">...</span>
+1165   <span class="string">'MenuBar'</span>,<span class="string">'figure'</span>,<span class="string">'Position'</span>,[1 1 GUIwidth GUIheight]);
+1166 movegui(GUI,<span class="string">'center'</span>);
+1167 
+1168 set(GUI,<span class="string">'KeyPressFcn'</span>,<span class="string">'avw_view([],[],''keypress'');'</span>);
+1169 
+1170 AVWVIEW.gui = GUI;
+1171 
+1172 Font.FontName   = <span class="string">'Helvetica'</span>;
+1173 Font.FontUnits  = <span class="string">'Pixels'</span>;
+1174 Font.FontSize   = 9;
+1175 Font.FontWeight = <span class="string">'normal'</span>;
+1176 Font.FontAngle  = <span class="string">'normal'</span>;
+1177 
+1178 
+1179 AVWVIEW.shading = <span class="string">'flat'</span>;
+1180 shading(AVWVIEW.shading)
+1181 
+1182 
+1183 
+1184 <span class="comment">%     % determine the datatype of avw.img</span>
+1185 <span class="comment">%     switch double(avw.hdr.dime.bitpix),</span>
+1186 <span class="comment">%     case 1,</span>
+1187 <span class="comment">%         fprintf('...converting avw.img to uint8 for viewing only.\n\n');</span>
+1188 <span class="comment">%         avw.img = uint8(avw.img);</span>
+1189 <span class="comment">%     case 8,</span>
+1190 <span class="comment">%         fprintf('...converting avw.img to uint8 for viewing only.\n\n');</span>
+1191 <span class="comment">%         avw.img = uint8(avw.img);</span>
+1192 <span class="comment">%     case 16,</span>
+1193 <span class="comment">%         fprintf('...converting avw.img to uint16 for viewing only.\n\n');</span>
+1194 <span class="comment">%         avw.img = uint16(avw.img);</span>
+1195 <span class="comment">%     case {32,64},</span>
+1196 <span class="comment">%         % make sure it is double, not single</span>
+1197 <span class="comment">%         avw.img = double(avw.img);</span>
+1198 <span class="comment">%     otherwise,</span>
+1199 <span class="comment">%         % do nothing, leave it as is</span>
+1200 <span class="comment">%     end</span>
+1201 
+1202 
+1203 <span class="comment">% calculate image stats</span>
+1204 intensityMean = mean(mean(mean(avw.img)));
+1205 intensityMeanRobust = mean(mean(mean(avw.img(find(avw.img)))));
+1206 intensityStdev = std(std(std(avw.img)));
+1207 
+1208 intensityMax = max(max(max(avw.img)));
+1209 
+1210 <span class="comment">% try to adjust for large intensity extremes</span>
+1211 <span class="keyword">if</span> intensityMax &gt; 255,
+1212   <span class="comment">% got 16 bit data, at least</span>
+1213   adjust = 0.5;
+1214 <span class="keyword">else</span>
+1215   adjust = 0.9;
+1216 <span class="keyword">end</span>
+1217 <span class="comment">%AVWVIEW.clim = [0 (intensityMeanRobust + (10 * intensityStdev)) ];</span>
+1218 AVWVIEW.clim = [0 (intensityMax * adjust)];
+1219 
+1220 
+1221 
+1222 AVWVIEW.xdim = size(avw.img,1);
+1223 AVWVIEW.ydim = size(avw.img,2);
+1224 AVWVIEW.zdim = size(avw.img,3);
+1225 
+1226 AVWVIEW.slices.sag = 1;
+1227 AVWVIEW.slices.cor = 1;
+1228 AVWVIEW.slices.axi = 1;
+1229 <span class="keyword">if</span> AVWVIEW.xdim &gt; 1, AVWVIEW.slices.sag = floor(AVWVIEW.xdim/2); <span class="keyword">end</span>
+1230 <span class="keyword">if</span> AVWVIEW.ydim &gt; 1, AVWVIEW.slices.cor = floor(AVWVIEW.ydim/2); <span class="keyword">end</span>
+1231 <span class="keyword">if</span> AVWVIEW.zdim &gt; 1, AVWVIEW.slices.axi = floor(AVWVIEW.zdim/2); <span class="keyword">end</span>
+1232 
+1233 <span class="comment">% store the volume center for later reference when</span>
+1234 <span class="comment">% calculating fiducial locations</span>
+1235 center = <a href="avw_center.html" class="code" title="function center = avw_center(avw)">avw_center</a>(avw);
+1236 AVWVIEW.center = center.abs.voxels;
+1237 <span class="comment">%AVWVIEW.center  = [AVWVIEW.slices.sag,AVWVIEW.slices.cor,AVWVIEW.slices.axi];</span>
+1238 
+1239 <span class="comment">% set the default origin at the center</span>
+1240 AVWVIEW.origin  = AVWVIEW.center;
+1241 
+1242 AVWVIEW.pixdim = double(avw.hdr.dime.pixdim(2:4));
+1243 
+1244 AVWVIEW.scale2mm     = AVWVIEW.pixdim;          <span class="comment">% vol scale in mm</span>
+1245 AVWVIEW.scale2meters = AVWVIEW.pixdim ./ 1000;  <span class="comment">% vol scale in meters</span>
+1246 AVWVIEW.daspect      = AVWVIEW.pixdim ./ min(AVWVIEW.pixdim);
+1247 
+1248 xPlotSize = 0.38;
+1249 yPlotSize = 0.38;
+1250 
+1251 AVWVIEW.cmapString = <span class="string">'gray'</span>;
+1252 
+1253 AVWVIEW.cmap = colormap(AVWVIEW.cmapString);
+1254 
+1255 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1256 
+1257 <span class="comment">% Axial Slice</span>
+1258 <span class="keyword">if</span> AVWVIEW.xdim &gt; 1 &amp; AVWVIEW.ydim &gt; 1,
+1259   
+1260   handles.axial_subplot = subplot(<span class="string">'position'</span>,[0.075 0.075 xPlotSize yPlotSize]);
+1261   
+1262   Saxial = squeeze(avw.img(:,:,AVWVIEW.slices.axi));
+1263   
+1264   <span class="comment">%handles.axial_image = pcolor(double(Saxial)); colormap(gray); shading interp</span>
+1265   <span class="comment">%pcolor(Saxial'); colormap(gray); shading flat</span>
+1266   
+1267   <span class="comment">%surf(avw.img(:,:,20)','edgecolor','none'); view(2); axis tight; colormap(flipdim(gray,1)); colorbar</span>
+1268   <span class="comment">%surf(avw.img(:,:,20)','edgecolor','none'); view(2); axis tight; colormap(gray)</span>
+1269   <span class="comment">%image(avw.img(:,:,20)'); axis image; colormap(gray)</span>
+1270   <span class="comment">%imagesc(avw.img(:,:,20)'); axis image; colormap(gray)</span>
+1271   
+1272   <span class="comment">%handles.axial_image = image('Cdata',Saxial','CDataMapping','scaled',...</span>
+1273   <span class="comment">%    'XData',[0 xdim],'YData',[0 ydim]);</span>
+1274   
+1275   handles.axial_image = imagesc([0,AVWVIEW.xdim],[0,AVWVIEW.ydim],Saxial',AVWVIEW.clim);
+1276   
+1277   handles.axial_axes = gca;
+1278   set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>,<span class="string">'XLimMode'</span>,<span class="string">'manual'</span>,<span class="string">'YLimMode'</span>,<span class="string">'manual'</span>,<span class="keyword">...</span>
+1279     <span class="string">'ClimMode'</span>,<span class="string">'manual'</span>,<span class="string">'YColor'</span>,[1 1 1],<span class="string">'XColor'</span>,[1 1 1])
+1280   
+1281   title(<span class="string">'Axial'</span>,<span class="string">'Color'</span>,[1 1 1])
+1282   ylabel(<span class="string">'Y'</span>)
+1283   xlabel(<span class="string">'X'</span>)
+1284   <span class="comment">%xlabel('(Right &lt;&lt;) X (&gt;&gt; Left)'); % default radiological orientation for Analyze</span>
+1285   <span class="comment">%xlabel('(Left &lt;&lt;) X (&gt;&gt; Right)')</span>
+1286   
+1287   <span class="comment">% This callback navigates with mouse button click</span>
+1288   set(handles.axial_image,<span class="string">'ButtonDownFcn'</span>,<span class="string">'avw_view([],[],''axial_image'');'</span>);
+1289   
+1290   GUIheight = 0.46;
+1291   
+1292   <span class="keyword">if</span> AVWVIEW.zdim &gt; 1,
+1293     slider_step(1) = 1/(AVWVIEW.zdim);
+1294     slider_step(2) = 1/(AVWVIEW.zdim);
+1295     handles.axial_slider = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="keyword">...</span>
+1296       <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1297       <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+1298       <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1299       <span class="string">'TooltipString'</span>,<span class="string">'Axial slice navigation'</span>,<span class="keyword">...</span>
+1300       <span class="string">'Min'</span>,1,<span class="string">'Max'</span>,AVWVIEW.zdim,<span class="string">'SliderStep'</span>,slider_step,<span class="string">'Value'</span>,AVWVIEW.slices.axi,<span class="keyword">...</span>
+1301       <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''axial_slider'');'</span>);
+1302   <span class="keyword">end</span>
+1303   handles.axial_sliderN = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span>
+1304     <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1305     <span class="string">'Position'</span>,[.65 GUIheight .03 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+1306     <span class="string">'BackgroundColor'</span>,[0 0 0],<span class="string">'ForegroundColor'</span>,[1 1 1],<span class="keyword">...</span>
+1307     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1308     <span class="string">'TooltipString'</span>,<span class="string">'Axial slice number'</span>,<span class="keyword">...</span>
+1309     <span class="string">'String'</span>,num2str(AVWVIEW.slices.axi),<span class="string">'Value'</span>,AVWVIEW.slices.axi);
+1310   handles.axial_sliderT = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span>
+1311     <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1312     <span class="string">'Position'</span>,[.70 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1313     <span class="string">'BackgroundColor'</span>,[0 0 0],<span class="string">'ForegroundColor'</span>,[1 1 1],<span class="keyword">...</span>
+1314     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1315     <span class="string">'TooltipString'</span>,<span class="string">'Axial slice navigation'</span>,<span class="keyword">...</span>
+1316     <span class="string">'String'</span>,<span class="string">'Axial'</span>);
+1317   
+1318   handles.axial_xlim = get(handles.axial_axes,<span class="string">'Xlim'</span>);
+1319   handles.axial_ylim = get(handles.axial_axes,<span class="string">'Ylim'</span>);
+1320   handles.axial_xline = line(<span class="string">'Xdata'</span>,[AVWVIEW.slices.sag AVWVIEW.slices.sag],<span class="string">'Ydata'</span>,handles.axial_ylim);
+1321   handles.axial_yline = line(<span class="string">'Ydata'</span>,[AVWVIEW.slices.cor AVWVIEW.slices.cor],<span class="string">'Xdata'</span>,handles.axial_xlim);
+1322   set(handles.axial_xline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'XLINE'</span>);
+1323   set(handles.axial_yline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'YLINE'</span>);
+1324   
+1325 <span class="keyword">end</span>
+1326 
+1327 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1328 
+1329 <span class="comment">% Coronal Slice</span>
+1330 <span class="keyword">if</span> AVWVIEW.xdim &gt; 1 &amp; AVWVIEW.zdim &gt; 1,
+1331   
+1332   handles.coronal_subplot = subplot(<span class="string">'position'</span>,[0.075 0.575 xPlotSize yPlotSize]);
+1333   
+1334   Scor = squeeze(avw.img(:,AVWVIEW.slices.cor,:));
+1335   handles.coronal_image = imagesc([0,AVWVIEW.xdim],[0,AVWVIEW.zdim],Scor',AVWVIEW.clim);
+1336   
+1337   handles.coronal_axes = gca;
+1338   set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>,<span class="string">'XLimMode'</span>,<span class="string">'manual'</span>,<span class="string">'YLimMode'</span>,<span class="string">'manual'</span>,<span class="keyword">...</span>
+1339     <span class="string">'ClimMode'</span>,<span class="string">'manual'</span>,<span class="string">'YColor'</span>,[1 1 1],<span class="string">'XColor'</span>,[1 1 1])
+1340   
+1341   <span class="comment">%xlabel('(Left &lt;&lt;) X (&gt;&gt; Right)')</span>
+1342   <span class="comment">%xlabel('(Right &lt;&lt;) X (&gt;&gt; Left)')</span>
+1343   xlabel(<span class="string">'X'</span>)
+1344   ylabel(<span class="string">'Z'</span>)
+1345   title(<span class="string">'Coronal'</span>,<span class="string">'Color'</span>,[1 1 1])
+1346   
+1347   <span class="comment">% This callback navigates with left click</span>
+1348   set(handles.coronal_image,<span class="string">'ButtonDownFcn'</span>,<span class="string">'avw_view([],[],''coronal_image'');'</span>);
+1349   
+1350   GUIheight = GUIheight - 0.04;
+1351   
+1352   <span class="keyword">if</span> AVWVIEW.ydim &gt; 1,
+1353     slider_step(1) = 1/(AVWVIEW.ydim);
+1354     slider_step(2) = 1/(AVWVIEW.ydim);
+1355     handles.coronal_slider = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="keyword">...</span>
+1356       <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1357       <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+1358       <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1359       <span class="string">'TooltipString'</span>,<span class="string">'Coronal slice navigation'</span>,<span class="keyword">...</span>
+1360       <span class="string">'Min'</span>,1,<span class="string">'Max'</span>,AVWVIEW.ydim,<span class="string">'SliderStep'</span>,slider_step,<span class="string">'Value'</span>,AVWVIEW.slices.cor,<span class="keyword">...</span>
+1361       <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''coronal_slider'');'</span>);
+1362   <span class="keyword">end</span>
+1363   handles.coronal_sliderN = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span>
+1364     <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1365     <span class="string">'Position'</span>,[.65 GUIheight .03 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+1366     <span class="string">'BackgroundColor'</span>,[0 0 0],<span class="string">'ForegroundColor'</span>,[1 1 1],<span class="keyword">...</span>
+1367     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1368     <span class="string">'TooltipString'</span>,<span class="string">'Coronal slice number'</span>,<span class="keyword">...</span>
+1369     <span class="string">'String'</span>,num2str(AVWVIEW.slices.cor),<span class="string">'Value'</span>,AVWVIEW.slices.cor);
+1370   handles.coronal_sliderT = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span>
+1371     <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1372     <span class="string">'Position'</span>,[.70 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1373     <span class="string">'BackgroundColor'</span>,[0 0 0],<span class="string">'ForegroundColor'</span>,[1 1 1],<span class="keyword">...</span>
+1374     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1375     <span class="string">'TooltipString'</span>,<span class="string">'Coronal slice navigation'</span>,<span class="keyword">...</span>
+1376     <span class="string">'String'</span>,<span class="string">'Coronal'</span>);
+1377   
+1378   handles.coronal_xlim = get(handles.coronal_axes,<span class="string">'Xlim'</span>);
+1379   handles.coronal_ylim = get(handles.coronal_axes,<span class="string">'Ylim'</span>);
+1380   handles.coronal_xline = line(<span class="string">'Xdata'</span>,[AVWVIEW.slices.sag AVWVIEW.slices.sag],<span class="string">'Ydata'</span>,handles.coronal_ylim);
+1381   handles.coronal_yline = line(<span class="string">'Ydata'</span>,[AVWVIEW.slices.axi AVWVIEW.slices.axi],<span class="string">'Xdata'</span>,handles.coronal_xlim);
+1382   set(handles.coronal_xline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'XLINE'</span>);
+1383   set(handles.coronal_yline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'YLINE'</span>);
+1384   
+1385 <span class="keyword">end</span>
+1386 
+1387 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1388 
+1389 <span class="comment">% Sagittal Slice</span>
+1390 <span class="keyword">if</span> AVWVIEW.ydim &gt; 1 &amp; AVWVIEW.zdim &gt; 1,
+1391   
+1392   handles.sagittal_subplot = subplot(<span class="string">'position'</span>,[0.575 0.575 xPlotSize yPlotSize]);
+1393   
+1394   Ssag = squeeze(avw.img(AVWVIEW.slices.sag,:,:));
+1395   handles.sagittal_image = imagesc([0,AVWVIEW.ydim],[0,AVWVIEW.zdim],Ssag',AVWVIEW.clim);
+1396   
+1397   handles.sagittal_axes = gca;
+1398   set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>,<span class="string">'XLimMode'</span>,<span class="string">'manual'</span>,<span class="string">'YLimMode'</span>,<span class="string">'manual'</span>,<span class="keyword">...</span>
+1399     <span class="string">'ClimMode'</span>,<span class="string">'manual'</span>,<span class="string">'YColor'</span>,[1 1 1],<span class="string">'XColor'</span>,[1 1 1])
+1400   
+1401   xlabel(<span class="string">'Y'</span>)
+1402   ylabel(<span class="string">'Z'</span>)
+1403   title(<span class="string">'Sagittal'</span>,<span class="string">'Color'</span>,[1 1 1])
+1404   
+1405   <span class="comment">% This callback navigates with mouse click</span>
+1406   set(handles.sagittal_image,<span class="string">'ButtonDownFcn'</span>,<span class="string">'avw_view([],[],''sagittal_image'');'</span>);
+1407   
+1408   GUIheight = GUIheight - 0.04;
+1409   
+1410   <span class="keyword">if</span> AVWVIEW.xdim &gt; 1,
+1411     slider_step(1) = 1/(AVWVIEW.xdim);
+1412     slider_step(2) = 1/(AVWVIEW.xdim);
+1413     handles.sagittal_slider = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="keyword">...</span>
+1414       <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1415       <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+1416       <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1417       <span class="string">'TooltipString'</span>,<span class="string">'Sagittal slice navigation'</span>,<span class="keyword">...</span>
+1418       <span class="string">'Min'</span>,1,<span class="string">'Max'</span>,AVWVIEW.xdim,<span class="string">'SliderStep'</span>,slider_step,<span class="string">'Value'</span>,AVWVIEW.slices.sag,<span class="keyword">...</span>
+1419       <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''sagittal_slider'');'</span>);
+1420   <span class="keyword">end</span>
+1421   handles.sagittal_sliderN = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span>
+1422     <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1423     <span class="string">'Position'</span>,[.65 GUIheight .03 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+1424     <span class="string">'BackgroundColor'</span>,[0 0 0],<span class="string">'ForegroundColor'</span>,[1 1 1],<span class="keyword">...</span>
+1425     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1426     <span class="string">'TooltipString'</span>,<span class="string">'Sagittal slice number'</span>,<span class="keyword">...</span>
+1427     <span class="string">'String'</span>,num2str(AVWVIEW.slices.sag),<span class="string">'Value'</span>,AVWVIEW.slices.sag);
+1428   handles.sagittal_sliderT = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span>
+1429     <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1430     <span class="string">'Position'</span>,[.70 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1431     <span class="string">'BackgroundColor'</span>,[0 0 0],<span class="string">'ForegroundColor'</span>,[1 1 1],<span class="keyword">...</span>
+1432     <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1433     <span class="string">'TooltipString'</span>,<span class="string">'Sagittal slice navigation'</span>,<span class="keyword">...</span>
+1434     <span class="string">'String'</span>,<span class="string">'Sagittal'</span>);
+1435   
+1436   handles.sagittal_xlim = get(handles.sagittal_axes,<span class="string">'Xlim'</span>);
+1437   handles.sagittal_ylim = get(handles.sagittal_axes,<span class="string">'Ylim'</span>);
+1438   handles.sagittal_xline = line(<span class="string">'Xdata'</span>,[AVWVIEW.slices.cor AVWVIEW.slices.cor],<span class="string">'Ydata'</span>,handles.sagittal_ylim);
+1439   handles.sagittal_yline = line(<span class="string">'Ydata'</span>,[AVWVIEW.slices.axi AVWVIEW.slices.axi],<span class="string">'Xdata'</span>,handles.sagittal_xlim);
+1440   set(handles.sagittal_xline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'XLINE'</span>);
+1441   set(handles.sagittal_yline,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'EraseMode'</span>,<span class="string">'xor'</span>,<span class="string">'Tag'</span>,<span class="string">'YLINE'</span>);
+1442   
+1443 <span class="keyword">end</span>
+1444 
+1445 
+1446 
+1447 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1448 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1449 <span class="comment">% Image Contex Menus</span>
+1450 
+1451 menu=uicontextmenu;
+1452 
+1453 <span class="comment">% enable right click access to ROI tools</span>
+1454 roi = uimenu(menu,<span class="string">'Label'</span>,<span class="string">'ROI'</span>);
+1455 uimenu(roi,<span class="string">'Label'</span>,<span class="string">'ROI (9x9x9 block)'</span>,<span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''roi_9'');'</span>);
+1456 uimenu(roi,<span class="string">'Label'</span>,<span class="string">'ROI (7x7x7 block)'</span>,<span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''roi_7'');'</span>);
+1457 uimenu(roi,<span class="string">'Label'</span>,<span class="string">'ROI (5x5x5 block)'</span>,<span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''roi_5'');'</span>);
+1458 uimenu(roi,<span class="string">'Label'</span>,<span class="string">'ROI (3x3x3 block)'</span>,<span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''roi_3'');'</span>);
+1459 
+1460 <span class="comment">% save image to graphics file</span>
+1461 uimenu(menu,<span class="string">'Label'</span>,<span class="string">'Save Image'</span>,<span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''save_image'');'</span>);
+1462 
+1463 <span class="comment">% zoom image to new figure</span>
+1464 uimenu(menu,<span class="string">'Label'</span>,<span class="string">'Zoom Image'</span>,<span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''zoom'');'</span>);
+1465 
+1466 <span class="keyword">if</span> isfield(handles,<span class="string">'axial_image'</span>),
+1467   <span class="keyword">if</span> isempty(get(handles.axial_image,<span class="string">'uicontextmenu'</span>)),
+1468     set(handles.axial_image,<span class="string">'uicontextmenu'</span>,menu);
+1469   <span class="keyword">end</span>
+1470 <span class="keyword">end</span>
+1471 <span class="keyword">if</span> isfield(handles,<span class="string">'coronal_image'</span>),
+1472   <span class="keyword">if</span> isempty(get(handles.coronal_image,<span class="string">'uicontextmenu'</span>)),
+1473     set(handles.coronal_image,<span class="string">'uicontextmenu'</span>,menu);
+1474   <span class="keyword">end</span>
+1475 <span class="keyword">end</span>
+1476 <span class="keyword">if</span> isfield(handles,<span class="string">'sagittal_image'</span>),
+1477   <span class="keyword">if</span> isempty(get(handles.sagittal_image,<span class="string">'uicontextmenu'</span>)),
+1478     set(handles.sagittal_image,<span class="string">'uicontextmenu'</span>,menu);
+1479   <span class="keyword">end</span>
+1480 <span class="keyword">end</span>
+1481 
+1482 
+1483 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1484 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1485 
+1486 <span class="comment">% Image Intensity at Mouse Click</span>
+1487 
+1488 GUIheight = GUIheight - 0.04;
+1489 
+1490 handles.Timval = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1491   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1492   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1493   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1494   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1495   <span class="string">'String'</span>,<span class="string">'Image Intensity'</span>);
+1496 handles.imval = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1497   <span class="string">'Position'</span>,[.65 GUIheight .15 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+1498   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1499   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1500   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1501   <span class="string">'String'</span>,<span class="string">'x'</span>,<span class="string">'Value'</span>,0);
+1502 
+1503 <span class="comment">% Image Position at Mouse Click</span>
+1504 
+1505 GUIheight = GUIheight - 0.04;
+1506 
+1507 handles.Timpos = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1508   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1509   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1510   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1511   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1512   <span class="string">'String'</span>,<span class="string">'Image Position'</span>);
+1513 handles.impos = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1514   <span class="string">'Position'</span>,[.65 GUIheight .15 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+1515   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1516   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1517   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1518   <span class="string">'String'</span>,<span class="string">'xyz'</span>,<span class="string">'Value'</span>,[0 0 0]);
+1519 
+1520 
+1521 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1522 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1523 
+1524 GUIheight = GUIheight - 0.04;
+1525 
+1526 handles.flip = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1527   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1528   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1529   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1530   <span class="string">'TooltipString'</span>,<span class="string">'Flip Left and Right (viewer only, see also avw_flip).'</span>,<span class="keyword">...</span>
+1531   <span class="string">'String'</span>,<span class="string">'Flip L/R'</span>,<span class="keyword">...</span>
+1532   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''flip'');'</span>);
+1533 handles.flipStatus = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1534   <span class="string">'Position'</span>,[.65 GUIheight .15 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+1535   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1536   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1537   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1538   <span class="string">'TooltipString'</span>,<span class="string">'Flipped Status'</span>,<span class="keyword">...</span>
+1539   <span class="string">'String'</span>,<span class="string">'R&gt;&gt;L (radiological)'</span>);
+1540 
+1541 
+1542 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1543 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1544 
+1545 <span class="comment">% AC Location</span>
+1546 
+1547 GUIheight = GUIheight - 0.04;
+1548 
+1549 handles.Tac = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1550   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1551   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="keyword">...</span>
+1552   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1553   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1554   <span class="string">'TooltipString'</span>,<span class="string">'AC point in (voxels) or (meter offset from center of volume)'</span>,<span class="keyword">...</span>
+1555   <span class="string">'String'</span>,<span class="string">'AC Point'</span>,<span class="keyword">...</span>
+1556   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''ac'');'</span>);
+1557 handles.ac = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1558   <span class="string">'Position'</span>,[.65 GUIheight .15 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+1559   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1560   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1561   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1562   <span class="string">'TooltipString'</span>,<span class="string">'These values are offset from volume center.'</span>,<span class="keyword">...</span>
+1563   <span class="string">'String'</span>,<span class="string">'x,y,z'</span>);
+1564 
+1565 <span class="comment">% Nasion Location</span>
+1566 
+1567 GUIheight = GUIheight - 0.04;
+1568 
+1569 handles.Tnasion = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1570   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1571   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="keyword">...</span>
+1572   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1573   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1574   <span class="string">'TooltipString'</span>,<span class="string">'Update Nasion - should be toward +Y'</span>,<span class="keyword">...</span>
+1575   <span class="string">'String'</span>,<span class="string">'Fiducial: Nas'</span>,<span class="keyword">...</span>
+1576   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''nasion'');'</span>);
+1577 handles.nasion = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1578   <span class="string">'Position'</span>,[.65 GUIheight .15 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+1579   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1580   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1581   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1582   <span class="string">'TooltipString'</span>,<span class="string">'These values are offset from volume center, should be toward +Y'</span>,<span class="keyword">...</span>
+1583   <span class="string">'String'</span>,<span class="string">'x,y,z'</span>);
+1584 
+1585 <span class="comment">% Right Preauricular Location</span>
+1586 
+1587 GUIheight = GUIheight - 0.04;
+1588 
+1589 handles.Trpa = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1590   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1591   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="keyword">...</span>
+1592   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1593   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1594   <span class="string">'TooltipString'</span>,<span class="string">'Update Right Preauricular - should be toward -X'</span>,<span class="keyword">...</span>
+1595   <span class="string">'String'</span>,<span class="string">'Fiducial: RPA'</span>,<span class="keyword">...</span>
+1596   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''rpa'');'</span>);
+1597 handles.rpa = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1598   <span class="string">'Position'</span>,[.65 GUIheight .15 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+1599   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1600   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1601   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1602   <span class="string">'TooltipString'</span>,<span class="string">'These values are offset from volume center, should be toward -X'</span>,<span class="keyword">...</span>
+1603   <span class="string">'String'</span>,<span class="string">'x,y,z'</span>);
+1604 
+1605 <span class="comment">% Left Preauricular Location</span>
+1606 
+1607 GUIheight = GUIheight - 0.04;
+1608 
+1609 handles.Tlpa = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1610   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1611   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="keyword">...</span>
+1612   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1613   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1614   <span class="string">'TooltipString'</span>,<span class="string">'Update Left Preauricular - should be toward +X'</span>,<span class="keyword">...</span>
+1615   <span class="string">'String'</span>,<span class="string">'Fiducial: LPA'</span>,<span class="keyword">...</span>
+1616   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''lpa'');'</span>);
+1617 handles.lpa = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1618   <span class="string">'Position'</span>,[.65 GUIheight .15 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+1619   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1620   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1621   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1622   <span class="string">'TooltipString'</span>,<span class="string">'These values are offset from volume center, should be toward +X'</span>,<span class="keyword">...</span>
+1623   <span class="string">'String'</span>,<span class="string">'x,y,z'</span>);
+1624 
+1625 
+1626 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1627 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1628 
+1629 GUIheight = GUIheight - 0.04;
+1630 
+1631 handles.contrast = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1632   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1633   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1634   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1635   <span class="string">'TooltipString'</span>,<span class="string">'Auto contrast with gray colormap'</span>,<span class="keyword">...</span>
+1636   <span class="string">'String'</span>,<span class="string">'Auto Contrast'</span>,<span class="keyword">...</span>
+1637   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''contrast'');'</span>);
+1638 
+1639 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1640 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1641 
+1642 GUIheight = GUIheight - 0.04;
+1643 
+1644 handles.dimmer = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1645   <span class="string">'Position'</span>,[.55 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1646   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1647   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1648   <span class="string">'TooltipString'</span>,<span class="string">'Dim by 1%'</span>,<span class="keyword">...</span>
+1649   <span class="string">'String'</span>,<span class="string">'Dimmer'</span>,<span class="keyword">...</span>
+1650   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''dimmer'');'</span>);
+1651 
+1652 handles.brighter = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1653   <span class="string">'Position'</span>,[.65 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1654   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1655   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1656   <span class="string">'TooltipString'</span>,<span class="string">'Brighten by 1%'</span>,<span class="keyword">...</span>
+1657   <span class="string">'String'</span>,<span class="string">'Brighter'</span>,<span class="keyword">...</span>
+1658   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''brighter'');'</span>);
+1659 
+1660 handles.clim = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1661   <span class="string">'Position'</span>,[.75 GUIheight .06 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'right'</span>,<span class="keyword">...</span>
+1662   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1663   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1664   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1665   <span class="string">'TooltipString'</span>,<span class="string">'Image intensity Climit (inverse brightness)'</span>,<span class="keyword">...</span>
+1666   <span class="string">'String'</span>,num2str(AVWVIEW.clim(2)),<span class="keyword">...</span>
+1667   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''setClimit'');'</span>);
+1668 
+1669 handles.cmap = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'popup'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1670   <span class="string">'Position'</span>,[.82 GUIheight .06 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1671   <span class="string">'BackgroundColor'</span>, [0 0 0],<span class="keyword">...</span>
+1672   <span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1673   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1674   <span class="string">'TooltipString'</span>,<span class="string">'Color Map'</span>,<span class="keyword">...</span>
+1675   <span class="string">'String'</span>,{<span class="string">'gray'</span>,<span class="string">'bone'</span>,<span class="string">'copper'</span>,<span class="string">'hot'</span>,<span class="string">'cool'</span>,<span class="string">'spring'</span>,<span class="string">'summer'</span>,<span class="string">'autumn'</span>,<span class="string">'winter'</span>,<span class="string">'hsv'</span>,<span class="string">'jet'</span>},<span class="keyword">...</span>
+1676   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''setCmap'');'</span>);
+1677 
+1678 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1679 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1680 
+1681 GUIheight = 0.46;
+1682 
+1683 handles.crosshairs = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'checkbox'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1684   <span class="string">'Position'</span>,[.85 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1685   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1686   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1687   <span class="string">'TooltipString'</span>,<span class="string">'Toggle Crosshairs on/off'</span>,<span class="keyword">...</span>
+1688   <span class="string">'String'</span>,<span class="string">'Crosshairs'</span>,<span class="string">'Value'</span>,1,<span class="keyword">...</span>
+1689   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''crosshairs'');'</span>);
+1690 
+1691 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1692 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1693 
+1694 GUIheight = GUIheight - 0.04;
+1695 
+1696 handles.histogram = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1697   <span class="string">'Position'</span>,[.85 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1698   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1699   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1700   <span class="string">'TooltipString'</span>,<span class="string">'Histogram of Volume Intensity'</span>,<span class="keyword">...</span>
+1701   <span class="string">'String'</span>,<span class="string">'Histogram'</span>,<span class="keyword">...</span>
+1702   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''histogram'');'</span>);
+1703 
+1704 
+1705 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1706 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1707 
+1708 GUIheight = GUIheight - 0.04;
+1709 
+1710 handles.coord = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'popupmenu'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1711   <span class="string">'Position'</span>,[.85 GUIheight .10 .03], <span class="string">'HorizontalAlignment'</span>, <span class="string">'left'</span>,<span class="keyword">...</span>
+1712   <span class="string">'BackgroundColor'</span>, [.3 .3 .3],<span class="string">'ForegroundColor'</span>, [1 1 1],<span class="keyword">...</span>
+1713   <span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1714   <span class="string">'TooltipString'</span>,<span class="string">'Voxel or Mensurated Axis Coordinates'</span>,<span class="keyword">...</span>
+1715   <span class="string">'String'</span>,{<span class="string">'Voxels'</span>,<span class="string">'mm'</span>,<span class="string">'meters'</span>},<span class="keyword">...</span>
+1716   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''coordinates'');'</span>);
+1717 
+1718 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1719 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1720 
+1721 Font.FontWeight = <span class="string">'bold'</span>;
+1722 
+1723 <span class="comment">% View avw.hdr</span>
+1724 handles.Bhdr = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1725   <span class="string">'Position'</span>,[.92 .05 .07 .03],<span class="keyword">...</span>
+1726   <span class="string">'String'</span>,<span class="string">'HDR'</span>,<span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1727   <span class="string">'TooltipString'</span>,<span class="string">'View the .hdr parameters.'</span>,<span class="keyword">...</span>
+1728   <span class="string">'BackgroundColor'</span>,[0.0 0.0 0.5],<span class="keyword">...</span>
+1729   <span class="string">'ForegroundColor'</span>,[1 1 1], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+1730   <span class="string">'Callback'</span>,strcat(<span class="string">'AVWVIEW = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+1731   <span class="string">'avw_view_hdr(AVWVIEW.avw,AVWVIEW.gui);'</span>,<span class="keyword">...</span>
+1732   <span class="string">'clear AVWVIEW;'</span>));
+1733 
+1734 <span class="comment">% OK: Return the avw!</span>
+1735 handles.Bquit = uicontrol(<span class="string">'Parent'</span>,GUI,<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'Units'</span>,<span class="string">'Normalized'</span>, Font, <span class="keyword">...</span>
+1736   <span class="string">'Position'</span>,[.92 .01 .07 .03],<span class="keyword">...</span>
+1737   <span class="string">'String'</span>,<span class="string">'RETURN'</span>,<span class="string">'BusyAction'</span>,<span class="string">'queue'</span>,<span class="keyword">...</span>
+1738   <span class="string">'BackgroundColor'</span>,[0.0 0.5 0.0],<span class="keyword">...</span>
+1739   <span class="string">'ForegroundColor'</span>, [1 1 1], <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+1740   <span class="string">'Callback'</span>,<span class="string">'avw_view([],[],''quit'');'</span>);
+1741 
+1742 <span class="comment">% Update the gui_struct handles for this gui</span>
+1743 <span class="keyword">if</span> exist(<span class="string">'parent'</span>,<span class="string">'var'</span>), AVWVIEW.parent.gui = parent; <span class="keyword">end</span>
+1744 AVWVIEW.avw = avw;
+1745 AVWVIEW.handles = handles;
+1746 set(AVWVIEW.gui,<span class="string">'Userdata'</span>,AVWVIEW);
+1747 set(AVWVIEW.gui,<span class="string">'HandleVisibility'</span>,<span class="string">'callback'</span>);
+1748 
+1749 <span class="keyword">return</span>
+1750 
+1751 
+1752 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1753 <a name="_sub13" href="#_subfunctions" class="code">function slice_img(avw),</a>
+1754 
+1755 figure
+1756 xslice = 128;
+1757 slice = squeeze( avw.img(xslice,:,:) );
+1758 imagesc(slice); axis image; colormap(<span class="string">'gray'</span>)
+1759 figure
+1760 yslice = 128;
+1761 slice = squeeze( avw.img(:,yslice,:) );
+1762 imagesc(slice); axis image; colormap(<span class="string">'gray'</span>)
+1763 figure
+1764 zslice = 128;
+1765 slice = squeeze( avw.img(:,:,zslice) );
+1766 imagesc(slice); axis image; colormap(<span class="string">'gray'</span>)
+1767 
+1768 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

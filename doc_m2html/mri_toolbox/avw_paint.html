@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_paint</title>
+  <meta name="keywords" content="avw_paint">
+  <meta name="description" content="script to test vertex to voxel coordinate mapping">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_paint.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_paint
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>script to test vertex to voxel coordinate mapping</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> script to test vertex to voxel coordinate mapping</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_center.html" class="code" title="function center = avw_center(avw)">avw_center</a>	avw_center - find center of a volume</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 
+0002 
+0003 <span class="comment">% script to test vertex to voxel coordinate mapping</span>
+0004 
+0005 
+0006 origin = <a href="avw_center.html" class="code" title="function center = avw_center(avw)">avw_center</a>(avw);
+0007 
+0008 xo = origin.abs.mm(1);
+0009 yo = origin.abs.mm(2);
+0010 zo = origin.abs.mm(3);
+0011 
+0012 <span class="comment">% Find direction cosines for line from origin to nasion</span>
+0013 x =   0 + xo;
+0014 y = 100 + yo;
+0015 z =   0 + zo;
+0016 r = sqrt( (x-xo).^2 + (y-yo).^2 + (z-zo).^2 );
+0017 l = (x-xo)/r; <span class="comment">% cos alpha</span>
+0018 m = (y-yo)/r; <span class="comment">% cos beta</span>
+0019 n = (z-zo)/r; <span class="comment">% cos gamma</span>
+0020 
+0021 <span class="comment">% find discrete points from origin to the vertex + 25%</span>
+0022 POINTS = 250;
+0023 PERCENT = 0.25;
+0024 RMIN = 0;
+0025 rmax = r + (r * PERCENT);
+0026 radial_distances = linspace(RMIN,rmax,POINTS);
+0027 
+0028 L = repmat(l,1,POINTS);
+0029 M = repmat(m,1,POINTS);
+0030 N = repmat(n,1,POINTS);
+0031 
+0032 XI = (L .* radial_distances) + xo;
+0033 YI = (M .* radial_distances) + yo;
+0034 ZI = (N .* radial_distances) + zo;
+0035 
+0036 <span class="comment">% interpolate volume values at these points ( XI,YI are swapped here</span>
+0037 <span class="comment">% because the Analyze volume is a left handed coordinate system )</span>
+0038 VI = interp3(vol,YI,XI,ZI,<span class="string">'*nearest'</span>);
+0039 
+0040 <span class="comment">% Find the intensity values in this array that approximate</span>
+0041 <span class="comment">% the scalp</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

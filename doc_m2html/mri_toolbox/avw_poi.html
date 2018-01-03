@@ -1,0 +1,783 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_poi</title>
+  <meta name="keywords" content="avw_poi">
+  <meta name="description" content="File/function name:  poi.m   (Pixels Of Interest)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_poi.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_poi
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>File/function name:  poi.m   (Pixels Of Interest)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function poi(slice_no,selection); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> File/function name:  poi.m   (Pixels Of Interest)
+         Written by:  Tim DeMonte
+               Date:  Mar 27, 2001
+            Version:  1.0
+        Description:  A tool for studying Regions of Interest (ROI)
+                      defined by selected groups of pixels in 2D
+                      images taken from multi-slice (3D) data sets.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function poi(slice_no,selection);</a>
+0002 
+0003 <span class="comment">% File/function name:  poi.m   (Pixels Of Interest)</span>
+0004 <span class="comment">%         Written by:  Tim DeMonte</span>
+0005 <span class="comment">%               Date:  Mar 27, 2001</span>
+0006 <span class="comment">%            Version:  1.0</span>
+0007 <span class="comment">%        Description:  A tool for studying Regions of Interest (ROI)</span>
+0008 <span class="comment">%                      defined by selected groups of pixels in 2D</span>
+0009 <span class="comment">%                      images taken from multi-slice (3D) data sets.</span>
+0010 <span class="comment">%</span>
+0011 
+0012 <span class="keyword">global</span> image Jmax Jtotal doublemap
+0013 <span class="keyword">global</span> ROI_1 ROI_1sum ROI_1no ROI_1mean ROI_1std ROI_1min ROI_1max
+0014 <span class="keyword">global</span> ROI_1percent
+0015 <span class="keyword">global</span> h1 h2
+0016 <span class="keyword">global</span> rad1 rad2 rad3
+0017 <span class="keyword">global</span> editbox1 editbox2 editbox3 editbox4 editbox5 editbox6 editbox7 editbox8
+0018 <span class="keyword">if</span> nargin&lt;2,
+0019    selection=0;
+0020    clear <span class="keyword">global</span> ROI_1 ROI_1mean ROI_1std ROI_1min ROI_1max ROI_1percent
+0021 <span class="keyword">end</span>
+0022 
+0023 <span class="keyword">if</span> selection==0,
+0024    
+0025    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0026    <span class="comment">%%% Modify these lines to read in a particular image file               %%%</span>
+0027    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0028    load Jxyz.mat;
+0029    image=Jz(:,:,slice_no);
+0030    Jtotal=sum(sum(image(:,:)));
+0031    
+0032    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0033    <span class="comment">%%% Modify this line to specify the maximum range of data to display    %%%</span>
+0034    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0035    Jmax=15;
+0036    
+0037    ROI_1mean=0;
+0038    ROI_1std=0;
+0039    ROI_1min=0;
+0040    ROI_1max=0;
+0041    ROI_1sum=0;
+0042    ROI_1no=0;
+0043    dfc=get(0,<span class="string">'defaultfigurecolor'</span>);
+0044    gui_dim=[200,100,820,625];
+0045    figure(<span class="string">'name'</span>,<span class="keyword">...</span>
+0046       <span class="string">'POI (Pixels of Interest)'</span>,<span class="keyword">...</span>
+0047       <span class="string">'numbertitle'</span>,<span class="string">'off'</span>,<span class="string">'position'</span>,gui_dim,<span class="string">'menubar'</span>,<span class="string">'none'</span>);
+0048    h1=imagesc(image(:,:),[-Jmax Jmax]);
+0049    axis square
+0050    pwr=0.5; <span class="comment">% exponent for colormap (1 is linear)</span>
+0051    <span class="keyword">for</span> m=1:128
+0052       <span class="keyword">if</span> m&lt;64
+0053          doublemap(m,1)=((m-1)./64).^pwr;
+0054          doublemap(m,2)=((m-1)./64).^pwr;
+0055          doublemap(m,3)=1;
+0056       <span class="keyword">elseif</span> m&gt;64
+0057          doublemap(m,1)=1;
+0058          doublemap(m,2)=((128-m)./64).^pwr;
+0059          doublemap(m,3)=((128-m)./64).^pwr;
+0060       <span class="keyword">else</span>
+0061          doublemap(m,1)=1;
+0062          doublemap(m,2)=1;
+0063          doublemap(m,3)=1;
+0064       <span class="keyword">end</span>
+0065    <span class="keyword">end</span>
+0066    colormap(doublemap)
+0067    colorbar
+0068    set(h1,<span class="string">'buttondownfcn'</span>,<span class="string">'global slice_no,poi(slice_no,1),clear slice_no'</span>);
+0069    
+0070    <span class="comment">% Text</span>
+0071    uicontrol(<span class="string">'style'</span>,<span class="string">'text'</span>,<span class="string">'position'</span>,[5,440,80,20],<span class="keyword">...</span>
+0072       <span class="string">'string'</span>,<span class="string">'Mean of ROI:'</span>,<span class="string">'backgroundcolor'</span>,dfc,<span class="string">'foregroundcolor'</span>,<span class="string">'black'</span>,<span class="keyword">...</span>
+0073       <span class="string">'fontname'</span>,<span class="string">'ms sans serif'</span>,<span class="string">'fontsize'</span>,8,<span class="string">'fontunits'</span>,<span class="string">'points'</span>,<span class="keyword">...</span>
+0074       <span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>);
+0075    uicontrol(<span class="string">'style'</span>,<span class="string">'text'</span>,<span class="string">'position'</span>,[5,390,80,20],<span class="keyword">...</span>
+0076       <span class="string">'string'</span>,<span class="string">'Std Dev of ROI:'</span>,<span class="string">'backgroundcolor'</span>,dfc,<span class="string">'foregroundcolor'</span>,<span class="string">'black'</span>,<span class="keyword">...</span>
+0077       <span class="string">'fontname'</span>,<span class="string">'ms sans serif'</span>,<span class="string">'fontsize'</span>,8,<span class="string">'fontunits'</span>,<span class="string">'points'</span>,<span class="keyword">...</span>
+0078       <span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>);
+0079    uicontrol(<span class="string">'style'</span>,<span class="string">'text'</span>,<span class="string">'position'</span>,[5,90,80,20],<span class="keyword">...</span>
+0080       <span class="string">'string'</span>,<span class="string">'Last Pick Value:'</span>,<span class="string">'backgroundcolor'</span>,dfc,<span class="string">'foregroundcolor'</span>,<span class="string">'black'</span>,<span class="keyword">...</span>
+0081       <span class="string">'fontname'</span>,<span class="string">'ms sans serif'</span>,<span class="string">'fontsize'</span>,8,<span class="string">'fontunits'</span>,<span class="string">'points'</span>,<span class="keyword">...</span>
+0082       <span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>);
+0083    uicontrol(<span class="string">'style'</span>,<span class="string">'text'</span>,<span class="string">'position'</span>,[5,340,80,20],<span class="keyword">...</span>
+0084       <span class="string">'string'</span>,<span class="string">'Min of ROI:'</span>,<span class="string">'backgroundcolor'</span>,dfc,<span class="string">'foregroundcolor'</span>,<span class="string">'black'</span>,<span class="keyword">...</span>
+0085       <span class="string">'fontname'</span>,<span class="string">'ms sans serif'</span>,<span class="string">'fontsize'</span>,8,<span class="string">'fontunits'</span>,<span class="string">'points'</span>,<span class="keyword">...</span>
+0086       <span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>);
+0087    uicontrol(<span class="string">'style'</span>,<span class="string">'text'</span>,<span class="string">'position'</span>,[5,290,80,20],<span class="keyword">...</span>
+0088       <span class="string">'string'</span>,<span class="string">'Max of ROI:'</span>,<span class="string">'backgroundcolor'</span>,dfc,<span class="string">'foregroundcolor'</span>,<span class="string">'black'</span>,<span class="keyword">...</span>
+0089       <span class="string">'fontname'</span>,<span class="string">'ms sans serif'</span>,<span class="string">'fontsize'</span>,8,<span class="string">'fontunits'</span>,<span class="string">'points'</span>,<span class="keyword">...</span>
+0090       <span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>);
+0091    uicontrol(<span class="string">'style'</span>,<span class="string">'text'</span>,<span class="string">'position'</span>,[5,510,90,20],<span class="keyword">...</span>
+0092       <span class="string">'string'</span>,<span class="string">'Sum of ROI:'</span>,<span class="string">'backgroundcolor'</span>,dfc,<span class="string">'foregroundcolor'</span>,<span class="string">'black'</span>,<span class="keyword">...</span>
+0093       <span class="string">'fontname'</span>,<span class="string">'ms sans serif'</span>,<span class="string">'fontsize'</span>,8,<span class="string">'fontunits'</span>,<span class="string">'points'</span>,<span class="keyword">...</span>
+0094       <span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>);
+0095    uicontrol(<span class="string">'style'</span>,<span class="string">'text'</span>,<span class="string">'position'</span>,[5,210,80,20],<span class="keyword">...</span>
+0096       <span class="string">'string'</span>,<span class="string">'No. of Pixels:'</span>,<span class="string">'backgroundcolor'</span>,dfc,<span class="string">'foregroundcolor'</span>,<span class="string">'black'</span>,<span class="keyword">...</span>
+0097       <span class="string">'fontname'</span>,<span class="string">'ms sans serif'</span>,<span class="string">'fontsize'</span>,8,<span class="string">'fontunits'</span>,<span class="string">'points'</span>,<span class="keyword">...</span>
+0098       <span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>);
+0099    uicontrol(<span class="string">'style'</span>,<span class="string">'text'</span>,<span class="string">'position'</span>,[5,160,80,20],<span class="keyword">...</span>
+0100       <span class="string">'string'</span>,<span class="string">'% of Total:'</span>,<span class="string">'backgroundcolor'</span>,dfc,<span class="string">'foregroundcolor'</span>,<span class="string">'black'</span>,<span class="keyword">...</span>
+0101       <span class="string">'fontname'</span>,<span class="string">'ms sans serif'</span>,<span class="string">'fontsize'</span>,8,<span class="string">'fontunits'</span>,<span class="string">'points'</span>,<span class="keyword">...</span>
+0102       <span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>);
+0103    
+0104    <span class="comment">% Edit Boxes</span>
+0105    editbox1=uicontrol(<span class="string">'style'</span>,<span class="string">'edit'</span>,<span class="string">'position'</span>,[5,420,90,20],<span class="keyword">...</span>
+0106       <span class="string">'string'</span>,num2str(ROI_1mean),<span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0107       <span class="string">'backgroundcolor'</span>,<span class="string">'white'</span>);
+0108    editbox2=uicontrol(<span class="string">'style'</span>,<span class="string">'edit'</span>,<span class="string">'position'</span>,[5,370,90,20],<span class="keyword">...</span>
+0109       <span class="string">'string'</span>,num2str(ROI_1std),<span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0110       <span class="string">'backgroundcolor'</span>,<span class="string">'white'</span>);
+0111    editbox3=uicontrol(<span class="string">'style'</span>,<span class="string">'edit'</span>,<span class="string">'position'</span>,[5,70,90,20],<span class="keyword">...</span>
+0112       <span class="string">'string'</span>,<span class="string">''</span>,<span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0113       <span class="string">'backgroundcolor'</span>,<span class="string">'white'</span>);
+0114    editbox4=uicontrol(<span class="string">'style'</span>,<span class="string">'edit'</span>,<span class="string">'position'</span>,[5,320,90,20],<span class="keyword">...</span>
+0115       <span class="string">'string'</span>,num2str(ROI_1min),<span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0116       <span class="string">'backgroundcolor'</span>,<span class="string">'white'</span>);
+0117    editbox5=uicontrol(<span class="string">'style'</span>,<span class="string">'edit'</span>,<span class="string">'position'</span>,[5,270,90,20],<span class="keyword">...</span>
+0118       <span class="string">'string'</span>,num2str(ROI_1max),<span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0119       <span class="string">'backgroundcolor'</span>,<span class="string">'white'</span>);
+0120    editbox6=uicontrol(<span class="string">'style'</span>,<span class="string">'edit'</span>,<span class="string">'position'</span>,[5,490,90,20],<span class="keyword">...</span>
+0121       <span class="string">'string'</span>,num2str(ROI_1sum),<span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0122       <span class="string">'backgroundcolor'</span>,<span class="string">'white'</span>);
+0123    editbox7=uicontrol(<span class="string">'style'</span>,<span class="string">'edit'</span>,<span class="string">'position'</span>,[5,190,90,20],<span class="keyword">...</span>
+0124       <span class="string">'string'</span>,num2str(ROI_1no),<span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0125       <span class="string">'backgroundcolor'</span>,<span class="string">'white'</span>);
+0126    editbox8=uicontrol(<span class="string">'style'</span>,<span class="string">'edit'</span>,<span class="string">'position'</span>,[5,140,90,20],<span class="keyword">...</span>
+0127       <span class="string">'string'</span>,<span class="string">''</span>,<span class="string">'horizontalalignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0128       <span class="string">'backgroundcolor'</span>,<span class="string">'white'</span>);
+0129    
+0130    <span class="comment">% Radio Buttons</span>
+0131    rad1=uicontrol(<span class="string">'style'</span>,<span class="string">'radiobutton'</span>,<span class="string">'position'</span>,[5,585,90,20],<span class="keyword">...</span>
+0132       <span class="string">'string'</span>,<span class="string">'Pick/Clear'</span>,<span class="string">'min'</span>,0,<span class="string">'max'</span>,1,<span class="string">'value'</span>,1);
+0133    rad2=uicontrol(<span class="string">'style'</span>,<span class="string">'radiobutton'</span>,<span class="string">'position'</span>,[5,560,90,20],<span class="keyword">...</span>
+0134       <span class="string">'string'</span>,<span class="string">'Big Block'</span>,<span class="string">'min'</span>,0,<span class="string">'max'</span>,1,<span class="string">'value'</span>,0);
+0135    rad3=uicontrol(<span class="string">'style'</span>,<span class="string">'radiobutton'</span>,<span class="string">'position'</span>,[5,535,90,20],<span class="keyword">...</span>
+0136       <span class="string">'string'</span>,<span class="string">'Zoom ON/OFF'</span>,<span class="string">'min'</span>,0,<span class="string">'max'</span>,1,<span class="string">'value'</span>,0,<span class="keyword">...</span>
+0137       <span class="string">'callback'</span>,<span class="string">'global slice_no,poi(slice_no,2),clear slice_no'</span>);
+0138    
+0139 <span class="keyword">elseif</span> selection==1,
+0140    pos=round(get(gca,<span class="string">'currentpoint'</span>));
+0141    x=[pos(1,1)-0.5 pos(1,1)-0.5;pos(1,1)-0.5 pos(1,1)+0.5;pos(1,1)+0.5 pos(1,1)+0.5;<span class="keyword">...</span>
+0142          pos(1,1)+0.5 pos(1,1)-0.5;pos(1,1)-0.5 pos(1,1)];
+0143    y=[pos(1,2)-0.5 pos(1,2)+0.5;pos(1,2)+0.5 pos(1,2)+0.5;pos(1,2)+0.5 pos(1,2)-0.5;<span class="keyword">...</span>
+0144          pos(1,2)-0.5 pos(1,2)-0.5;pos(1,2)-0.5 pos(1,2)+0.5];
+0145    <span class="keyword">if</span>(get(rad1,<span class="string">'value'</span>)),   <span class="comment">% Pick</span>
+0146       <span class="keyword">if</span>(get(rad2,<span class="string">'value'</span>)),  <span class="comment">% Big Block (i.e. 3x3 array)</span>
+0147          h3=line(x,y);
+0148          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0149          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0150          <span class="keyword">if</span> ~isempty(ROI_1),
+0151             a=find(pos(1,1)==ROI_1(:,2));
+0152             b=find(pos(1,2)==ROI_1(:,3));
+0153             <span class="keyword">if</span> isempty(a),
+0154                ROI_1=[ROI_1;image(pos(1,2),pos(1,1)) pos(1,1) pos(1,2)];
+0155             <span class="keyword">elseif</span> isempty(b),
+0156                ROI_1=[ROI_1;image(pos(1,2),pos(1,1)) pos(1,1) pos(1,2)];
+0157             <span class="keyword">else</span>
+0158                c=0;
+0159                <span class="keyword">for</span> n=1:length(a),
+0160                   <span class="keyword">if</span> find(a(n)==b(:)),
+0161                      c=a(n);
+0162                   <span class="keyword">end</span>
+0163                <span class="keyword">end</span>
+0164                <span class="keyword">if</span> c==0,
+0165                   ROI_1=[ROI_1;image(pos(1,2),pos(1,1)) pos(1,1) pos(1,2)];
+0166                <span class="keyword">end</span>
+0167             <span class="keyword">end</span>
+0168          <span class="keyword">else</span>
+0169             ROI_1=[ROI_1;image(pos(1,2),pos(1,1)) pos(1,1) pos(1,2)];
+0170          <span class="keyword">end</span>
+0171          <span class="comment">%%% End of Check ... %%%</span>
+0172          h3=line(x,y-1);
+0173          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0174          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0175          <span class="keyword">if</span> ~isempty(ROI_1),
+0176             a=find(pos(1,1)==ROI_1(:,2));
+0177             b=find(pos(1,2)-1==ROI_1(:,3));
+0178             <span class="keyword">if</span> isempty(a),
+0179                ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)) pos(1,1) pos(1,2)-1];
+0180             <span class="keyword">elseif</span> isempty(b),
+0181                ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)) pos(1,1) pos(1,2)-1];
+0182             <span class="keyword">else</span>
+0183                c=0;
+0184                <span class="keyword">for</span> n=1:length(a),
+0185                   <span class="keyword">if</span> find(a(n)==b(:)),
+0186                      c=a(n);
+0187                   <span class="keyword">end</span>
+0188                <span class="keyword">end</span>
+0189                <span class="keyword">if</span> c==0,
+0190                   ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)) pos(1,1) pos(1,2)-1];
+0191                <span class="keyword">end</span>
+0192             <span class="keyword">end</span>
+0193          <span class="keyword">else</span>
+0194             ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)) pos(1,1) pos(1,2)-1];
+0195          <span class="keyword">end</span>
+0196          <span class="comment">%%% End of Check ... %%%</span>
+0197          
+0198          h3=line(x+1,y-1);
+0199          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0200          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0201          <span class="keyword">if</span> ~isempty(ROI_1),
+0202             a=find(pos(1,1)+1==ROI_1(:,2));
+0203             b=find(pos(1,2)-1==ROI_1(:,3));
+0204             <span class="keyword">if</span> isempty(a),
+0205                ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)+1) pos(1,1)+1 pos(1,2)-1];
+0206             <span class="keyword">elseif</span> isempty(b),
+0207                ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)+1) pos(1,1)+1 pos(1,2)-1];
+0208             <span class="keyword">else</span>
+0209                c=0;
+0210                <span class="keyword">for</span> n=1:length(a),
+0211                   <span class="keyword">if</span> find(a(n)==b(:)),
+0212                      c=a(n);
+0213                   <span class="keyword">end</span>
+0214                <span class="keyword">end</span>
+0215                <span class="keyword">if</span> c==0,
+0216                   ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)+1) pos(1,1)+1 pos(1,2)-1];
+0217                <span class="keyword">end</span>
+0218             <span class="keyword">end</span>
+0219          <span class="keyword">else</span>
+0220             ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)+1) pos(1,1)+1 pos(1,2)-1];
+0221          <span class="keyword">end</span>
+0222          <span class="comment">%%% End of Check ... %%%</span>
+0223          
+0224          h3=line(x-1,y);
+0225          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0226          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0227          <span class="keyword">if</span> ~isempty(ROI_1),
+0228             a=find(pos(1,1)-1==ROI_1(:,2));
+0229             b=find(pos(1,2)==ROI_1(:,3));
+0230             <span class="keyword">if</span> isempty(a),
+0231                ROI_1=[ROI_1;image(pos(1,2),pos(1,1)-1) pos(1,1)-1 pos(1,2)];
+0232             <span class="keyword">elseif</span> isempty(b),
+0233                ROI_1=[ROI_1;image(pos(1,2),pos(1,1)-1) pos(1,1)-1 pos(1,2)];
+0234             <span class="keyword">else</span>
+0235                c=0;
+0236                <span class="keyword">for</span> n=1:length(a),
+0237                   <span class="keyword">if</span> find(a(n)==b(:)),
+0238                      c=a(n);
+0239                   <span class="keyword">end</span>
+0240                <span class="keyword">end</span>
+0241                <span class="keyword">if</span> c==0,
+0242                   ROI_1=[ROI_1;image(pos(1,2),pos(1,1)-1) pos(1,1)-1 pos(1,2)];
+0243                <span class="keyword">end</span>
+0244             <span class="keyword">end</span>
+0245          <span class="keyword">else</span>
+0246             ROI_1=[ROI_1;image(pos(1,2),pos(1,1)-1) pos(1,1)-1 pos(1,2)];
+0247          <span class="keyword">end</span>
+0248          <span class="comment">%%% End of Check ... %%%</span>
+0249          
+0250          h3=line(x+1,y);
+0251          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0252          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0253          <span class="keyword">if</span> ~isempty(ROI_1),
+0254             a=find(pos(1,1)+1==ROI_1(:,2));
+0255             b=find(pos(1,2)==ROI_1(:,3));
+0256             <span class="keyword">if</span> isempty(a),
+0257                ROI_1=[ROI_1;image(pos(1,2),pos(1,1)+1) pos(1,1)+1 pos(1,2)];
+0258             <span class="keyword">elseif</span> isempty(b),
+0259                ROI_1=[ROI_1;image(pos(1,2),pos(1,1)+1) pos(1,1)+1 pos(1,2)];
+0260             <span class="keyword">else</span>
+0261                c=0;
+0262                <span class="keyword">for</span> n=1:length(a),
+0263                   <span class="keyword">if</span> find(a(n)==b(:)),
+0264                      c=a(n);
+0265                   <span class="keyword">end</span>
+0266                <span class="keyword">end</span>
+0267                <span class="keyword">if</span> c==0,
+0268                   ROI_1=[ROI_1;image(pos(1,2),pos(1,1)+1) pos(1,1)+1 pos(1,2)];
+0269                <span class="keyword">end</span>
+0270             <span class="keyword">end</span>
+0271          <span class="keyword">else</span>
+0272             ROI_1=[ROI_1;image(pos(1,2),pos(1,1)+1) pos(1,1)+1 pos(1,2)];
+0273          <span class="keyword">end</span>
+0274          <span class="comment">%%% End of Check ... %%%</span>
+0275          
+0276          h3=line(x-1,y+1);
+0277          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0278          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0279          <span class="keyword">if</span> ~isempty(ROI_1),
+0280             a=find(pos(1,1)-1==ROI_1(:,2));
+0281             b=find(pos(1,2)+1==ROI_1(:,3));
+0282             <span class="keyword">if</span> isempty(a),
+0283                ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)-1) pos(1,1)-1 pos(1,2)+1];
+0284             <span class="keyword">elseif</span> isempty(b),
+0285                ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)-1) pos(1,1)-1 pos(1,2)+1];
+0286             <span class="keyword">else</span>
+0287                c=0;
+0288                <span class="keyword">for</span> n=1:length(a),
+0289                   <span class="keyword">if</span> find(a(n)==b(:)),
+0290                      c=a(n);
+0291                   <span class="keyword">end</span>
+0292                <span class="keyword">end</span>
+0293                <span class="keyword">if</span> c==0,
+0294                   ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)-1) pos(1,1)-1 pos(1,2)+1];
+0295                <span class="keyword">end</span>
+0296             <span class="keyword">end</span>
+0297          <span class="keyword">else</span>
+0298             ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)-1) pos(1,1)-1 pos(1,2)+1];
+0299          <span class="keyword">end</span>
+0300          <span class="comment">%%% End of Check ... %%%</span>
+0301          
+0302          h3=line(x,y+1);
+0303          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0304          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0305          <span class="keyword">if</span> ~isempty(ROI_1),
+0306             a=find(pos(1,1)==ROI_1(:,2));
+0307             b=find(pos(1,2)+1==ROI_1(:,3));
+0308             <span class="keyword">if</span> isempty(a),
+0309                ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)) pos(1,1) pos(1,2)+1];
+0310             <span class="keyword">elseif</span> isempty(b),
+0311                ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)) pos(1,1) pos(1,2)+1];
+0312             <span class="keyword">else</span>
+0313                c=0;
+0314                <span class="keyword">for</span> n=1:length(a),
+0315                   <span class="keyword">if</span> find(a(n)==b(:)),
+0316                      c=a(n);
+0317                   <span class="keyword">end</span>
+0318                <span class="keyword">end</span>
+0319                <span class="keyword">if</span> c==0,
+0320                   ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)) pos(1,1) pos(1,2)+1];
+0321                <span class="keyword">end</span>
+0322             <span class="keyword">end</span>
+0323          <span class="keyword">else</span>
+0324             ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)) pos(1,1) pos(1,2)+1];
+0325          <span class="keyword">end</span>
+0326          <span class="comment">%%% End of Check ... %%%</span>
+0327          
+0328          h3=line(x+1,y+1);
+0329          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0330          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0331          <span class="keyword">if</span> ~isempty(ROI_1),
+0332             a=find(pos(1,1)+1==ROI_1(:,2));
+0333             b=find(pos(1,2)+1==ROI_1(:,3));
+0334             <span class="keyword">if</span> isempty(a),
+0335                ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)+1) pos(1,1)+1 pos(1,2)+1];
+0336             <span class="keyword">elseif</span> isempty(b),
+0337                ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)+1) pos(1,1)+1 pos(1,2)+1];
+0338             <span class="keyword">else</span>
+0339                c=0;
+0340                <span class="keyword">for</span> n=1:length(a),
+0341                   <span class="keyword">if</span> find(a(n)==b(:)),
+0342                      c=a(n);
+0343                   <span class="keyword">end</span>
+0344                <span class="keyword">end</span>
+0345                <span class="keyword">if</span> c==0,
+0346                   ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)+1) pos(1,1)+1 pos(1,2)+1];
+0347                <span class="keyword">end</span>
+0348             <span class="keyword">end</span>
+0349          <span class="keyword">else</span>
+0350             ROI_1=[ROI_1;image(pos(1,2)+1,pos(1,1)+1) pos(1,1)+1 pos(1,2)+1];
+0351          <span class="keyword">end</span>
+0352          <span class="comment">%%% End of Check ... %%%</span>
+0353          
+0354          h3=line(x-1,y-1);
+0355          set(h3,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0356          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0357          <span class="keyword">if</span> ~isempty(ROI_1),
+0358             a=find(pos(1,1)-1==ROI_1(:,2));
+0359             b=find(pos(1,2)-1==ROI_1(:,3));
+0360             <span class="keyword">if</span> isempty(a),
+0361                ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)-1) pos(1,1)-1 pos(1,2)-1];
+0362             <span class="keyword">elseif</span> isempty(b),
+0363                ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)-1) pos(1,1)-1 pos(1,2)-1];
+0364             <span class="keyword">else</span>
+0365                c=0;
+0366                <span class="keyword">for</span> n=1:length(a),
+0367                   <span class="keyword">if</span> find(a(n)==b(:)),
+0368                      c=a(n);
+0369                   <span class="keyword">end</span>
+0370                <span class="keyword">end</span>
+0371                <span class="keyword">if</span> c==0,
+0372                   ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)-1) pos(1,1)-1 pos(1,2)-1];
+0373                <span class="keyword">end</span>
+0374             <span class="keyword">end</span>
+0375          <span class="keyword">else</span>
+0376             ROI_1=[ROI_1;image(pos(1,2)-1,pos(1,1)-1) pos(1,1)-1 pos(1,2)-1];
+0377          <span class="keyword">end</span>
+0378          <span class="comment">%%% End of Check ... %%%</span>
+0379          
+0380          ROI_1mean=mean(ROI_1(:,1));
+0381          ROI_1std=std(ROI_1(:,1));
+0382          ROI_1min=min(ROI_1(:,1));
+0383          ROI_1max=max(ROI_1(:,1));
+0384          ROI_1sum=sum(ROI_1(:,1));
+0385          [ROI_1no,n]=size(ROI_1);
+0386          ROI_1percent=(ROI_1sum./Jtotal).*100;
+0387          set(editbox1,<span class="string">'string'</span>,num2str(ROI_1mean));
+0388          set(editbox2,<span class="string">'string'</span>,num2str(ROI_1std));
+0389          set(editbox3,<span class="string">'string'</span>,num2str(image(pos(1,2),pos(1,1))));
+0390          set(editbox4,<span class="string">'string'</span>,num2str(ROI_1min));
+0391          set(editbox5,<span class="string">'string'</span>,num2str(ROI_1max));
+0392          set(editbox6,<span class="string">'string'</span>,num2str(ROI_1sum));
+0393          set(editbox7,<span class="string">'string'</span>,num2str(ROI_1no));
+0394          set(editbox8,<span class="string">'string'</span>,num2str(ROI_1percent));
+0395       <span class="keyword">else</span>   <span class="comment">% single pixel</span>
+0396          h2=line(x,y);
+0397          set(h2,<span class="string">'color'</span>,<span class="string">'g'</span>);
+0398          <span class="comment">%%% Check if pixel is already selected %%%</span>
+0399          <span class="keyword">if</span> ~isempty(ROI_1),
+0400             a=find(pos(1,1)==ROI_1(:,2));
+0401             b=find(pos(1,2)==ROI_1(:,3));
+0402             <span class="keyword">if</span> isempty(a),
+0403                ROI_1=[ROI_1;image(pos(1,2),pos(1,1)) pos(1,1) pos(1,2)];
+0404             <span class="keyword">elseif</span> isempty(b),
+0405                ROI_1=[ROI_1;image(pos(1,2),pos(1,1)) pos(1,1) pos(1,2)];
+0406             <span class="keyword">else</span>
+0407                c=0;
+0408                <span class="keyword">for</span> n=1:length(a),
+0409                   <span class="keyword">if</span> find(a(n)==b(:)),
+0410                      c=a(n);
+0411                   <span class="keyword">end</span>
+0412                <span class="keyword">end</span>
+0413                <span class="keyword">if</span> c==0,
+0414                   ROI_1=[ROI_1;image(pos(1,2),pos(1,1)) pos(1,1) pos(1,2)];
+0415                <span class="keyword">end</span>
+0416             <span class="keyword">end</span>
+0417          <span class="keyword">else</span>
+0418             ROI_1=[ROI_1;image(pos(1,2),pos(1,1)) pos(1,1) pos(1,2)];
+0419          <span class="keyword">end</span>
+0420          <span class="comment">%%% End of Check ... %%%</span>
+0421          ROI_1mean=mean(ROI_1(:,1));
+0422          ROI_1std=std(ROI_1(:,1));
+0423          ROI_1min=min(ROI_1(:,1));
+0424          ROI_1max=max(ROI_1(:,1));
+0425          ROI_1sum=sum(ROI_1(:,1));
+0426          [ROI_1no,n]=size(ROI_1);
+0427          ROI_1percent=(ROI_1sum./Jtotal).*100;
+0428          set(editbox1,<span class="string">'string'</span>,num2str(ROI_1mean));
+0429          set(editbox2,<span class="string">'string'</span>,num2str(ROI_1std));
+0430          set(editbox3,<span class="string">'string'</span>,num2str(image(pos(1,2),pos(1,1))));
+0431          set(editbox4,<span class="string">'string'</span>,num2str(ROI_1min));
+0432          set(editbox5,<span class="string">'string'</span>,num2str(ROI_1max));
+0433          set(editbox6,<span class="string">'string'</span>,num2str(ROI_1sum));
+0434          set(editbox7,<span class="string">'string'</span>,num2str(ROI_1no));
+0435          set(editbox8,<span class="string">'string'</span>,num2str(ROI_1percent));
+0436       <span class="keyword">end</span>
+0437    <span class="keyword">else</span>   <span class="comment">% Clear</span>
+0438       pix=image(pos(1,2),pos(1,1));
+0439       color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0440       <span class="keyword">if</span> color&gt;128,
+0441          color=128;
+0442       <span class="keyword">elseif</span> color&lt;1,
+0443          color=1;
+0444       <span class="keyword">end</span>
+0445       <span class="keyword">if</span>(get(rad2,<span class="string">'value'</span>)),  <span class="comment">% Clear Big Block</span>
+0446          h3=line(x,y);
+0447          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0448          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0449          a=find(pos(1,1)==ROI_1(:,2));
+0450          b=find(pos(1,2)==ROI_1(:,3));
+0451          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0452             c=0;
+0453             <span class="keyword">for</span> n=1:length(a),
+0454                <span class="keyword">if</span> find(a(n)==b(:)),
+0455                   c=a(n);
+0456                <span class="keyword">end</span>
+0457             <span class="keyword">end</span>
+0458             <span class="keyword">if</span> c,
+0459                d=size(ROI_1);
+0460                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0461                ROI_1=ROI_1(1:(d(1)-1),:);
+0462             <span class="keyword">end</span>
+0463          <span class="keyword">end</span>
+0464          <span class="comment">%%% End of Remove ... %%%</span>
+0465          h3=line(x,y-1);
+0466          pix=image(pos(1,2)-1,pos(1,1));
+0467          color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0468          <span class="keyword">if</span> color&gt;128,
+0469             color=128;
+0470          <span class="keyword">elseif</span> color&lt;1,
+0471             color=1;
+0472          <span class="keyword">end</span>
+0473          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0474          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0475          a=find(pos(1,1)==ROI_1(:,2));
+0476          b=find(pos(1,2)-1==ROI_1(:,3));
+0477          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0478             c=0;
+0479             <span class="keyword">for</span> n=1:length(a),
+0480                <span class="keyword">if</span> find(a(n)==b(:)),
+0481                   c=a(n);
+0482                <span class="keyword">end</span>
+0483             <span class="keyword">end</span>
+0484             <span class="keyword">if</span> c,
+0485                d=size(ROI_1);
+0486                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0487                ROI_1=ROI_1(1:(d(1)-1),:);
+0488             <span class="keyword">end</span>
+0489          <span class="keyword">end</span>
+0490          <span class="comment">%%% End of Remove ... %%%</span>
+0491          h3=line(x+1,y-1);
+0492          pix=image(pos(1,2)-1,pos(1,1)+1);
+0493          color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0494          <span class="keyword">if</span> color&gt;128,
+0495             color=128;
+0496          <span class="keyword">elseif</span> color&lt;1,
+0497             color=1;
+0498          <span class="keyword">end</span>
+0499          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0500          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0501          a=find(pos(1,1)+1==ROI_1(:,2));
+0502          b=find(pos(1,2)-1==ROI_1(:,3));
+0503          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0504             c=0;
+0505             <span class="keyword">for</span> n=1:length(a),
+0506                <span class="keyword">if</span> find(a(n)==b(:)),
+0507                   c=a(n);
+0508                <span class="keyword">end</span>
+0509             <span class="keyword">end</span>
+0510             <span class="keyword">if</span> c,
+0511                d=size(ROI_1);
+0512                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0513                ROI_1=ROI_1(1:(d(1)-1),:);
+0514             <span class="keyword">end</span>
+0515          <span class="keyword">end</span>
+0516          <span class="comment">%%% End of Remove ... %%%</span>
+0517          h3=line(x-1,y);
+0518          pix=image(pos(1,2),pos(1,1)-1);
+0519          color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0520          <span class="keyword">if</span> color&gt;128,
+0521             color=128;
+0522          <span class="keyword">elseif</span> color&lt;1,
+0523             color=1;
+0524          <span class="keyword">end</span>
+0525          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0526          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0527          a=find(pos(1,1)-1==ROI_1(:,2));
+0528          b=find(pos(1,2)==ROI_1(:,3));
+0529          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0530             c=0;
+0531             <span class="keyword">for</span> n=1:length(a),
+0532                <span class="keyword">if</span> find(a(n)==b(:)),
+0533                   c=a(n);
+0534                <span class="keyword">end</span>
+0535             <span class="keyword">end</span>
+0536             <span class="keyword">if</span> c,
+0537                d=size(ROI_1);
+0538                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0539                ROI_1=ROI_1(1:(d(1)-1),:);
+0540             <span class="keyword">end</span>
+0541          <span class="keyword">end</span>
+0542          <span class="comment">%%% End of Remove ... %%%</span>
+0543          h3=line(x+1,y);
+0544          pix=image(pos(1,2),pos(1,1)+1);
+0545          color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0546          <span class="keyword">if</span> color&gt;128,
+0547             color=128;
+0548          <span class="keyword">elseif</span> color&lt;1,
+0549             color=1;
+0550          <span class="keyword">end</span>
+0551          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0552          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0553          a=find(pos(1,1)+1==ROI_1(:,2));
+0554          b=find(pos(1,2)==ROI_1(:,3));
+0555          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0556             c=0;
+0557             <span class="keyword">for</span> n=1:length(a),
+0558                <span class="keyword">if</span> find(a(n)==b(:)),
+0559                   c=a(n);
+0560                <span class="keyword">end</span>
+0561             <span class="keyword">end</span>
+0562             <span class="keyword">if</span> c,
+0563                d=size(ROI_1);
+0564                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0565                ROI_1=ROI_1(1:(d(1)-1),:);
+0566             <span class="keyword">end</span>
+0567          <span class="keyword">end</span>
+0568          <span class="comment">%%% End of Remove ... %%%</span>
+0569          h3=line(x-1,y+1);
+0570          pix=image(pos(1,2)+1,pos(1,1)-1);
+0571          color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0572          <span class="keyword">if</span> color&gt;128,
+0573             color=128;
+0574          <span class="keyword">elseif</span> color&lt;1,
+0575             color=1;
+0576          <span class="keyword">end</span>
+0577          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0578          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0579          a=find(pos(1,1)-1==ROI_1(:,2));
+0580          b=find(pos(1,2)+1==ROI_1(:,3));
+0581          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0582             c=0;
+0583             <span class="keyword">for</span> n=1:length(a),
+0584                <span class="keyword">if</span> find(a(n)==b(:)),
+0585                   c=a(n);
+0586                <span class="keyword">end</span>
+0587             <span class="keyword">end</span>
+0588             <span class="keyword">if</span> c,
+0589                d=size(ROI_1);
+0590                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0591                ROI_1=ROI_1(1:(d(1)-1),:);
+0592             <span class="keyword">end</span>
+0593          <span class="keyword">end</span>
+0594          <span class="comment">%%% End of Remove ... %%%</span>
+0595          h3=line(x,y+1);
+0596          pix=image(pos(1,2)+1,pos(1,1));
+0597          color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0598          <span class="keyword">if</span> color&gt;128,
+0599             color=128;
+0600          <span class="keyword">elseif</span> color&lt;1,
+0601             color=1;
+0602          <span class="keyword">end</span>
+0603          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0604          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0605          a=find(pos(1,1)==ROI_1(:,2));
+0606          b=find(pos(1,2)+1==ROI_1(:,3));
+0607          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0608             c=0;
+0609             <span class="keyword">for</span> n=1:length(a),
+0610                <span class="keyword">if</span> find(a(n)==b(:)),
+0611                   c=a(n);
+0612                <span class="keyword">end</span>
+0613             <span class="keyword">end</span>
+0614             <span class="keyword">if</span> c,
+0615                d=size(ROI_1);
+0616                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0617                ROI_1=ROI_1(1:(d(1)-1),:);
+0618             <span class="keyword">end</span>
+0619          <span class="keyword">end</span>
+0620          <span class="comment">%%% End of Remove ... %%%</span>
+0621          h3=line(x+1,y+1);
+0622          pix=image(pos(1,2)+1,pos(1,1)+1);
+0623          color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0624          <span class="keyword">if</span> color&gt;128,
+0625             color=128;
+0626          <span class="keyword">elseif</span> color&lt;1,
+0627             color=1;
+0628          <span class="keyword">end</span>
+0629          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0630          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0631          a=find(pos(1,1)+1==ROI_1(:,2));
+0632          b=find(pos(1,2)+1==ROI_1(:,3));
+0633          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0634             c=0;
+0635             <span class="keyword">for</span> n=1:length(a),
+0636                <span class="keyword">if</span> find(a(n)==b(:)),
+0637                   c=a(n);
+0638                <span class="keyword">end</span>
+0639             <span class="keyword">end</span>
+0640             <span class="keyword">if</span> c,
+0641                d=size(ROI_1);
+0642                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0643                ROI_1=ROI_1(1:(d(1)-1),:);
+0644             <span class="keyword">end</span>
+0645          <span class="keyword">end</span>
+0646          <span class="comment">%%% End of Remove ... %%%</span>
+0647          h3=line(x-1,y-1);
+0648          pix=image(pos(1,2)-1,pos(1,1)-1);
+0649          color=round(((pix+Jmax)./(2.*Jmax)).*128);
+0650          <span class="keyword">if</span> color&gt;128,
+0651             color=128;
+0652          <span class="keyword">elseif</span> color&lt;1,
+0653             color=1;
+0654          <span class="keyword">end</span>
+0655          set(h3,<span class="string">'color'</span>,doublemap(color,:));
+0656          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0657          a=find(pos(1,1)-1==ROI_1(:,2));
+0658          b=find(pos(1,2)-1==ROI_1(:,3));
+0659          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0660             c=0;
+0661             <span class="keyword">for</span> n=1:length(a),
+0662                <span class="keyword">if</span> find(a(n)==b(:)),
+0663                   c=a(n);
+0664                <span class="keyword">end</span>
+0665             <span class="keyword">end</span>
+0666             <span class="keyword">if</span> c,
+0667                d=size(ROI_1);
+0668                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0669                ROI_1=ROI_1(1:(d(1)-1),:);
+0670             <span class="keyword">end</span>
+0671          <span class="keyword">end</span>
+0672          <span class="comment">%%% End of Remove ... %%%</span>
+0673          ROI_1mean=mean(ROI_1(:,1));
+0674          ROI_1std=std(ROI_1(:,1));
+0675          ROI_1min=min(ROI_1(:,1));
+0676          ROI_1max=max(ROI_1(:,1));
+0677          ROI_1sum=sum(ROI_1(:,1));
+0678          [ROI_1no,n]=size(ROI_1);
+0679          ROI_1percent=(ROI_1sum./Jtotal).*100;
+0680          set(editbox1,<span class="string">'string'</span>,num2str(ROI_1mean));
+0681          set(editbox2,<span class="string">'string'</span>,num2str(ROI_1std));
+0682          set(editbox3,<span class="string">'string'</span>,num2str(image(pos(1,2),pos(1,1))));
+0683          set(editbox4,<span class="string">'string'</span>,num2str(ROI_1min));
+0684          set(editbox5,<span class="string">'string'</span>,num2str(ROI_1max));
+0685          set(editbox6,<span class="string">'string'</span>,num2str(ROI_1sum));
+0686          set(editbox7,<span class="string">'string'</span>,num2str(ROI_1no));
+0687          set(editbox8,<span class="string">'string'</span>,num2str(ROI_1percent));
+0688       <span class="keyword">else</span>  <span class="comment">% Clear single pixel</span>
+0689          h2=line(x,y);
+0690          set(h2,<span class="string">'color'</span>,doublemap(color,:));
+0691          <span class="comment">%%% Remove a pixel from ROI list %%%</span>
+0692          a=find(pos(1,1)==ROI_1(:,2));
+0693          b=find(pos(1,2)==ROI_1(:,3));
+0694          <span class="keyword">if</span> ~isempty(a) &amp; ~isempty(b),
+0695             c=0;
+0696             <span class="keyword">for</span> n=1:length(a),
+0697                <span class="keyword">if</span> find(a(n)==b(:)),
+0698                   c=a(n);
+0699                <span class="keyword">end</span>
+0700             <span class="keyword">end</span>
+0701             <span class="keyword">if</span> c,
+0702                d=size(ROI_1);
+0703                ROI_1(c,1:3)=ROI_1(d(1),1:3);
+0704                ROI_1=ROI_1(1:(d(1)-1),:);
+0705             <span class="keyword">end</span>
+0706          <span class="keyword">end</span>
+0707          <span class="comment">%%% End of Remove ... %%%</span>
+0708          ROI_1mean=mean(ROI_1(:,1));
+0709          ROI_1std=std(ROI_1(:,1));
+0710          ROI_1min=min(ROI_1(:,1));
+0711          ROI_1max=max(ROI_1(:,1));
+0712          ROI_1sum=sum(ROI_1(:,1));
+0713          [ROI_1no,n]=size(ROI_1);
+0714          ROI_1percent=(ROI_1sum./Jtotal).*100;
+0715          set(editbox1,<span class="string">'string'</span>,num2str(ROI_1mean));
+0716          set(editbox2,<span class="string">'string'</span>,num2str(ROI_1std));
+0717          set(editbox3,<span class="string">'string'</span>,num2str(image(pos(1,2),pos(1,1))));
+0718          set(editbox4,<span class="string">'string'</span>,num2str(ROI_1min));
+0719          set(editbox5,<span class="string">'string'</span>,num2str(ROI_1max));
+0720          set(editbox6,<span class="string">'string'</span>,num2str(ROI_1sum));
+0721          set(editbox7,<span class="string">'string'</span>,num2str(ROI_1no));
+0722          set(editbox8,<span class="string">'string'</span>,num2str(ROI_1percent));
+0723       <span class="keyword">end</span>
+0724    <span class="keyword">end</span>
+0725 <span class="keyword">elseif</span> selection==2,
+0726    <span class="keyword">if</span>(get(rad3,<span class="string">'value'</span>)),
+0727       zoom
+0728    <span class="keyword">else</span>
+0729       zoom off
+0730    <span class="keyword">end</span>
+0731 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

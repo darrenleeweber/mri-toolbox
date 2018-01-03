@@ -1,0 +1,329 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ge_series2avw</title>
+  <meta name="keywords" content="ge_series2avw">
+  <meta name="description" content="ge_series2avw - converts a GE series to Analyze">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; ge_series2avw.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>ge_series2avw
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>ge_series2avw - converts a GE series to Analyze</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ avw ] = ge_series2avw(examPath,seriesPath) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> ge_series2avw - converts a GE series to Analyze
+ 
+ avw = ge_series2avw(examPath,seriesPath)
+ 
+ Converts a series of GE slices into an Analyze 
+ avw struct (see avw_read), which can be output
+ as an Analyze .hdr/.img pair using avw_write.
+ 
+ examPath   - string path to an exam directory, 
+              which contains series directories 
+              below it
+ seriesPath - the series to convert
+              (integer or string argument)
+ 
+ examPath is the name of the directory containing 
+ the series subdirectories (e.g., series 1), which 
+ contain the series image files (*.MR or I.*).  
+ This function calls ge_series_read.
+ 
+ The function will attempt to reorient the GE 
+ 3D volume into radiological orientation 
+ (axial LAS, which is the default Analyze 
+ orientation).  The resulting data should
+ be SPM compatible when output with avw_write.
+ 
+ This function is in alpha development (as of 03/2003) 
+ although a prior version has been tested with 
+ Ax,Sag,Cor slices (with slice direction going both 
+ ways). It was also tested for oblique axial, but 
+ not on double obliques or anything more complicated.  
+ The function does not provide information for an 
+ SPM compatible .mat file.
+ 
+ see also <a href="ge_series_read.html" class="code" title="function [ ge, lastfile ] = ge_series_read(examPath, series)">ge_series_read</a>,
+          <a href="avw_view.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">avw_view</a>, <a href="avw_read.html" class="code" title="function [ avw, machine ] = avw_read(fileprefix,IMGorient,machine)">avw_read</a>, <a href="avw_write.html" class="code" title="function avw_write(avw, fileprefix, IMGorient, machine)">avw_write</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="ge_hdr2avw.html" class="code" title="function [ avw ] = ge_hdr2avw(ge)">ge_hdr2avw</a>	ge_hdr2avw - extract Analyze header from ge struct</li><li><a href="ge_series2avw.html" class="code" title="function [ avw ] = ge_series2avw(examPath,seriesPath)">ge_series2avw</a>	ge_series2avw - converts a GE series to Analyze</li><li><a href="ge_series_read.html" class="code" title="function [ ge, lastfile ] = ge_series_read(examPath, series)">ge_series_read</a>	ge_series_read - reads a volume of images from a GE series</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="ge_series2avw.html" class="code" title="function [ avw ] = ge_series2avw(examPath,seriesPath)">ge_series2avw</a>	ge_series2avw - converts a GE series to Analyze</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [avw] = ge_reorient(ge, avw)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ avw ] = ge_series2avw(examPath,seriesPath)</a>
+0002 
+0003 <span class="comment">% ge_series2avw - converts a GE series to Analyze</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% avw = ge_series2avw(examPath,seriesPath)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Converts a series of GE slices into an Analyze</span>
+0008 <span class="comment">% avw struct (see avw_read), which can be output</span>
+0009 <span class="comment">% as an Analyze .hdr/.img pair using avw_write.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% examPath   - string path to an exam directory,</span>
+0012 <span class="comment">%              which contains series directories</span>
+0013 <span class="comment">%              below it</span>
+0014 <span class="comment">% seriesPath - the series to convert</span>
+0015 <span class="comment">%              (integer or string argument)</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% examPath is the name of the directory containing</span>
+0018 <span class="comment">% the series subdirectories (e.g., series 1), which</span>
+0019 <span class="comment">% contain the series image files (*.MR or I.*).</span>
+0020 <span class="comment">% This function calls ge_series_read.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% The function will attempt to reorient the GE</span>
+0023 <span class="comment">% 3D volume into radiological orientation</span>
+0024 <span class="comment">% (axial LAS, which is the default Analyze</span>
+0025 <span class="comment">% orientation).  The resulting data should</span>
+0026 <span class="comment">% be SPM compatible when output with avw_write.</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">% This function is in alpha development (as of 03/2003)</span>
+0029 <span class="comment">% although a prior version has been tested with</span>
+0030 <span class="comment">% Ax,Sag,Cor slices (with slice direction going both</span>
+0031 <span class="comment">% ways). It was also tested for oblique axial, but</span>
+0032 <span class="comment">% not on double obliques or anything more complicated.</span>
+0033 <span class="comment">% The function does not provide information for an</span>
+0034 <span class="comment">% SPM compatible .mat file.</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">% see also ge_series_read,</span>
+0037 <span class="comment">%          avw_view, avw_read, avw_write</span>
+0038 <span class="comment">%</span>
+0039 
+0040 
+0041 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0042 
+0043 <span class="comment">% Souheil J. Inati  &lt;souheil.inati@nyu.edu&gt; at 03/2003</span>
+0044 <span class="comment">% Dartmouth College, May 2000</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% Darren.Weber@flinders.edu.au, March 2003</span>
+0047 <span class="comment">% - Substantially redesigned file handling and function</span>
+0048 <span class="comment">%   call structures for integration with mri_toolbox at</span>
+0049 <span class="comment">%   http://eeg.sf.net</span>
+0050 <span class="comment">% - Requested permission to distribute code under GPL licence</span>
+0051 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0052 
+0053 <span class="keyword">if</span> (nargin &lt; 2),
+0054     doc <a href="ge_series2avw.html" class="code" title="function [ avw ] = ge_series2avw(examPath,seriesPath)">ge_series2avw</a>;
+0055     error(<span class="string">'...not enough input arguments.'</span>)
+0056     <span class="keyword">return</span>
+0057 <span class="keyword">end</span>
+0058 
+0059 
+0060 
+0061 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0062 <span class="comment">% Read in the GE series header and image volume</span>
+0063 [ge, lastfile] = <a href="ge_series_read.html" class="code" title="function [ ge, lastfile ] = ge_series_read(examPath, series)">ge_series_read</a>(examPath, seriesPath);
+0064 
+0065 <span class="comment">% could try to use lastfile to create avw.fileprefix, but</span>
+0066 <span class="comment">% it is too variable to be reliable</span>
+0067 <span class="comment">% avw.fileprefix = lastfile</span>
+0068 
+0069 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0070 <span class="comment">% Convert the GE series to an Analyze volume</span>
+0071 
+0072 <span class="comment">% Generate the Analyze header</span>
+0073 avw = <a href="ge_hdr2avw.html" class="code" title="function [ avw ] = ge_hdr2avw(ge)">ge_hdr2avw</a>(ge);
+0074 
+0075 version = <span class="string">'[$Revision: 1.2 $]'</span>;
+0076 fprintf(<span class="string">'\nGE_SERIES2AVW [v%s]\n'</span>,version(12:16));  tic;
+0077 
+0078 <span class="comment">% Check if ADW scan (not sure this is useful, DLW 03/2003)</span>
+0079 <span class="comment">%if ge.hdr.image.user9 == 0, adwcount = 1;</span>
+0080 <span class="comment">%else,                    adwcount = ge.hdr.image.user9;</span>
+0081 <span class="comment">%end</span>
+0082 
+0083 
+0084 <span class="comment">% Reorient the GE data into radiological orientation during assignment</span>
+0085 <span class="comment">% of ge.img into avw.img (leave ge.img in original orientation)</span>
+0086 avw = <a href="#_sub1" class="code" title="subfunction [avw] = ge_reorient(ge, avw)">ge_reorient</a>(ge, avw); <span class="comment">% see below</span>
+0087 
+0088 <span class="comment">% Write the Analyze files (not doing this)</span>
+0089 <span class="comment">%avw_write(avw,outName);</span>
+0090 
+0091 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0092 <span class="comment">% This is the original write code, now replace with above (DLW)...</span>
+0093 
+0094 <span class="comment">%outFile = strcat(outName,'.hdr');</span>
+0095 <span class="comment">%status = ge_writeSPMHeader(outFile,header);</span>
+0096 <span class="comment">%outFile = [outName sprintf('.img')];</span>
+0097 <span class="comment">%[fid,message] = fopen(outFile,'w');</span>
+0098 <span class="comment">%if (fid == -1),</span>
+0099 <span class="comment">%    fprintf('Cannot Open %s for writing.\n',outFile);</span>
+0100 <span class="comment">%    error(message);</span>
+0101 <span class="comment">%end</span>
+0102 <span class="comment">%fwrite(fid,reshape(imageVol,1,prod(size(imageVol))),'int16');</span>
+0103 <span class="comment">%status = fclose(fid);</span>
+0104 
+0105 t=toc; fprintf(<span class="string">'...done (%5.2f sec).\n'</span>,t);
+0106 
+0107 <span class="keyword">return</span>
+0108 
+0109 
+0110 
+0111 
+0112 
+0113 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0114 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0115 
+0116 <a name="_sub1" href="#_subfunctions" class="code">function [avw] = ge_reorient(ge, avw)</a>
+0117 
+0118 <span class="comment">%ge_reorient - Assigns Analyze header dimensions and volume based on GE orientation</span>
+0119 <span class="comment">%</span>
+0120 <span class="comment">% avw = ge_reorient(ge, avw)</span>
+0121 <span class="comment">%</span>
+0122 <span class="comment">% reorients the GE 3D volume to be radiological</span>
+0123 <span class="comment">% orientation (axial LAS, which is SPM compatible)</span>
+0124 <span class="comment">% based on the GE acquition orientation</span>
+0125 <span class="comment">%</span>
+0126 <span class="comment">% This has been tested with Ax,Sag,Cor with slices going</span>
+0127 <span class="comment">% both ways.  Also for Oblique axial. Don't count on double</span>
+0128 <span class="comment">% obliques or anything really fancy.</span>
+0129 <span class="comment">%</span>
+0130 
+0131 
+0132 <span class="comment">% Have looked over this orientation code carefully (DLW, 03/2003)</span>
+0133 <span class="comment">% The above comments are from a previous version, note it</span>
+0134 <span class="comment">% should be LAS, not RAS !!!!  I have found some inconsistencies</span>
+0135 <span class="comment">% in the code (03/2003) and fixed it as best I can for now.  Further</span>
+0136 <span class="comment">% testing with various volumes is required.</span>
+0137 
+0138 
+0139 series_description = deblank(char(ge.hdr.series.se_desc)'); <span class="comment">% unreliable!</span>
+0140 
+0141 fprintf(<span class="string">'...checking GE series data orientation.\n'</span>);
+0142 
+0143 <span class="comment">% Determine the GE orientation</span>
+0144 <span class="comment">% orient is 1=axial, 2=sagittal, 3=coronal</span>
+0145 <span class="comment">% with opposite sign if backwards slice order</span>
+0146 ras_start = char(ge.hdr.series.start_ras);
+0147 ras_end   = char(ge.hdr.series.end_ras);
+0148 <span class="keyword">if</span>     strcmp(ras_start,<span class="string">'I'</span>) &amp; strcmp(ras_end,<span class="string">'S'</span>),
+0149     fprintf(<span class="string">'...slices are axial from inferior to superior.\n'</span>);
+0150     orient =  1;
+0151 <span class="keyword">elseif</span> strcmp(ras_start,<span class="string">'S'</span>) &amp; strcmp(ras_end,<span class="string">'I'</span>),
+0152     fprintf(<span class="string">'...slices are axial from superior to inferior.\n'</span>);
+0153     orient = -1;
+0154 <span class="keyword">elseif</span> strcmp(ras_start,<span class="string">'R'</span>) &amp; strcmp(ras_end,<span class="string">'L'</span>),
+0155     fprintf(<span class="string">'...slices are sagittal from right to left.\n'</span>);
+0156     orient =  2;
+0157 <span class="keyword">elseif</span> strcmp(ras_start,<span class="string">'L'</span>) &amp; strcmp(ras_end,<span class="string">'R'</span>),
+0158     fprintf(<span class="string">'...slices are sagittal from left to right.\n'</span>);
+0159     orient = -2;
+0160 <span class="keyword">elseif</span> strcmp(ras_start,<span class="string">'P'</span>) &amp; strcmp(ras_end,<span class="string">'A'</span>),
+0161     fprintf(<span class="string">'...slices are coronal from posterior to anterior.\n'</span>);
+0162     orient =  3;
+0163 <span class="keyword">elseif</span> strcmp(ras_start,<span class="string">'A'</span>) &amp; strcmp(ras_end,<span class="string">'P'</span>),
+0164     fprintf(<span class="string">'...slices are coronal from anterior to posterior.\n'</span>);
+0165     orient = -3;
+0166 <span class="keyword">else</span>,
+0167     warning(<span class="string">'GE orientation unknown!'</span>);
+0168     orient = 0;
+0169 <span class="keyword">end</span>
+0170 
+0171 <span class="comment">% Get the GE dimensions</span>
+0172 nX = ge.hdr.image.imatrix_X;
+0173 nY = ge.hdr.image.imatrix_Y;
+0174 nZ = ge.hdr.image.slquant;     <span class="comment">% slice quantity (Nslices)</span>
+0175 pX = ge.hdr.image.pixsize_X;
+0176 pY = ge.hdr.image.pixsize_Y;
+0177 pZ = ge.hdr.image.slthick + ge.hdr.image.scanspacing;
+0178 
+0179 [vX vY vZ] = size(ge.img);
+0180 
+0181 <span class="comment">% Reshape into axial radiological orientation (SPM compatible)</span>
+0182 <span class="comment">% The default Analyze orientation is +X left, +Y anterior, +Z superior (LAS)</span>
+0183 
+0184 <span class="keyword">switch</span> orient,
+0185     
+0186 <span class="keyword">case</span>  0, <span class="comment">% Unknown Orientation</span>
+0187     
+0188     warning(<span class="string">'avw.img = ge.img without reorientation!\n'</span>);
+0189     avw.img = ge.img;
+0190     
+0191 <span class="keyword">case</span> {1, -1}, <span class="comment">% Axial</span>
+0192     avw.hdr.dime.dim(2:4)    = [ nX nY nZ ];
+0193     avw.hdr.dime.pixdim(2:4) = [ pX pY pZ ];
+0194     
+0195     avw.img = ge.img;
+0196     <span class="keyword">if</span> orient == 1, <span class="comment">% Axial (I to S)</span>
+0197         <span class="comment">% checked this (03/2003), not sure of L/R orient</span>
+0198         avw.img = flipdim(avw.img,2); <span class="comment">% flip to P to A</span>
+0199     <span class="keyword">elseif</span> orient == -1, <span class="comment">% Axial (S to I)</span>
+0200         <span class="comment">% have not checked this (03/2003)</span>
+0201         avw.img = flipdim(avw.img,2); <span class="comment">% flip to P to A</span>
+0202         avw.img = flipdim(avw.img,3); <span class="comment">% flip to I to S</span>
+0203     <span class="keyword">end</span>
+0204     
+0205 <span class="keyword">case</span> {2, -2}, <span class="comment">% Sagittal</span>
+0206     
+0207     avw.hdr.dime.dim(2:4)    = [ nZ nX nY ];
+0208     avw.hdr.dime.pixdim(2:4) = [ pZ pX pY ];
+0209     
+0210     avw.img = permute(ge.img,[3 1 2]);
+0211     <span class="keyword">if</span> orient == 2, <span class="comment">% Sagittal (R to L)</span>
+0212         <span class="comment">% have not checked this (03/2003)</span>
+0213         avw.img = flipdim(avw.img,2); <span class="comment">% flip to P to A?</span>
+0214         avw.img = flipdim(avw.img,3); <span class="comment">% flip to I to S?</span>
+0215     <span class="keyword">elseif</span> orient == -2, <span class="comment">% Sagittal (L to R)</span>
+0216         <span class="comment">% checked this (03/2003)</span>
+0217         avw.img = flipdim(avw.img,1); <span class="comment">% flip to R to L</span>
+0218         avw.img = flipdim(avw.img,2); <span class="comment">% flip to P to A</span>
+0219         avw.img = flipdim(avw.img,3); <span class="comment">% flip to I to S</span>
+0220     <span class="keyword">end</span>
+0221     
+0222 <span class="keyword">case</span> {3, -3}, <span class="comment">% Coronal</span>
+0223     
+0224     avw.hdr.dime.dim(2:4)    = [ nX nZ nY ];
+0225     avw.hdr.dime.pixdim(2:4) = [ pX pZ pY ];
+0226     
+0227     avw.img = permute(ge.img,[1 3 2]);
+0228     <span class="keyword">if</span> orient == 3, <span class="comment">% Coronal (P to A)</span>
+0229         <span class="comment">% have not checked this (03/2003), not sure of L/R orient</span>
+0230         avw.img = flipdim(avw.img,3); <span class="comment">% flip to I to S?</span>
+0231     <span class="keyword">elseif</span> orient == -3, <span class="comment">% Coronal (A to P)</span>
+0232         <span class="comment">% have not checked this (03/2003), not sure of L/R orient</span>
+0233         avw.img = flipdim(avw.img,2); <span class="comment">% flip to P to A?</span>
+0234         avw.img = flipdim(avw.img,3); <span class="comment">% flip to I to S?</span>
+0235     <span class="keyword">end</span>
+0236     
+0237 <span class="keyword">end</span>
+0238 
+0239 <span class="comment">% Set the origin to the center of the volume (not sure this is valid, DLW)</span>
+0240 <span class="comment">%avw.hdr.dime.originator = [floor(avw.hdr.dime.dim(2)/2) ...</span>
+0241 <span class="comment">%                           floor(avw.hdr.dime.dim(3)/2) ...</span>
+0242 <span class="comment">%                           floor(avw.hdr.dime.dim(4)/2) 0 0];</span>
+0243 
+0244 avw.hdr.dime.glmax = max(max(max(avw.img)));
+0245 avw.hdr.hist.orient = <span class="string">'0'</span>;
+0246 
+0247 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

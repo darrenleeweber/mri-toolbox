@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mri_toolbox</title>
+  <meta name="keywords" content="mri_toolbox">
+  <meta name="description" content="mri_toolbox - Graphical user interface (GUI) to various MRI tools">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; mri_toolbox.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>mri_toolbox
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>mri_toolbox - Graphical user interface (GUI) to various MRI tools</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ varargout ] = mri_toolbox(command) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> mri_toolbox - Graphical user interface (GUI) to various MRI tools
+ 
+ The main gui is the primary store for general parameters 
+ and provides access to other tools.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="gui_avw_open.html" class="code" title="function [mri] = gui_avw_open(mri,command,parent)">gui_avw_open</a>	gui_avw_open - Load & Display Analyze 7.5 data</li><li><a href="gui_cor_open.html" class="code" title="function [mri] = gui_cor_open(mri,command,parent)">gui_cor_open</a>	gui_cor_open - Load & Display FreeSurfer COR-??? data</li><li><a href="gui_ge_open.html" class="code" title="function [mri] = gui_ge_open(mri,command,parent)">gui_ge_open</a>	gui_ge_open - Load & Display MRI data</li><li><a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>	mri_toolbox_defaults - Create, read, write mri_toolbox defaults</li><li><a href="mri_toolbox_recent.html" class="code" title="function [ files, varargout ] = mri_toolbox_recent(filename,command);">mri_toolbox_recent</a>	mri_toolbox_recent - Keep track of mri_toolbox .mat files</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [H] = init()</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ varargout ] = mri_toolbox(command)</a>
+0002 
+0003 <span class="comment">% mri_toolbox - Graphical user interface (GUI) to various MRI tools</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% The main gui is the primary store for general parameters</span>
+0006 <span class="comment">% and provides access to other tools.</span>
+0007 <span class="comment">%</span>
+0008 
+0009 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0010 
+0011 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0012 <span class="comment">% History:  07/2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0013 <span class="comment">%                    adapted from eeg_toolbox</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Depends:  various tools in the mri_toolbox</span>
+0016 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0017 
+0018 <span class="keyword">if</span> ~exist(<span class="string">'command'</span>,<span class="string">'var'</span>),
+0019     command = <span class="string">'init'</span>;
+0020 <span class="keyword">elseif</span> isempty(command),
+0021     command = <span class="string">'init'</span>;
+0022 <span class="keyword">end</span>
+0023 
+0024 command = lower(command);
+0025 
+0026 <span class="comment">% first establish GUI or get userdata</span>
+0027 <span class="keyword">switch</span> command,
+0028 <span class="keyword">case</span> <span class="string">'init'</span>,
+0029     MRITOOLBOX = <a href="#_sub1" class="code" title="subfunction [H] = init()">init</a>;    
+0030 <span class="keyword">otherwise</span>,
+0031     MRITOOLBOX = get(gcbf,<span class="string">'Userdata'</span>);
+0032 <span class="keyword">end</span>
+0033 
+0034 
+0035 <span class="comment">% now run commands, if required</span>
+0036 <span class="keyword">switch</span> command,
+0037 <span class="keyword">case</span> <span class="string">'init'</span>,
+0038     <span class="comment">% taken care of above</span>
+0039     
+0040 <span class="keyword">case</span> <span class="string">'openavw'</span>,
+0041     <a href="gui_avw_open.html" class="code" title="function [mri] = gui_avw_open(mri,command,parent)">gui_avw_open</a>(MRITOOLBOX.mri,<span class="string">'init'</span>,MRITOOLBOX.gui);
+0042     
+0043 <span class="keyword">case</span> <span class="string">'opencor'</span>,
+0044     <a href="gui_cor_open.html" class="code" title="function [mri] = gui_cor_open(mri,command,parent)">gui_cor_open</a>(MRITOOLBOX.mri,<span class="string">'init'</span>,MRITOOLBOX.gui);
+0045     
+0046 <span class="keyword">case</span> <span class="string">'openge'</span>,
+0047     <a href="gui_ge_open.html" class="code" title="function [mri] = gui_ge_open(mri,command,parent)">gui_ge_open</a>(MRITOOLBOX.mri,<span class="string">'init'</span>,MRITOOLBOX.gui);
+0048     
+0049 <span class="keyword">case</span> <span class="string">'defaultreturn'</span>,
+0050     <span class="comment">% keep this command so the return action is tidy</span>
+0051     <span class="comment">%mri = MRITOOLBOX.mri; % done below just before return</span>
+0052     
+0053 <span class="keyword">case</span> <span class="string">'defaultreset'</span>,
+0054     MRITOOLBOX.mri = <a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>(<span class="string">'create'</span>);
+0055     
+0056 <span class="keyword">case</span> <span class="string">'defaultsave'</span>,
+0057     <a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>(<span class="string">'write'</span>,MRITOOLBOX.mri);
+0058     
+0059 <span class="keyword">case</span> <span class="string">'saveas'</span>,
+0060     <a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>(<span class="string">'write_other'</span>,MRITOOLBOX.mri);
+0061     
+0062 <span class="keyword">case</span> <span class="string">'recent'</span>,
+0063     
+0064     <span class="comment">% -- get recent files list</span>
+0065     
+0066     recentfiles = <a href="mri_toolbox_recent.html" class="code" title="function [ files, varargout ] = mri_toolbox_recent(filename,command);">mri_toolbox_recent</a>;
+0067     
+0068     <span class="comment">% -- remove current menu items for recent files</span>
+0069     
+0070     <span class="keyword">if</span> isfield(MRITOOLBOX.menu,<span class="string">'recentfiles'</span>),
+0071         handleIndex = find(ishandle(MRITOOLBOX.menu.recentfiles));
+0072         delete(MRITOOLBOX.menu.recentfiles(handleIndex));
+0073     <span class="keyword">end</span>
+0074     MRITOOLBOX.menu.recentfiles = [];
+0075     
+0076     <span class="comment">% -- recreate recent files menu items</span>
+0077     
+0078     <span class="keyword">if</span> and(size(recentfiles,2) == 1, isempty(recentfiles{1})),
+0079         <span class="keyword">if</span> ishandle(MRITOOLBOX.menu.recent),
+0080             set(MRITOOLBOX.menu.recent,<span class="string">'Label'</span>,<span class="string">'No Recent Files'</span>);
+0081         <span class="keyword">end</span>
+0082     <span class="keyword">else</span>
+0083         <span class="keyword">if</span> ishandle(MRITOOLBOX.menu.recent),
+0084             set(MRITOOLBOX.menu.recent,<span class="string">'Label'</span>,<span class="string">'Recent Files'</span>);
+0085         <span class="keyword">end</span>
+0086         
+0087         <span class="comment">% -- add recent files to menu and setup their callbacks</span>
+0088         
+0089         <span class="keyword">for</span> i=1:length(recentfiles),
+0090             <span class="keyword">if</span> ~isempty(recentfiles{i}),
+0091                 MRITOOLBOX.menu.recentfiles(i) = uimenu(MRITOOLBOX.menu.recent,<span class="keyword">...</span>
+0092                     <span class="string">'Label'</span>,recentfiles{i},<span class="keyword">...</span>
+0093                     <span class="string">'Callback'</span>,strcat(<span class="string">'[recentfiles,mri] = mri_toolbox_recent('''</span>,<span class="keyword">...</span>
+0094                     recentfiles{i},<span class="string">''',''load''); '</span>,<span class="keyword">...</span>
+0095                     <span class="string">'MRITOOLBOX = get(gcbf,''Userdata''); '</span>,<span class="keyword">...</span>
+0096                     <span class="string">'gui_mri_open(mri,''init'',MRITOOLBOX.gui); '</span>,<span class="keyword">...</span>
+0097                     <span class="string">'clear MRITOOLBOX recentfiles;'</span>));
+0098             <span class="keyword">end</span>
+0099         <span class="keyword">end</span>
+0100         
+0101         <span class="comment">% -- add recent files clear command</span>
+0102         
+0103         MRITOOLBOX.menu.recentfiles(i+1) = uimenu(MRITOOLBOX.menu.recent,<span class="keyword">...</span>
+0104             <span class="string">'Label'</span>,<span class="string">'Clear All'</span>,<span class="keyword">...</span>
+0105             <span class="string">'Callback'</span>,strcat(<span class="string">'mri_toolbox_recent('''',''clear''); '</span>,<span class="keyword">...</span>
+0106             <span class="string">'mri_toolbox(''recent''); '</span>));
+0107     <span class="keyword">end</span>
+0108     
+0109 <span class="keyword">case</span> <span class="string">'exit'</span>,
+0110     close gcbf;
+0111     
+0112 <span class="keyword">otherwise</span>,
+0113     fprintf(<span class="string">'...invalid command to mri_toolbox\n\n'</span>);
+0114     
+0115 <span class="keyword">end</span>
+0116 
+0117 
+0118 <span class="keyword">switch</span> command,
+0119 <span class="keyword">case</span> <span class="string">'exit'</span>,
+0120 <span class="keyword">otherwise</span>,
+0121     set(MRITOOLBOX.gui,<span class="string">'UserData'</span>,MRITOOLBOX);
+0122 <span class="keyword">end</span>
+0123 
+0124 <span class="keyword">if</span> nargout &gt; 0,
+0125     <span class="keyword">if</span> isfield(MRITOOLBOX,<span class="string">'mri'</span>),
+0126         <span class="keyword">if</span> ~isempty(MRITOOLBOX.mri),
+0127             varargout{1} = MRITOOLBOX.mri;
+0128         <span class="keyword">end</span>
+0129     <span class="keyword">end</span>
+0130 <span class="keyword">end</span>
+0131 
+0132 
+0133 <span class="keyword">return</span>
+0134 
+0135 
+0136 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0137 <span class="comment">% Paint the GUI</span>
+0138 <a name="_sub1" href="#_subfunctions" class="code">function [H] = init()</a>
+0139 
+0140 <span class="comment">% Parameters are supplied in the file defaultfile.</span>
+0141 H.mri = <a href="mri_toolbox_defaults.html" class="code" title="function [mri] = mri_toolbox_defaults(command,mri);">mri_toolbox_defaults</a>(<span class="string">'read'</span>);
+0142 
+0143 GUIwidth  = 250;
+0144 GUIheight = 50;
+0145 
+0146 H.gui = figure(<span class="string">'Name'</span>,<span class="string">'MRI Toolbox'</span>,<span class="string">'Tag'</span>,<span class="string">'MRI_TOOLBOX'</span>,<span class="keyword">...</span>
+0147     <span class="string">'NumberTitle'</span>,<span class="string">'off'</span>,<span class="string">'HandleVisibility'</span>,<span class="string">'callback'</span>,<span class="keyword">...</span>
+0148     <span class="string">'MenuBar'</span>,<span class="string">'none'</span>);
+0149 set(H.gui,<span class="string">'Position'</span>,[1 1 GUIwidth GUIheight]);  <span class="comment">% Activate GUI Figure</span>
+0150 movegui(H.gui, <span class="string">'center'</span>);
+0151 
+0152 <span class="comment">% -- file menu</span>
+0153 
+0154 H.menu.file_menu = uimenu(H.gui,<span class="string">'Label'</span>,<span class="string">'File'</span>,<span class="keyword">...</span>
+0155     <span class="string">'Callback'</span>,<span class="string">'mri_toolbox(''recent'');'</span>);
+0156 
+0157 <span class="keyword">if</span> exist(<span class="string">'avw_read.m'</span>) == 2,
+0158     H.menu.open_mri = uimenu(H.menu.file_menu,<span class="string">'Label'</span>,<span class="string">'Open Analyze 7.5'</span>,<span class="keyword">...</span>
+0159         <span class="string">'Callback'</span>,<span class="string">'mri = mri_toolbox(''openAVW'');'</span>,<span class="string">'Accelerator'</span>,<span class="string">'a'</span>);
+0160 <span class="keyword">end</span>
+0161 
+0162 <span class="keyword">if</span> exist(<span class="string">'cor_img_read.m'</span>) == 2,
+0163     H.menu.open_mri = uimenu(H.menu.file_menu,<span class="string">'Label'</span>,<span class="string">'Open FreeSurfer COR'</span>,<span class="keyword">...</span>
+0164         <span class="string">'Callback'</span>,<span class="string">'mri = mri_toolbox(''openCOR'');'</span>,<span class="string">'Accelerator'</span>,<span class="string">'f'</span>);
+0165 <span class="keyword">end</span>
+0166 
+0167 <span class="keyword">if</span> exist(<span class="string">'ge_series_read.m'</span>) == 2,
+0168     H.menu.open_mri = uimenu(H.menu.file_menu,<span class="string">'Label'</span>,<span class="string">'Open GE Signa 5.x/LX'</span>,<span class="keyword">...</span>
+0169         <span class="string">'Callback'</span>,<span class="string">'mri = mri_toolbox(''openGE'');'</span>,<span class="string">'Accelerator'</span>,<span class="string">'g'</span>);
+0170 <span class="keyword">end</span>
+0171 
+0172 H.menu.recent = uimenu(H.menu.file_menu,<span class="string">'Label'</span>,<span class="string">'Recent'</span>);
+0173 H.menu.quit   = uimenu(H.menu.file_menu,<span class="string">'Label'</span>,<span class="string">'Exit'</span>,<span class="keyword">...</span>
+0174     <span class="string">'Callback'</span>,<span class="string">'mri_toolbox(''exit'');'</span>,<span class="string">'Accelerator'</span>,<span class="string">'x'</span>);
+0175 
+0176 <span class="comment">% -- Parameters menu</span>
+0177 
+0178 H.menu.p_menu = uimenu(H.gui,<span class="string">'Label'</span>,<span class="string">'Parameters'</span>);
+0179 H.menu.show   = uimenu(H.menu.p_menu,<span class="string">'Label'</span>,<span class="string">'Return to Workspace'</span>,<span class="keyword">...</span>
+0180     <span class="string">'Callback'</span>,<span class="string">'mri = mri_toolbox(''defaultreturn'')'</span>);
+0181 H.menu.reset  = uimenu(H.menu.p_menu,<span class="string">'Label'</span>,<span class="string">'Reset to Defaults'</span>,<span class="keyword">...</span>
+0182     <span class="string">'Callback'</span>,<span class="string">'mri = mri_toolbox(''defaultreset'');'</span>);
+0183 H.menu.save   = uimenu(H.menu.p_menu,<span class="string">'Label'</span>,<span class="string">'Save Defaults'</span>,<span class="keyword">...</span>
+0184     <span class="string">'Callback'</span>,<span class="string">'mri = mri_toolbox(''defaultsave'');'</span>);
+0185 H.menu.saveas = uimenu(H.menu.p_menu,<span class="string">'Label'</span>,<span class="string">'Save As Data Workspace'</span>,<span class="keyword">...</span>
+0186     <span class="string">'Callback'</span>,<span class="string">'mri = mri_toolbox(''saveas'');'</span>);
+0187 
+0188 <span class="comment">% -- help menu</span>
+0189 
+0190 H.menu.help = uimenu(H.gui,<span class="string">'Label'</span>,<span class="string">'Help'</span>,<span class="string">'Callback'</span>,<span class="string">'doc mri_toolbox;'</span>);
+0191 
+0192 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

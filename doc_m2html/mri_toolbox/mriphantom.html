@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mriphantom</title>
+  <meta name="keywords" content="mriphantom">
+  <meta name="description" content="MRIPHANTOM - simulated MRI of a Shepp Logan head phantom">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; mriphantom.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>mriphantom
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MRIPHANTOM - simulated MRI of a Shepp Logan head phantom</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function Sk = mriphantom(kx,ky) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> MRIPHANTOM - simulated MRI of a Shepp Logan head phantom
+ 
+ Sk = mriphantom(kx,ky)
+ 
+ Creates simulated raw MRI data of a Shepp Logan head phantom 
+ for given k space points
+ input is the kx and ky coordinates in the image frequency space
+ default values for kx and ky are for a Carthesian sampling.
+ Input 
+   kx, ky  Matrices with kx and ky sampling coordinates
+   E       Optional analytical phantom data matrix as produced by 
+           image toolbox function phantom.m (see comments below).
+ Data are from an analytical expression for a continuous phantom.
+ Core equations for this are taken form :
+  Rik van der Walle et al IEEE Trans Med Imag 19(12) p1160.
+
+ Note that the standard matlab function just gives the phantom 
+ sampled in image space on a carthesian grid. 
+ This function delivers the simulated raw MRI data sampled through 
+ a user defined path in k-space (image frequency space)
+
+ Author : Ronald Ouwekerk Johns Hopkins University Dept. Radiology
+ 601 N. Caroline Street Room 4250 Baltimore, MD 21287-0845 USA
+ rouwerke@mri.jhu.edu
+ Written :May 2002 
+ Modified June 2002 :  Revised to give a non-NaN result for k=0
+                       Suppress output if nargout == 0
+                       Added comments to explain the difference with phantom.m
+
+ Whenever this software is used for publications an acknowledgment 
+ would be much appreciated. 
+                           RO</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function toft=modified_shepp_logan</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Sk = mriphantom(kx,ky)</a>
+0002 
+0003 <span class="comment">% MRIPHANTOM - simulated MRI of a Shepp Logan head phantom</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Sk = mriphantom(kx,ky)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Creates simulated raw MRI data of a Shepp Logan head phantom</span>
+0008 <span class="comment">% for given k space points</span>
+0009 <span class="comment">% input is the kx and ky coordinates in the image frequency space</span>
+0010 <span class="comment">% default values for kx and ky are for a Carthesian sampling.</span>
+0011 <span class="comment">% Input</span>
+0012 <span class="comment">%   kx, ky  Matrices with kx and ky sampling coordinates</span>
+0013 <span class="comment">%   E       Optional analytical phantom data matrix as produced by</span>
+0014 <span class="comment">%           image toolbox function phantom.m (see comments below).</span>
+0015 <span class="comment">% Data are from an analytical expression for a continuous phantom.</span>
+0016 <span class="comment">% Core equations for this are taken form :</span>
+0017 <span class="comment">%  Rik van der Walle et al IEEE Trans Med Imag 19(12) p1160.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% Note that the standard matlab function just gives the phantom</span>
+0020 <span class="comment">% sampled in image space on a carthesian grid.</span>
+0021 <span class="comment">% This function delivers the simulated raw MRI data sampled through</span>
+0022 <span class="comment">% a user defined path in k-space (image frequency space)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% Author : Ronald Ouwekerk Johns Hopkins University Dept. Radiology</span>
+0025 <span class="comment">% 601 N. Caroline Street Room 4250 Baltimore, MD 21287-0845 USA</span>
+0026 <span class="comment">% rouwerke@mri.jhu.edu</span>
+0027 <span class="comment">% Written :May 2002</span>
+0028 <span class="comment">% Modified June 2002 :  Revised to give a non-NaN result for k=0</span>
+0029 <span class="comment">%                       Suppress output if nargout == 0</span>
+0030 <span class="comment">%                       Added comments to explain the difference with phantom.m</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% Whenever this software is used for publications an acknowledgment</span>
+0033 <span class="comment">% would be much appreciated.</span>
+0034 <span class="comment">%                           RO</span>
+0035 
+0036 FOV = 2;    
+0037 N = 64;
+0038 
+0039 <span class="keyword">if</span> nargin &lt; 2
+0040     <span class="comment">%=====================================================================</span>
+0041     <span class="comment">% Set the field of view to 24 cm (see image toolbox phantom.m)</span>
+0042     <span class="comment">% resolution 128x128 points</span>
+0043     <span class="comment">% create k-space coordinates for Carthesion sampling</span>
+0044     <span class="comment">% Should be equivalent to IFFT of the phantom</span>
+0045     <span class="comment">%=====================================================================</span>
+0046     FOV = 0.24;
+0047     res = FOV/N;
+0048     Kmax = 1/(2*res);
+0049     ky = linspace(-Kmax,Kmax, N);
+0050     ky = ky(ones(N,1),:);
+0051     kx = permute(ky, [2,1]);
+0052 <span class="keyword">end</span>;
+0053 <span class="keyword">if</span> ( (nargin &lt; 3 ) | isempty(E) )  &amp; (exist(<span class="string">'phantom.m'</span>)==2)
+0054     <span class="comment">%========================================================================</span>
+0055     <span class="comment">% Create 2D phantom to get defining matrix E</span>
+0056     <span class="comment">%========================================================================</span>
+0057     [P,E] = phantom;
+0058 <span class="keyword">elseif</span> ~(exist(<span class="string">'phantom.m'</span>)==2)
+0059     P = [];
+0060     E = <a href="#_sub1" class="code" title="subfunction toft=modified_shepp_logan">modified_shepp_logan</a>;
+0061 <span class="keyword">end</span>;
+0062 
+0063 <span class="comment">%========================================================================</span>
+0064 <span class="comment">% copy the elements of E and scale to field of view</span>
+0065 <span class="comment">% Matlab phantom.m default yields FOV =[-1,1]= 2</span>
+0066 <span class="comment">% Scale all dimensions to desired FOV (*FOV/2).</span>
+0067 <span class="comment">%   Column 1:  rho  the additive intensity value of the ellipse</span>
+0068 <span class="comment">%   Column 2:  a    the length of the horizontal semi-axis of the ellipse</span>
+0069 <span class="comment">%   Column 3:  b    the length of the vertical semi-axis of the ellipse</span>
+0070 <span class="comment">%   Column 4:  x0   the x-coordinate of the center of the ellipse</span>
+0071 <span class="comment">%   Column 5:  y0   the y-coordinate of the center of the ellipse</span>
+0072 <span class="comment">%   Column 6:  alpha  the angle (in degrees) between the horizontal semi-axis</span>
+0073 <span class="comment">%                   of the ellipse and the x-axis of the image</span>
+0074 <span class="comment">%========================================================================</span>
+0075 [me,ne] = size(E);
+0076 rho = E(:,1)';  
+0077 nellipses = length(rho);
+0078 a   = FOV/2 * E(:,2)';
+0079 b   = FOV/2 * E(:,3)';
+0080 x0  = FOV/2 * E(:,4)';
+0081 y0  = FOV/2 * E(:,5)';
+0082 alpha = pi*E(:,6)'/180;
+0083 
+0084 
+0085 <span class="comment">%========================================================================</span>
+0086 <span class="comment">% Stretch kspace coordinates to column vector (retain original size info)</span>
+0087 <span class="comment">%========================================================================</span>
+0088 [mk,nk] = size(kx);
+0089 kx = kx(:);
+0090 ky = ky(:);
+0091 k = kx + j*ky;
+0092 klen = length(kx);
+0093 
+0094 <span class="comment">%========================================================================</span>
+0095 <span class="comment">% Calculate angle of the vector to the ellipse center in real space.</span>
+0096 <span class="comment">%========================================================================</span>
+0097 gamma = atan2(y0, x0);
+0098 te = sqrt(x0.^2 + y0.^2);
+0099 
+0100 <span class="comment">%========================================================================</span>
+0101 <span class="comment">% Replicate all the ellipse defining vectors to the number of k space values</span>
+0102 <span class="comment">%========================================================================</span>
+0103 gamma = gamma(ones(klen,1),:);
+0104 te = te(ones(klen,1),:);
+0105 alpha = alpha(ones(klen,1),:);
+0106 rho = rho(ones(klen,1),:);
+0107 a = a(ones(klen,1),:);
+0108 b = b(ones(klen,1),:);
+0109 
+0110 <span class="comment">%========================================================================</span>
+0111 <span class="comment">% Calculate k space vectors angle and magnitude</span>
+0112 <span class="comment">%========================================================================</span>
+0113 kphi = angle(k);
+0114 kr = abs(k);
+0115 
+0116 <span class="comment">%========================================================================</span>
+0117 <span class="comment">% Replicate k space and time vectors to the number of ellipses</span>
+0118 <span class="comment">%========================================================================</span>
+0119 kr = kr(:,ones(1,nellipses));
+0120 kphi = kphi(:,ones(1,nellipses));
+0121 
+0122 <span class="comment">%========================================================================</span>
+0123 <span class="comment">% Precalculate some values</span>
+0124 <span class="comment">%========================================================================</span>
+0125 pi2 = 2*pi;
+0126 cose = cos(gamma - kphi);
+0127 
+0128 <span class="comment">%========================================================================</span>
+0129 <span class="comment">% Projection angles:</span>
+0130 <span class="comment">% Difference of the k space vector angle and the angles of the ellipses</span>
+0131 <span class="comment">%========================================================================</span>
+0132 sind = sin(kphi - alpha);
+0133 cosd = cos(kphi - alpha);
+0134 
+0135 akphi = sqrt(a.^2 .* cosd.^2 + b.^2 .* sind.^2);
+0136 <span class="comment">%========================================================================</span>
+0137 <span class="comment">% Calculate the signals for each ellips and each k space point kx,ky</span>
+0138 <span class="comment">% avoid division by zero    besselj(1,0) = 0 so set 0/0 = 1</span>
+0139 <span class="comment">%========================================================================</span>
+0140 knz = (akphi.*kr ~=0);
+0141 bess = ones(size(akphi.*kr));
+0142 bess(knz) = besselj(1,pi2.*akphi(knz).*kr(knz)) ./(akphi(knz).*kr(knz));
+0143 Sk = exp(-j*pi2.*kr.*te.*cose) .*rho.*a.*b.* bess;
+0144 <span class="comment">%========================================================================</span>
+0145 <span class="comment">% Sum the signals for all ellipses and reshape the data back to</span>
+0146 <span class="comment">% the matrix size of the kx and ky input data</span>
+0147 <span class="comment">%========================================================================</span>
+0148 Sk = sum(Sk,2);
+0149 Sk = reshape(Sk, mk,nk);
+0150 <span class="comment">%========================================================================</span>
+0151 <span class="comment">% Show the result, including the reconstruction if default Carthesian</span>
+0152 <span class="comment">% sampling was used</span>
+0153 <span class="comment">%========================================================================</span>
+0154 <span class="keyword">if</span>  nargin &gt;= 2
+0155     fh = figure;
+0156     subplot(1,2,1);
+0157     <span class="keyword">if</span> ~isempty(P)
+0158         imagesc(abs(P));
+0159     <span class="keyword">end</span>;    
+0160     title(<span class="string">'Software head phantom'</span>)
+0161     axis image
+0162     
+0163     subplot(1,2,2);
+0164     imagesc(abs(Sk));
+0165     title(<span class="string">'Simulated raw data'</span>)
+0166     <span class="keyword">return</span>
+0167 <span class="keyword">else</span>
+0168     fh = figure;
+0169     subplot(1,3,1);
+0170     <span class="keyword">if</span> ~isempty(P)
+0171         imagesc(abs(P));
+0172     <span class="keyword">end</span>;
+0173     axis image
+0174 
+0175     subplot(1,3,2);
+0176     imagesc(abs(Sk));    
+0177     title(<span class="string">'Simulated raw data'</span>)
+0178     axis image
+0179 
+0180     subplot(1,3,3);
+0181     I = fftshift(fft2(Sk));
+0182     imagesc(abs(I));
+0183     axis image    
+0184     title(<span class="string">'2DFFT Reconstructed image'</span>)
+0185 <span class="keyword">end</span>;
+0186 <span class="comment">%========================================================================</span>
+0187 <span class="comment">% Suppress output if not asked for any</span>
+0188 <span class="comment">%========================================================================</span>
+0189 <span class="keyword">if</span> nargout &lt; 1
+0190     Sk = [];
+0191 <span class="keyword">end</span>;
+0192 
+0193 
+0194 <span class="comment">%========================================================================</span>
+0195 <span class="comment">% END</span>
+0196 <span class="comment">%========================================================================</span>
+0197 
+0198 <span class="comment">%========================================================================</span>
+0199 <span class="comment">% local function Copied from function phantom.m</span>
+0200 <span class="comment">% to produce a result without the image toolbox</span>
+0201 <span class="comment">%========================================================================</span>
+0202 
+0203 <span class="comment">%========================================================================</span>
+0204 <a name="_sub1" href="#_subfunctions" class="code">function toft=modified_shepp_logan</a>
+0205 <span class="comment">%</span>
+0206 <span class="comment">%   This head phantom is the same as the Shepp-Logan except</span>
+0207 <span class="comment">%   the intensities are changed to yield higher contrast in</span>
+0208 <span class="comment">%   the image.  Taken from Toft, 199-200.</span>
+0209 <span class="comment">%</span>
+0210 <span class="comment">%         A    a     b    x0    y0    phi</span>
+0211 <span class="comment">%        ---------------------------------</span>
+0212 toft = [  1   .69   .92    0     0     0   
+0213         -.8  .6624 .8740   0  -.0184   0
+0214         -.2  .1100 .3100  .22    0    -18
+0215         -.2  .1600 .4100 -.22    0     18
+0216          .1  .2100 .2500   0    .35    0
+0217          .1  .0460 .0460   0    .1     0
+0218          .1  .0460 .0460   0   -.1     0
+0219          .1  .0460 .0230 -.08  -.605   0 
+0220          .1  .0230 .0230   0   -.606   0
+0221          .1  .0230 .0460  .06  -.605   0   ];
+0222 <span class="comment">%========================================================================</span>
+0223 <span class="comment">% end local function toft=modified_shepp_logan</span>
+0224 <span class="comment">%========================================================================</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

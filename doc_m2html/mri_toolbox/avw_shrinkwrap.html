@@ -1,0 +1,897 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_shrinkwrap</title>
+  <meta name="keywords" content="avw_shrinkwrap">
+  <meta name="description" content="avw_shrinkwrap - Tesselate the surface of a 3D Analyze 7.5 avw struct">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_shrinkwrap.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_shrinkwrap
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>avw_shrinkwrap - Tesselate the surface of a 3D Analyze 7.5 avw struct</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [FV, Edges] = avw_shrinkwrap(avw,FV,smooth,vthresh,interpVal,fitval,fittol,fititer,fitchange,fitvattr) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> avw_shrinkwrap - Tesselate the surface of a 3D Analyze 7.5 avw struct
+ 
+ [FV, Edges] = avw_shrinkwrap(avw,FV,smooth,vthresh,interpVal,...
+               fitval,fittol,fititer,fitchange,fitvattr)
+ 
+ avw       - an Analyze 7.5 data struct (see avw_read)
+ FV        - input tesselation; if empty, sphere tesselation 
+             is created.  FV has fields FV.vertices, FV.faces
+ smooth    - Gaussian smoothing of avw (5x5x5 kernel), 0|1 (default 0)
+ vthresh   - binarise avw at fitval, 0|1 (default 0)
+ interpVal - use radial interpolation (faster) or incremental
+             radial shrink (slower), 0|1 (default 1, faster)
+ fitval    - image intensity to shrink wrap (default 20)
+ fittol    - image intensity tolerance (default 5)
+ fititer   - max number of iterations to fit (default 200)
+ fitchange - least sig. change in intensity values 
+             between fit iterations (default 2)
+ fitvattr  - vertex attraction (constraint), 0:1, smaller
+             values are less constraint; close to 0 for 
+             no constraint is useful when dealing with 
+             binary volumes, otherwise 0.4 (40%) seems OK
+ 
+ FV        - a struct with 2562 vertices and 5120 faces
+ Edges     - a [2562,2562] matrix of edge connectivity for FV
+ 
+ This function has been developed to find the scalp surface 
+ for MRI of the human head.
+ 
+ It starts with a sphere tesselation (large radius) and moves
+ each vertex point toward the center of the volume until it
+ lies at or near the fitval.  The vertices are constrained to
+ move only along the radial projection from the origin and they
+ are also required to stay within a small distance of their
+ neighbours.  The function is not optimised for speed, but 
+ it should produce reasonable results.
+ 
+ Example of creating a scalp tesselation for SPM T1 MRI template:
+ 
+   avw = avw_read('T1');
+   FV = avw_shrinkwrap(avw,[],0,0,[],intensity,5.0,50,0.5,0.4);
+   patch('vertices',FV.vertices,'faces',FV.faces,'facecolor',[.6 .6 .6]);
+ 
+ The output vertex coordinates are in meters with an origin at (0,0,0), 
+ which lies at the center of the MRI volume.  This function uses the
+ avw.hdr.dime.pixdim values to convert from voxel coordinates into
+ meters.
+ 
+ See also: ISOSURFACE, SPHERE_TRI, MESH_REFINE_TRI4,
+           MESH_BEM_SHELLS_FUNC, MESH_BEM_SHELLS_SCRIPT</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_center.html" class="code" title="function center = avw_center(avw)">avw_center</a>	avw_center - find center of a volume</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="mesh_3shell_script.html" class="code" title="">mesh_3shell_script</a>	mesh_3shell_script</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [fit] = estimate_scalp(FV,vol,origin,fit),</a></li><li><a href="#_sub2" class="code">function [FV, intensityAtR, R] = locate_val(FV,vol,origin,fit),</a></li><li><a href="#_sub3" class="code">function [FV, intensityAtR, R] = shrink_wrap(FV,vol,origin,fit),</a></li><li><a href="#_sub4" class="code">function [FV] = constrain_vertex(FV,index,origin),</a></li><li><a href="#_sub5" class="code">function [val] = vol_val(vol,x,y,z),</a></li><li><a href="#_sub6" class="code">function [FV] = vertex_outliers(FV, R, origin),</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [FV, Edges] = avw_shrinkwrap(avw,FV,smooth,vthresh,interpVal,</a><span class="keyword">...</span>
+0002     fitval,fittol,fititer,fitchange,fitvattr)
+0003 
+0004 <span class="comment">% avw_shrinkwrap - Tesselate the surface of a 3D Analyze 7.5 avw struct</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% [FV, Edges] = avw_shrinkwrap(avw,FV,smooth,vthresh,interpVal,...</span>
+0007 <span class="comment">%               fitval,fittol,fititer,fitchange,fitvattr)</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% avw       - an Analyze 7.5 data struct (see avw_read)</span>
+0010 <span class="comment">% FV        - input tesselation; if empty, sphere tesselation</span>
+0011 <span class="comment">%             is created.  FV has fields FV.vertices, FV.faces</span>
+0012 <span class="comment">% smooth    - Gaussian smoothing of avw (5x5x5 kernel), 0|1 (default 0)</span>
+0013 <span class="comment">% vthresh   - binarise avw at fitval, 0|1 (default 0)</span>
+0014 <span class="comment">% interpVal - use radial interpolation (faster) or incremental</span>
+0015 <span class="comment">%             radial shrink (slower), 0|1 (default 1, faster)</span>
+0016 <span class="comment">% fitval    - image intensity to shrink wrap (default 20)</span>
+0017 <span class="comment">% fittol    - image intensity tolerance (default 5)</span>
+0018 <span class="comment">% fititer   - max number of iterations to fit (default 200)</span>
+0019 <span class="comment">% fitchange - least sig. change in intensity values</span>
+0020 <span class="comment">%             between fit iterations (default 2)</span>
+0021 <span class="comment">% fitvattr  - vertex attraction (constraint), 0:1, smaller</span>
+0022 <span class="comment">%             values are less constraint; close to 0 for</span>
+0023 <span class="comment">%             no constraint is useful when dealing with</span>
+0024 <span class="comment">%             binary volumes, otherwise 0.4 (40%) seems OK</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% FV        - a struct with 2562 vertices and 5120 faces</span>
+0027 <span class="comment">% Edges     - a [2562,2562] matrix of edge connectivity for FV</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% This function has been developed to find the scalp surface</span>
+0030 <span class="comment">% for MRI of the human head.</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% It starts with a sphere tesselation (large radius) and moves</span>
+0033 <span class="comment">% each vertex point toward the center of the volume until it</span>
+0034 <span class="comment">% lies at or near the fitval.  The vertices are constrained to</span>
+0035 <span class="comment">% move only along the radial projection from the origin and they</span>
+0036 <span class="comment">% are also required to stay within a small distance of their</span>
+0037 <span class="comment">% neighbours.  The function is not optimised for speed, but</span>
+0038 <span class="comment">% it should produce reasonable results.</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">% Example of creating a scalp tesselation for SPM T1 MRI template:</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">%   avw = avw_read('T1');</span>
+0043 <span class="comment">%   FV = avw_shrinkwrap(avw,[],0,0,[],intensity,5.0,50,0.5,0.4);</span>
+0044 <span class="comment">%   patch('vertices',FV.vertices,'faces',FV.faces,'facecolor',[.6 .6 .6]);</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% The output vertex coordinates are in meters with an origin at (0,0,0),</span>
+0047 <span class="comment">% which lies at the center of the MRI volume.  This function uses the</span>
+0048 <span class="comment">% avw.hdr.dime.pixdim values to convert from voxel coordinates into</span>
+0049 <span class="comment">% meters.</span>
+0050 <span class="comment">%</span>
+0051 <span class="comment">% See also: ISOSURFACE, SPHERE_TRI, MESH_REFINE_TRI4,</span>
+0052 <span class="comment">%           MESH_BEM_SHELLS_FUNC, MESH_BEM_SHELLS_SCRIPT</span>
+0053 <span class="comment">%</span>
+0054 
+0055 <span class="comment">% $Revision: 1.1 $ $Date: 2004/04/08 20:12:52 $</span>
+0056 
+0057 <span class="comment">% Licence:  GNU GPL, no implied or express warranties</span>
+0058 <span class="comment">% History:  08/2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0059 <span class="comment">%                    - adapted from mesh_shrinkwrap</span>
+0060 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0061 
+0062 <span class="comment">% Parse arguments</span>
+0063 
+0064 <span class="keyword">if</span> ~exist(<span class="string">'avw'</span>,<span class="string">'var'</span>), error(<span class="string">'...no input volume\n'</span>);
+0065 <span class="keyword">elseif</span> isempty(avw),    error(<span class="string">'...empty input volume\n'</span>);
+0066 <span class="keyword">end</span>
+0067 
+0068 <span class="comment">% Find approximate center of volume</span>
+0069 center = <a href="avw_center.html" class="code" title="function center = avw_center(avw)">avw_center</a>(avw);
+0070 origin = center.abs.voxels;
+0071 
+0072 version = <span class="string">'[$Revision: 1.1 $]'</span>;
+0073 fprintf(<span class="string">'AVW_SHRINKWRAP [v%s]\n'</span>,version(12:16));  tic;
+0074 
+0075 <span class="keyword">if</span> ~exist(<span class="string">'smooth'</span>,<span class="string">'var'</span>),   smooth = 0;
+0076 <span class="keyword">elseif</span> isempty(smooth),      smooth = 0;
+0077 <span class="keyword">end</span>
+0078 
+0079 <span class="keyword">if</span> ~exist(<span class="string">'vthresh'</span>,<span class="string">'var'</span>),  vthresh = 0;
+0080 <span class="keyword">elseif</span> isempty(vthresh),     vthresh = 0;
+0081 <span class="keyword">end</span>
+0082 
+0083 <span class="keyword">if</span> ~exist(<span class="string">'interpVal'</span>,<span class="string">'var'</span>), interpVal = 0;
+0084 <span class="keyword">elseif</span> isempty(interpVal),    interpVal = 0;
+0085 <span class="keyword">end</span>
+0086 
+0087 <span class="keyword">if</span> ~exist(<span class="string">'fitval'</span>,<span class="string">'var'</span>),   fit.val = 20;
+0088 <span class="keyword">elseif</span> isempty(fitval),      fit.val = 20;
+0089 <span class="keyword">else</span>                         fit.val = fitval;
+0090 <span class="keyword">end</span>
+0091 
+0092 <span class="keyword">if</span> ~exist(<span class="string">'fittol'</span>,<span class="string">'var'</span>),   fit.tol = 5;
+0093 <span class="keyword">elseif</span> isempty(fittol),      fit.tol = 5;
+0094 <span class="keyword">else</span>                         fit.tol = fittol;
+0095 <span class="keyword">end</span>
+0096 
+0097 <span class="keyword">if</span> fit.val &lt;= fit.tol,
+0098     error(<span class="string">'...must use fit tolerance &lt; fit value\n'</span>);
+0099 <span class="keyword">end</span>
+0100 
+0101 <span class="keyword">if</span> ~exist(<span class="string">'fititer'</span>,<span class="string">'var'</span>),  fit.iter = 200;
+0102 <span class="keyword">elseif</span> isempty(fititer),     fit.iter = 200;
+0103 <span class="keyword">else</span>                         fit.iter = fititer;
+0104 <span class="keyword">end</span>
+0105 
+0106 <span class="keyword">if</span> ~exist(<span class="string">'fitchange'</span>,<span class="string">'var'</span>),fit.change = 2;
+0107 <span class="keyword">elseif</span> isempty(fitchange),   fit.change = 2;
+0108 <span class="keyword">else</span>                         fit.change = fitchange;
+0109 <span class="keyword">end</span>
+0110 
+0111 <span class="keyword">if</span> ~exist(<span class="string">'fitvattr'</span>,<span class="string">'var'</span>), fit.vattr = 0.4;
+0112 <span class="keyword">elseif</span> isempty(fitvattr),    fit.vattr = 0.4;
+0113 <span class="keyword">else</span>                         fit.vattr = fitvattr;
+0114 <span class="keyword">end</span>
+0115 <span class="keyword">if</span> fit.vattr &gt; 1,
+0116     fprintf(<span class="string">'...fit vertattr (v) must be 0 &lt;= v &lt;= 1, setting v = 1\n'</span>);
+0117     fit.vattr = 1;
+0118 <span class="keyword">end</span>
+0119 <span class="keyword">if</span> fit.vattr &lt; 0,
+0120     fprintf(<span class="string">'...fit vertattr (v) must be 0 &lt;= v &lt;= 1, setting v = 0.\n'</span>);
+0121     fit.vattr = 0;
+0122 <span class="keyword">end</span>
+0123 
+0124 
+0125 <span class="comment">% get size of volume, in voxels</span>
+0126 xdim = size(avw.img,1);
+0127 ydim = size(avw.img,2);
+0128 zdim = size(avw.img,3);
+0129 
+0130 
+0131 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0132 <span class="comment">% Check whether to create a sphere tesselation</span>
+0133 <span class="comment">% or use an input tesselation as the start point</span>
+0134 
+0135 sphere = 0;
+0136 <span class="keyword">if</span> ~exist(<span class="string">'FV'</span>,<span class="string">'var'</span>),
+0137     sphere = 1;
+0138 <span class="keyword">elseif</span> ~isfield(FV,<span class="string">'vertices'</span>),
+0139     sphere = 1;
+0140 <span class="keyword">elseif</span> ~isfield(FV,<span class="string">'faces'</span>),
+0141     sphere = 1;
+0142 <span class="keyword">elseif</span> isempty(FV.vertices),
+0143     sphere = 1;
+0144 <span class="keyword">elseif</span> isempty(FV.faces),
+0145     sphere = 1;
+0146 <span class="keyword">end</span>
+0147 <span class="keyword">if</span> sphere,
+0148     <span class="comment">% Create a sphere tesselation to encompass the volume</span>
+0149     diameter = max([xdim ydim zdim]);
+0150     radius = diameter / 1.5;
+0151     FV = sphere_tri(<span class="string">'ico'</span>,4,radius); <span class="comment">% 2562 vertices</span>
+0152     <span class="comment">% Shift the center of the sphere to the center of the volume</span>
+0153     FV.vertices = FV.vertices + repmat(origin,size(FV.vertices,1),1);
+0154 <span class="keyword">else</span>
+0155     fprintf(<span class="string">'...using input FV tesselation...\n'</span>);
+0156 <span class="keyword">end</span>
+0157 
+0158 <span class="comment">% the 'edge' matrix is the connectivity of all vertices,</span>
+0159 <span class="comment">% used to find neighbours during movement of vertices,</span>
+0160 <span class="comment">% including smoothing the tesselation</span>
+0161 FV.edge = mesh_edges(FV);
+0162 
+0163 
+0164 
+0165 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0166 <span class="comment">% theshold the volume based on background noise estimate</span>
+0167 slice_x0 = avw.img(1,:,:);
+0168 slice_x1 = avw.img(<span class="keyword">end</span>,:,:);
+0169 slice_y0 = avw.img(:,1,:);
+0170 slice_y1 = avw.img(:,<span class="keyword">end</span>,:);
+0171 slice_z0 = avw.img(:,:,1);
+0172 slice_z1 = avw.img(:,:,end);
+0173 
+0174 slice_x0_mean = mean(mean(slice_x0));
+0175 slice_x1_mean = mean(mean(slice_x1));
+0176 slice_y0_mean = mean(mean(slice_y0));
+0177 slice_y1_mean = mean(mean(slice_y1));
+0178 slice_z0_mean = mean(mean(slice_z0));
+0179 slice_z1_mean = mean(mean(slice_z1));
+0180 
+0181 background_mean = mean([slice_x0_mean,slice_x1_mean,slice_y0_mean,slice_y1_mean,slice_z0_mean,slice_z1_mean]);
+0182 
+0183 <span class="comment">% threshold the volume by this background value</span>
+0184 index = find(avw.img &lt; background_mean);
+0185 <span class="keyword">if</span> index,
+0186   avw.img(index) = 0;
+0187 <span class="keyword">end</span>
+0188 
+0189 
+0190 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0191 <span class="comment">% Calculate a binary version of the volume, zeroing all</span>
+0192 <span class="comment">% values below a threshold, setting all others to threshold</span>
+0193 <span class="keyword">if</span> vthresh,
+0194     fprintf(<span class="string">'...binarising volume at fit.val threshold...'</span>); tic;
+0195     Vindex = find(avw.img &lt; fit.val);
+0196     avw.img(Vindex) = 0;
+0197     Vindex = find(avw.img &gt;= fit.val);
+0198     avw.img(Vindex) = fit.val;
+0199     t = toc; fprintf(<span class="string">'done (%5.2f sec)\n'</span>,t);
+0200 <span class="keyword">end</span>
+0201 
+0202 
+0203 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0204 <span class="comment">% smooth the volume</span>
+0205 <span class="keyword">if</span> smooth,
+0206     fprintf(<span class="string">'...gaussian smoothing (5-10 minutes)...'</span>); tic;
+0207     avw.img = smooth3(avw.img,<span class="string">'gaussian'</span>,5,.8);
+0208     t = toc; fprintf(<span class="string">'done (%5.2f sec)\n'</span>,t);
+0209 <span class="keyword">end</span>
+0210 
+0211 
+0212 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0213 <span class="comment">% Estimate scalp intensity</span>
+0214 fit = <a href="#_sub1" class="code" title="subfunction [fit] = estimate_scalp(FV,vol,origin,fit),">estimate_scalp</a>(FV,avw.img,origin,fit);
+0215 
+0216 
+0217 
+0218 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0219 <span class="comment">% Now begin recursion</span>
+0220 fprintf(<span class="string">'...fitting...\n'</span>);    tic;
+0221 
+0222 i = 1;
+0223 Fminima = 0;
+0224 intensityAtRMean = [0 0];
+0225 
+0226 <span class="keyword">while</span> i &lt;= fit.iter,
+0227     
+0228     <span class="keyword">if</span> interpVal,
+0229         <span class="comment">% use radial interpolation method, moving directly</span>
+0230         <span class="comment">% to the intensity value nearest correct intensity</span>
+0231         [FV, intensityAtR, R] = <a href="#_sub2" class="code" title="subfunction [FV, intensityAtR, R] = locate_val(FV,vol,origin,fit),">locate_val</a>(FV,avw.img,origin,fit);
+0232     <span class="keyword">else</span>
+0233         <span class="comment">% use incremental method, moving along radial line</span>
+0234         <span class="comment">% gradually until finding correct intensity</span>
+0235         [FV, intensityAtR, R] = <a href="#_sub3" class="code" title="subfunction [FV, intensityAtR, R] = shrink_wrap(FV,vol,origin,fit),">shrink_wrap</a>(FV,avw.img,origin,fit);
+0236     <span class="keyword">end</span>
+0237     
+0238     intensityAtRMean = [ intensityAtRMean(2), mean(intensityAtR) ] ;
+0239     
+0240     fprintf(<span class="string">'...distance:  mean = %8.4f voxels, std = %8.4f voxels\n'</span>,mean(R),std(R));
+0241     fprintf(<span class="string">'...intensity: mean = %8.4f,        std = %8.4f\n'</span>,<span class="keyword">...</span>
+0242         mean(intensityAtR),std(intensityAtR));
+0243     fprintf(<span class="string">'...real iteration: %3d\n'</span>,i);
+0244     
+0245     <span class="comment">% Is the mean distance reasonable?</span>
+0246     <span class="keyword">if</span> mean(R) &lt; 0.5,
+0247         error(<span class="string">'...mean distance &lt; 0.5 voxel!\n'</span>);
+0248     <span class="keyword">end</span>
+0249     
+0250     <span class="comment">% MDifVal is the mean of the absolute difference</span>
+0251     <span class="comment">% between the vertex intensity and the fit intensity</span>
+0252     MDifVal = abs(intensityAtRMean(2) - fit.val);
+0253     
+0254     <span class="comment">% Is the mean difference within the tolerance range?</span>
+0255     <span class="keyword">if</span> MDifVal &lt; fit.tol,
+0256         fprintf(<span class="string">'...mean intensity difference &lt; tolerance (%5.2f +/- %5.2f)\n'</span>,<span class="keyword">...</span>
+0257             fit.val,fit.tol);
+0258         <span class="keyword">break</span>;
+0259     <span class="keyword">else</span>
+0260         fprintf(<span class="string">'...mean intensity difference &gt; tolerance (%5.2f +/- %5.2f)\n'</span>,<span class="keyword">...</span>
+0261             fit.val,fit.tol);
+0262     <span class="keyword">end</span>
+0263     
+0264     <span class="comment">% How much has the intensity values changed?</span>
+0265     <span class="keyword">if</span> (i &gt; 1) &amp; intensityAtRMean(2) &gt; 0,
+0266         <span class="keyword">if</span> intensityAtRMean(2) - intensityAtRMean(1) &lt; fit.change,
+0267             fprintf(<span class="string">'...no significant intensity change (&lt; %5.2f) in this iteration\n'</span>,<span class="keyword">...</span>
+0268                 fit.change);
+0269             Fminima = Fminima + 1;
+0270             <span class="keyword">if</span> Fminima &gt;= 5,
+0271                 fprintf(<span class="string">'...no significant intensity change in last 5 iterations\n'</span>);
+0272                 <span class="keyword">break</span>;
+0273             <span class="keyword">end</span>
+0274         <span class="keyword">else</span>
+0275             Fminima = 0;
+0276         <span class="keyword">end</span>
+0277     <span class="keyword">end</span>
+0278     
+0279     <span class="comment">% Ensure that iterations begin when MDifVal is truly initialised</span>
+0280     <span class="keyword">if</span> isnan(MDifVal),
+0281         i = 1;
+0282     <span class="keyword">else</span>,
+0283         i = i + 1;
+0284     <span class="keyword">end</span>
+0285     
+0286 <span class="keyword">end</span>
+0287 
+0288 FV = mesh_smooth(FV,origin,fit.vattr);
+0289 
+0290 <span class="comment">% Remove large edges matrix from FV</span>
+0291 Edges = FV.edge;
+0292 FV = struct(<span class="string">'vertices'</span>,FV.vertices,<span class="string">'faces'</span>,FV.faces);
+0293 
+0294 <span class="comment">% Now center the output vertices at 0,0,0 by subtracting</span>
+0295 <span class="comment">% the volume centroid</span>
+0296 FV.vertices(:,1) = FV.vertices(:,1) - origin(1);
+0297 FV.vertices(:,2) = FV.vertices(:,2) - origin(2);
+0298 FV.vertices(:,3) = FV.vertices(:,3) - origin(3);
+0299 
+0300 <span class="comment">% Scale the vertices by the pixdim values, after</span>
+0301 <span class="comment">% converting them from mm to meters</span>
+0302 xpixdim = double(avw.hdr.dime.pixdim(2)) / 1000;
+0303 ypixdim = double(avw.hdr.dime.pixdim(3)) / 1000;
+0304 zpixdim = double(avw.hdr.dime.pixdim(4)) / 1000;
+0305 
+0306 FV.vertices(:,1) = FV.vertices(:,1) .* xpixdim;
+0307 FV.vertices(:,2) = FV.vertices(:,2) .* ypixdim;
+0308 FV.vertices(:,3) = FV.vertices(:,3) .* zpixdim;
+0309 
+0310 
+0311 t=toc; fprintf(<span class="string">'...done (%5.2f sec).\n\n'</span>,t);
+0312 
+0313 <span class="keyword">return</span>
+0314 
+0315 
+0316 
+0317 
+0318 
+0319 
+0320 
+0321 
+0322 
+0323 
+0324 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0325 <span class="comment">% Subfunctions...</span>
+0326 
+0327 
+0328 
+0329 
+0330 
+0331 
+0332 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0333 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0334 <a name="_sub1" href="#_subfunctions" class="code">function [fit] = estimate_scalp(FV,vol,origin,fit),</a>
+0335 
+0336 xo = origin(1); yo = origin(2); zo = origin(3);
+0337 
+0338 Nvert = size(FV.vertices,1);
+0339 
+0340 <span class="comment">% Estimate the scalp intensity, using 10% of vertices</span>
+0341 N = round(0.05 * Nvert);
+0342 scalp_intensity = zeros(N,1);
+0343 
+0344 fprintf(<span class="string">'...estimating scalp intensity from %d vertices\n'</span>, N);
+0345 fprintf(<span class="string">'...starting scalp intensity = %d\n'</span>, fit.val);
+0346 
+0347 indices = round(rand(1,N) * Nvert);
+0348 
+0349 i = 0;
+0350 <span class="keyword">for</span> v = indices,
+0351   
+0352   x = FV.vertices(v,1);
+0353   y = FV.vertices(v,2);
+0354   z = FV.vertices(v,3);
+0355   r = sqrt( (x-xo).^2 + (y-yo).^2 + (z-zo).^2 );
+0356   l = (x-xo)/r; <span class="comment">% cos alpha</span>
+0357   m = (y-yo)/r; <span class="comment">% cos beta</span>
+0358   n = (z-zo)/r; <span class="comment">% cos gamma</span>
+0359   
+0360   <span class="comment">% find discrete points from zero to the vertex</span>
+0361   POINTS = 250;
+0362   radial_distances = linspace(0,r,POINTS);
+0363   
+0364   L = repmat(l,1,POINTS);
+0365   M = repmat(m,1,POINTS);
+0366   N = repmat(n,1,POINTS);
+0367   
+0368   XI = (L .* radial_distances) + xo;
+0369   YI = (M .* radial_distances) + yo;
+0370   ZI = (N .* radial_distances) + zo;
+0371   
+0372   <span class="comment">% interpolate volume values at these points</span>
+0373   <span class="comment">% ( not sure why have to swap XI,YI here )</span>
+0374   VI = interp3(vol,YI,XI,ZI,<span class="string">'*nearest'</span>);
+0375   
+0376   <span class="comment">% find location in VI where intensity gradient is steep</span>
+0377   half_max = 0.5 * max(VI);
+0378   index_maxima = find(VI &gt; half_max);
+0379   <span class="comment">% use the largest index value to locate the maxima intensity that lie</span>
+0380   <span class="comment">% furthest toward the outside of the head</span>
+0381   index_max = index_maxima(end);
+0382   
+0383   i = i + 1;
+0384   scalp_intensity(i,1) = VI(index_max);
+0385   
+0386   <span class="comment">%figure; plot(radial_distances,VI)</span>
+0387   
+0388 <span class="keyword">end</span>
+0389 
+0390 fit.val = mean(scalp_intensity);
+0391 fit.tol = std(scalp_intensity);
+0392 
+0393 fprintf(<span class="string">'...estimated scalp intensity = %g\n'</span>, fit.val);
+0394 fprintf(<span class="string">'...estimated tolerance intensity = %g\n'</span>, fit.tol);
+0395 
+0396 <span class="keyword">return</span>
+0397 
+0398 
+0399 
+0400 
+0401 
+0402 
+0403 
+0404 
+0405 
+0406 
+0407 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0408 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0409 <a name="_sub2" href="#_subfunctions" class="code">function [FV, intensityAtR, R] = locate_val(FV,vol,origin,fit),</a>
+0410 
+0411 xo = origin(1); yo = origin(2); zo = origin(3);
+0412 
+0413 Nvert = size(FV.vertices,1);
+0414 progress = round(.1 * Nvert);
+0415 
+0416 <span class="comment">% Initialise difference intensity &amp; distance arrays</span>
+0417 intensityAtR = zeros(Nvert,1);
+0418 R = intensityAtR;
+0419 
+0420 <span class="comment">% Find distance and direction cosines for line from</span>
+0421 <span class="comment">% origin to all vertices</span>
+0422 XV = FV.vertices(:,1);
+0423 YV = FV.vertices(:,2);
+0424 ZV = FV.vertices(:,3);
+0425 RV = sqrt( (XV-xo).^2 + (YV-yo).^2 + (ZV-zo).^2 );
+0426 LV = (XV-xo)./RV; <span class="comment">% cos alpha</span>
+0427 MV = (YV-yo)./RV; <span class="comment">% cos beta</span>
+0428 NV = (ZV-zo)./RV; <span class="comment">% cos gamma</span>
+0429 
+0430 <span class="comment">% Check for binary volume data, if empty, binary</span>
+0431 binvol = find(vol &gt; 1);
+0432 
+0433 <span class="comment">% Locate each vertex at a given fit value</span>
+0434 tic
+0435 <span class="keyword">for</span> v = 1:Nvert,
+0436     
+0437     <span class="keyword">if</span> v &gt; progress,
+0438         fprintf(<span class="string">'...interp3 processed %4d of %4d vertices'</span>,progress,Nvert);
+0439         t = toc; fprintf(<span class="string">' (%5.2f sec)\n'</span>,t);
+0440         progress = progress + progress;
+0441     <span class="keyword">end</span>
+0442     
+0443     <span class="comment">% Find direction cosines for line from origin to vertex</span>
+0444     x = XV(v);
+0445     y = YV(v);
+0446     z = ZV(v);
+0447     d = RV(v);
+0448     l = LV(v); <span class="comment">% cos alpha</span>
+0449     m = MV(v); <span class="comment">% cos beta</span>
+0450     n = NV(v); <span class="comment">% cos gamma</span>
+0451     
+0452     <span class="comment">% find discrete points between origin</span>
+0453     <span class="comment">% and vertex + 20% of vertex distance</span>
+0454     POINTS = 250;
+0455     
+0456     Rarray = linspace(0,(d + .2 * d),POINTS);
+0457     
+0458     L = repmat(l,1,POINTS);
+0459     M = repmat(m,1,POINTS);
+0460     N = repmat(n,1,POINTS);
+0461     
+0462     XI = (L .* Rarray) + xo;
+0463     YI = (M .* Rarray) + yo;
+0464     ZI = (N .* Rarray) + zo;
+0465     
+0466     <span class="comment">% interpolate volume values at these points</span>
+0467     <span class="comment">% ( not sure why have to swap XI,YI here )</span>
+0468     VI = interp3(vol,YI,XI,ZI,<span class="string">'*linear'</span>);
+0469     
+0470     <span class="comment">% do we have a binary volume (no values &gt; 1)</span>
+0471     <span class="keyword">if</span> isempty(binvol),
+0472         maxindex = max(find(VI&gt;0));
+0473         <span class="keyword">if</span> maxindex,
+0474             R(v) = Rarray(maxindex);
+0475         <span class="keyword">end</span>
+0476     <span class="keyword">else</span>
+0477         <span class="comment">% find the finite values of VI</span>
+0478         index = max(find(VI(isfinite(VI))));
+0479         <span class="keyword">if</span> index,
+0480             
+0481             <span class="comment">% Find nearest volume value to the required fit value</span>
+0482             nearest = max(find(VI &gt;= fit.val));
+0483             
+0484             <span class="comment">%[ nearest, value ] = NearestArrayPoint( VI, fit.val );</span>
+0485             
+0486             <span class="comment">% Check this nearest index against a differential</span>
+0487             <span class="comment">% negative peak value</span>
+0488             <span class="comment">%diffVI = diff(VI);</span>
+0489             <span class="comment">%if max(VI) &gt; 1,</span>
+0490             <span class="comment">%    diffindex = find(diffVI &lt; -20);</span>
+0491             <span class="comment">%else</span>
+0492             <span class="comment">% probably a binary volume</span>
+0493             <span class="comment">%    diffindex = find(diffVI &lt; 0);</span>
+0494             <span class="comment">%end</span>
+0495             
+0496             <span class="comment">% now set d</span>
+0497             <span class="keyword">if</span> nearest,
+0498                 R(v) = Rarray(nearest);
+0499             <span class="keyword">end</span>
+0500         <span class="keyword">end</span>
+0501     <span class="keyword">end</span>
+0502     
+0503     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0504     <span class="comment">% Constrain relocation by fit.vattr,</span>
+0505     <span class="comment">% some % of distance from neighbours</span>
+0506     
+0507     vi = find(FV.edge(v,:));  <span class="comment">% the neighbours' indices</span>
+0508     X = FV.vertices(vi,1);    <span class="comment">% the neighbours' vertices</span>
+0509     Y = FV.vertices(vi,2);
+0510     Z = FV.vertices(vi,3);
+0511     
+0512     <span class="comment">% Find neighbour distances</span>
+0513     RN = sqrt( (X-xo).^2 + (Y-yo).^2 + (Z-zo).^2 );
+0514     <span class="comment">% Find mean distance of neighbours</span>
+0515     neighbour_distances_mean = mean(RN);
+0516     
+0517     minattr = fit.vattr;
+0518     maxattr = 1 + fit.vattr;
+0519     
+0520     <span class="keyword">if</span> R(v) &lt; (minattr * neighbour_distances_mean),
+0521         R(v) = minattr * neighbour_distances_mean;
+0522     <span class="keyword">end</span>
+0523     <span class="keyword">if</span> R(v) &gt; (maxattr * neighbour_distances_mean),
+0524         R(v) = maxattr * neighbour_distances_mean;
+0525     <span class="keyword">end</span>
+0526     <span class="keyword">if</span> R(v) == 0, R(v) = neighbour_distances_mean; <span class="keyword">end</span>
+0527     
+0528     <span class="comment">% relocate vertex to new distance</span>
+0529     x = (l * R(v)) + xo;
+0530     y = (m * R(v)) + yo;
+0531     z = (n * R(v)) + zo;
+0532     
+0533     FV.vertices(v,:) = [ x y z ];
+0534     
+0535     <span class="comment">% Find intensity value at this distance</span>
+0536     intensityAtR(v) = interp1(Rarray,VI,R(v),<span class="string">'linear'</span>);
+0537     
+0538 <span class="keyword">end</span>
+0539 
+0540 <span class="keyword">if</span> isempty(binvol),
+0541     <span class="comment">% check outliers and smooth twice for binary volumes</span>
+0542     FV = <a href="#_sub6" class="code" title="subfunction [FV] = vertex_outliers(FV, R, origin),">vertex_outliers</a>(FV, R, origin);
+0543     FV = mesh_smooth(FV,origin,fit.vattr);
+0544 <span class="keyword">end</span>
+0545 FV = mesh_smooth(FV,origin,fit.vattr);
+0546 
+0547 <span class="keyword">return</span>
+0548 
+0549 
+0550 
+0551 
+0552 
+0553 
+0554 
+0555 
+0556 
+0557 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0558 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0559 <a name="_sub3" href="#_subfunctions" class="code">function [FV, intensityAtR, R] = shrink_wrap(FV,vol,origin,fit),</a>
+0560 
+0561 xo = origin(1); yo = origin(2); zo = origin(3);
+0562 
+0563 Nvert = size(FV.vertices,1);
+0564 progress = round(.1 * Nvert);
+0565 
+0566 <span class="comment">% Initialise difference intensity &amp; distance arrays</span>
+0567 R = zeros(Nvert,1);
+0568 intensityAtR = R;
+0569 
+0570 <span class="comment">% Check for binary volume data, if empty, binary</span>
+0571 binvol = find(vol &gt; 1);
+0572 
+0573 Imin = 0;
+0574 Imax = max(max(max(vol)));
+0575 
+0576 <span class="comment">% Manipulate each vertex</span>
+0577 tic
+0578 <span class="keyword">for</span> v = 1:Nvert,
+0579   
+0580   <span class="keyword">if</span> v &gt; progress,
+0581     fprintf(<span class="string">'...shrink-wrap processed %4d of %4d vertices'</span>,progress,Nvert);
+0582     t = toc; fprintf(<span class="string">' (%5.2f sec)\n'</span>,t);
+0583     progress = progress + progress;
+0584   <span class="keyword">end</span>
+0585   
+0586   <span class="comment">% Find direction cosines for line from origin to vertex</span>
+0587   x = FV.vertices(v,1);
+0588   y = FV.vertices(v,2);
+0589   z = FV.vertices(v,3);
+0590   r = sqrt( (x-xo).^2 + (y-yo).^2 + (z-zo).^2 );
+0591   l = (x-xo)/r; <span class="comment">% cos alpha</span>
+0592   m = (y-yo)/r; <span class="comment">% cos beta</span>
+0593   n = (z-zo)/r; <span class="comment">% cos gamma</span>
+0594   
+0595   <span class="comment">% interpolate volume values at this point ( x,y are swapped here</span>
+0596   <span class="comment">% because the Analyze volume is a left handed coordinate system )</span>
+0597   intensity_old = interp3(vol,y,x,z,<span class="string">'*nearest'</span>);
+0598   
+0599   <span class="comment">% move vertex closer to the origin, in a radial direction</span>
+0600   r_change = r * 0.05;
+0601   r_new = r - r_change;
+0602   
+0603   <span class="comment">% Calculate new vertex coordinates</span>
+0604   x = (l * r_new) + xo; <span class="comment">% cos alpha</span>
+0605   y = (m * r_new) + yo; <span class="comment">% cos beta</span>
+0606   z = (n * r_new) + zo; <span class="comment">% cos gamma</span>
+0607   
+0608   <span class="comment">% interpolate volume values at this point ( x,y are swapped here</span>
+0609   <span class="comment">% because the Analyze volume is a left handed coordinate system )</span>
+0610   intensity_new = interp3(vol,y,x,z,<span class="string">'*nearest'</span>);
+0611   
+0612   intensity_dif = intensity_new - intensity_old;
+0613   
+0614   <span class="keyword">if</span> intensity_dif == 0,
+0615     <span class="comment">% relocate vertex to new distance</span>
+0616     FV.vertices(v,1) = x;
+0617     FV.vertices(v,2) = y;
+0618     FV.vertices(v,3) = z;
+0619     intensityAtR(v,1) = intensity_new;
+0620     R(v) = r_new;
+0621   <span class="keyword">elseif</span> (fit.val - intensity_new) &lt; (fit.val - intensity_old),
+0622     <span class="comment">% relocate vertex to new distance</span>
+0623     FV.vertices(v,1) = x;
+0624     FV.vertices(v,2) = y;
+0625     FV.vertices(v,3) = z;
+0626     intensityAtR(v,1) = intensity_new;
+0627     R(v) = r_new;
+0628   <span class="keyword">else</span>
+0629     intensityAtR(v,1) = intensity_old;
+0630     R(v) = r;
+0631   <span class="keyword">end</span>
+0632   
+0633   FV = <a href="#_sub4" class="code" title="subfunction [FV] = constrain_vertex(FV,index,origin),">constrain_vertex</a>(FV,v,origin);
+0634   
+0635 <span class="keyword">end</span>
+0636 
+0637 FV = mesh_smooth(FV,origin,fit.vattr);
+0638 
+0639 <span class="keyword">return</span>
+0640 
+0641 
+0642 
+0643 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0644 <a name="_sub4" href="#_subfunctions" class="code">function [FV] = constrain_vertex(FV,index,origin),</a>
+0645 
+0646 <span class="comment">% This function adapts Smith, S. (2002), Fast robust automated brain</span>
+0647 <span class="comment">% extraction.  Human Brain Mapping, 17: 143-155.  It corresponds to update</span>
+0648 <span class="comment">% component 2: surface smoothness control.  It assumes that vertices are</span>
+0649 <span class="comment">% moved along a radial line from an origin, given by direction</span>
+0650 <span class="comment">% cosines, rather than calculating the surface normal vector.</span>
+0651 
+0652 xo = origin(1); yo = origin(2); zo = origin(3);
+0653 
+0654 v = FV.vertices(index,:);
+0655 x = FV.vertices(index,1);
+0656 y = FV.vertices(index,2);
+0657 z = FV.vertices(index,3);
+0658 
+0659 <span class="comment">% Find radial distance of vertex from origin</span>
+0660 r = sqrt( (x-xo)^2 + (y-yo)^2 + (z-zo)^2 );
+0661 
+0662 <span class="comment">% Calculate unit vector</span>
+0663 v_unit_vector = ( v - origin ) / r;
+0664 
+0665 <span class="comment">% Find direction cosines for line from center to vertex</span>
+0666 l = (x-xo)/r; <span class="comment">% cos alpha</span>
+0667 m = (y-yo)/r; <span class="comment">% cos beta</span>
+0668 n = (z-zo)/r; <span class="comment">% cos gamma</span>
+0669 
+0670 <span class="comment">% Find neighbouring vertex coordinates</span>
+0671 vi = find(FV.edge(index,:));  <span class="comment">% the indices</span>
+0672 neighbour_vertices = FV.vertices(vi,:);
+0673 X = neighbour_vertices(:,1);
+0674 Y = neighbour_vertices(:,2);
+0675 Z = neighbour_vertices(:,3);
+0676 
+0677 <span class="comment">% Find neighbour radial distances</span>
+0678 r_neighbours = sqrt( (X-xo).^2 + (Y-yo).^2 + (Z-zo).^2 );
+0679 r_neighbours_mean = mean(r_neighbours);
+0680 
+0681 <span class="comment">% Find difference in radial distance between the vertex of interest and its</span>
+0682 <span class="comment">% neighbours; this value approximates the magnitude of sn in</span>
+0683 <span class="comment">% Smith (2002, eq. 1 to 4)</span>
+0684 r_diff = r - r_neighbours_mean;
+0685 
+0686 <span class="comment">% Find the vector sn, in the direction of the vertex of interest, given the</span>
+0687 <span class="comment">% difference in radial distance between vertex and mean of neighbours</span>
+0688 sn = r_diff * v_unit_vector;
+0689 
+0690 <span class="comment">% Find distances between vertex and neighbours, using edge lengths.</span>
+0691 <span class="comment">% The mean value is l in Smith (2002, eq. 4)</span>
+0692 edge_distance = FV.edge(index,vi);
+0693 edge_distance_mean = mean(edge_distance);
+0694 
+0695 <span class="comment">% Calculate radius of local curvature, solve Smith (2002, eq. 4)</span>
+0696 <span class="keyword">if</span> r_diff,
+0697   radius_of_curvature = (edge_distance_mean ^ 2) / (2 * r_diff);
+0698 <span class="keyword">else</span>
+0699   radius_of_curvature = 10000;
+0700 <span class="keyword">end</span>
+0701 
+0702 <span class="comment">% Define limits for radius of curvature</span>
+0703 radius_min =  3.33; <span class="comment">% mm</span>
+0704 radius_max = 10.00; <span class="comment">% mm</span>
+0705 
+0706 <span class="comment">% Sigmoid function parameters,</span>
+0707 <span class="comment">% &quot;where E and F control the scale and offset of the sigmoid&quot;</span>
+0708 E = mean([(1 / radius_min),  (1 / radius_max)]);
+0709 F = 6 * ( (1 / radius_min) - (1 / radius_max) );
+0710 
+0711 Fsigmoid = (1 + tanh( F * (1 / radius_of_curvature - E))) / 2;
+0712 
+0713 <span class="comment">% multiply sigmoid function by sn</span>
+0714 move_vector = Fsigmoid * sn;
+0715 
+0716 FV.vertices(index,:) = v + move_vector;
+0717 
+0718 <span class="keyword">return</span>
+0719 
+0720 
+0721 
+0722 
+0723 
+0724 
+0725 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0726 <a name="_sub5" href="#_subfunctions" class="code">function [val] = vol_val(vol,x,y,z),</a>
+0727 
+0728 <span class="comment">% This function just ensures that xyz are</span>
+0729 <span class="comment">% actually within the volume before trying</span>
+0730 <span class="comment">% to get a volume value</span>
+0731 
+0732 val = nan; <span class="comment">% assume zero value</span>
+0733 
+0734 x = round(x);
+0735 y = round(y);
+0736 z = round(z);
+0737 
+0738 <span class="keyword">if</span> x &gt; 0 &amp; y &gt; 0 &amp; z &gt; 0,
+0739     
+0740     <span class="comment">% get bounds of vol</span>
+0741     xdim = size(vol,1);
+0742     ydim = size(vol,2);
+0743     zdim = size(vol,3);
+0744     
+0745     <span class="keyword">if</span> x &lt;= xdim &amp; y &lt;= ydim &amp; z &lt;= zdim,
+0746         <span class="comment">% OK return volume value at xyz</span>
+0747         val = vol(x,y,z);
+0748     <span class="keyword">end</span>
+0749 <span class="keyword">end</span>
+0750 
+0751 <span class="keyword">return</span>
+0752 
+0753 
+0754 
+0755 
+0756 
+0757 
+0758 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0759 <a name="_sub6" href="#_subfunctions" class="code">function [FV] = vertex_outliers(FV, R, origin),</a>
+0760 
+0761 xo = origin(1); yo = origin(2); zo = origin(3);
+0762 
+0763 <span class="comment">% Screen FV for outlying vertices, using</span>
+0764 <span class="comment">% mean +/- 2 * stdev of distance from origin</span>
+0765 DistMean = mean(R);
+0766 DistStDev = std(R);
+0767 DistMax = DistMean + 2 * DistStDev;
+0768 DistMin = DistMean - 2 * DistStDev;
+0769 
+0770 <span class="keyword">for</span> v = 1:size(FV.vertices,1),
+0771     
+0772     <span class="keyword">if</span> R(v) &gt;= DistMax,
+0773         R(v) = DistMean;
+0774         relocate = 1;
+0775     <span class="keyword">elseif</span> R(v) &lt;= DistMin,
+0776         R(v) = DistMean;
+0777         relocate = 1;
+0778     <span class="keyword">else</span>
+0779         relocate = 0;
+0780     <span class="keyword">end</span>
+0781     
+0782     <span class="keyword">if</span> relocate,
+0783         x = FV.vertices(v,1);
+0784         y = FV.vertices(v,2);
+0785         z = FV.vertices(v,3);
+0786         
+0787         <span class="comment">% Find direction cosines for line from center to vertex</span>
+0788         d = sqrt( (x-xo)^2 + (y-yo)^2 + (z-zo)^2 );
+0789         l = (x-xo)/d; <span class="comment">% cos alpha</span>
+0790         m = (y-yo)/d; <span class="comment">% cos beta</span>
+0791         n = (z-zo)/d; <span class="comment">% cos gamma</span>
+0792         
+0793         <span class="comment">% relocate vertex to this new distance</span>
+0794         x = (l * R(v)) + xo;
+0795         y = (m * R(v)) + yo;
+0796         z = (n * R(v)) + zo;
+0797         
+0798         FV.vertices(v,:) = [ x y z ];
+0799     <span class="keyword">end</span>
+0800 <span class="keyword">end</span>
+0801 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of LoadAVWObjectMap</title>
+  <meta name="keywords" content="LoadAVWObjectMap">
+  <meta name="description" content="objectmap = LoadAVWObjectMap ( Filename )">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; LoadAVWObjectMap.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>LoadAVWObjectMap
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>objectmap = LoadAVWObjectMap ( Filename )</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function objectmap = LoadAVWObjectMap ( Filename ) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> objectmap = LoadAVWObjectMap ( Filename )
+ Load the objectmap given by Filename.  Returns a structure
+ containing the map (as field Image), and a list of objects (as
+ field Objects)
+
+ NOTE: Matlab versions have an offset of 1, i.e. the 1-based
+ indexing of Matlab applies to the objectmap.Image as well as the
+ objectmap.Objects.  That is objectmap.Objects(1) is defined as
+ all the voxels in objectmap.Image == 1</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function objectmap = LoadAVWObjectMap ( Filename )</a>
+0002 <span class="comment">% objectmap = LoadAVWObjectMap ( Filename )</span>
+0003 <span class="comment">% Load the objectmap given by Filename.  Returns a structure</span>
+0004 <span class="comment">% containing the map (as field Image), and a list of objects (as</span>
+0005 <span class="comment">% field Objects)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% NOTE: Matlab versions have an offset of 1, i.e. the 1-based</span>
+0008 <span class="comment">% indexing of Matlab applies to the objectmap.Image as well as the</span>
+0009 <span class="comment">% objectmap.Objects.  That is objectmap.Objects(1) is defined as</span>
+0010 <span class="comment">% all the voxels in objectmap.Image == 1</span>
+0011 
+0012   <span class="comment">% Filename = 'BWLabelsHippocampus.obj';</span>
+0013 
+0014 objectmap = struct ( <span class="string">'Version'</span>, -1 );  
+0015   
+0016 fid = fopen ( Filename, <span class="string">'r'</span>, <span class="string">'b'</span>);
+0017 <span class="keyword">if</span> fid &lt; 0,
+0018   error ( [<span class="string">'Can not open '</span> Filename <span class="string">' for reading'</span>] );
+0019 <span class="keyword">end</span>
+0020 
+0021 objectmap.Version = fread ( fid, 1, <span class="string">'int'</span> );
+0022 <span class="keyword">if</span> objectmap.Version ~= 910926
+0023   error ( [<span class="string">'Unknown ObjectMap version: '</span> int2str(objectmap.Version) <span class="string">' expected 910926'</span>] );
+0024 <span class="keyword">end</span>
+0025 
+0026 objectmap.Width = fread ( fid, 1, <span class="string">'int'</span> );
+0027 objectmap.Height = fread ( fid, 1, <span class="string">'int'</span> );
+0028 objectmap.Depth = fread ( fid, 1, <span class="string">'int'</span> );
+0029 objectmap.NumberOfObjects = fread ( fid, 1, <span class="string">'int'</span> );
+0030 
+0031 <span class="keyword">for</span> o = 1:objectmap.NumberOfObjects
+0032   Object = struct ( <span class="string">'Name'</span>, <span class="string">'Foo'</span> );
+0033   Object.Name = char(fread ( fid, 32, <span class="string">'uchar'</span> ));
+0034   Object.Name = sscanf ( Object.Name, <span class="string">'%s'</span> );
+0035   Object.Display = fread ( fid, 1, <span class="string">'int'</span> );
+0036   Object.Copy = fread ( fid, 1, <span class="string">'uchar'</span> );
+0037   Object.Mirror = fread ( fid, 1, <span class="string">'uchar'</span> );
+0038   Object.Status = fread ( fid, 1, <span class="string">'uchar'</span> );
+0039   Object.NUsed = fread ( fid, 1, <span class="string">'uchar'</span> );
+0040   Object.Shades = fread ( fid, 1, <span class="string">'int'</span> );
+0041   Object.StartRed = fread ( fid, 1, <span class="string">'int'</span> );
+0042   Object.StartGreen = fread ( fid, 1, <span class="string">'int'</span> );
+0043   Object.StartBlue = fread ( fid, 1, <span class="string">'int'</span> );
+0044   Object.EndRed = fread ( fid, 1, <span class="string">'int'</span> );
+0045   Object.EndGreen = fread ( fid, 1, <span class="string">'int'</span> );
+0046   Object.EndBlue = fread ( fid, 1, <span class="string">'int'</span> );
+0047   Object.XRotation = fread ( fid, 1, <span class="string">'int'</span> );
+0048   Object.YRotation = fread ( fid, 1, <span class="string">'int'</span> );
+0049   Object.ZRotation = fread ( fid, 1, <span class="string">'int'</span> );
+0050   Object.XShift = fread ( fid, 1, <span class="string">'int'</span> );
+0051   Object.YShift = fread ( fid, 1, <span class="string">'int'</span> );
+0052   Object.ZShift = fread ( fid, 1, <span class="string">'int'</span> );
+0053   Object.XCenter = fread ( fid, 1, <span class="string">'int'</span> );
+0054   Object.YCenter = fread ( fid, 1, <span class="string">'int'</span> );
+0055   Object.ZCenter = fread ( fid, 1, <span class="string">'int'</span> );
+0056   Object.XRotationIncrement = fread ( fid, 1, <span class="string">'int'</span> );
+0057   Object.YRotationIncrement = fread ( fid, 1, <span class="string">'int'</span> );
+0058   Object.ZRotationIncrement = fread ( fid, 1, <span class="string">'int'</span> );
+0059   Object.XShiftIncrement = fread ( fid, 1, <span class="string">'int'</span> );
+0060   Object.YShiftIncrement = fread ( fid, 1, <span class="string">'int'</span> );
+0061   Object.ZShiftIncrement = fread ( fid, 1, <span class="string">'int'</span> );
+0062   Object.XMinimum = fread ( fid, 1, <span class="string">'short'</span> );
+0063   Object.YMinimum = fread ( fid, 1, <span class="string">'short'</span> );
+0064   Object.ZMinimum = fread ( fid, 1, <span class="string">'short'</span> );
+0065   Object.XMaximum = fread ( fid, 1, <span class="string">'short'</span> );
+0066   Object.YMaximum = fread ( fid, 1, <span class="string">'short'</span> );
+0067   Object.ZMaximum = fread ( fid, 1, <span class="string">'short'</span> );
+0068   Object.Opacity = fread ( fid, 1, <span class="string">'float'</span> );
+0069   Object.OpacityThickness = fread ( fid, 1, <span class="string">'int'</span> );
+0070   Dummy = fread ( fid, 1, <span class="string">'int'</span> );
+0071   objectmap.Objects(o) = Object;
+0072 <span class="keyword">end</span>
+0073 
+0074 <span class="comment">% Read the rest of the file</span>
+0075 Map = fread ( fid, inf, <span class="string">'uchar'</span> );
+0076 <span class="comment">% objectmap.RLE = Map;</span>
+0077 <span class="comment">% Undo RLE</span>
+0078 T = zeros ( objectmap.Width, objectmap.Height, objectmap.Depth );
+0079 
+0080 ImageIndex = 1;
+0081 Counts = Map(1:2:end);
+0082 Values = Map(2:2:end);
+0083 
+0084 <span class="keyword">for</span> idx = 1:length(Counts)
+0085   T(ImageIndex:ImageIndex+Counts(idx)-1) = Values(idx) + 1;
+0086   ImageIndex = ImageIndex + Counts(idx);
+0087 <span class="keyword">end</span>
+0088 
+0089 objectmap.Image = zeros ( objectmap.Height, objectmap.Width, objectmap.Depth );
+0090 yy = objectmap.Height:-1:1;
+0091 <span class="keyword">for</span> dd = 1:objectmap.Depth
+0092   t = T(:,:,dd)';
+0093   objectmap.Image(:,:,dd) = t(yy,:);
+0094 <span class="keyword">end</span>
+0095 
+0096 fclose ( fid );
+0097</pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

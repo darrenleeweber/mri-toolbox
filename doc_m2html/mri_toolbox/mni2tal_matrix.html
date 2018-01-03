@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mni2tal_matrix</title>
+  <meta name="keywords" content="mni2tal_matrix">
+  <meta name="description" content="MNI2TAL_MATRIX - Talairach to MNI coordinates (best guess)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; mni2tal_matrix.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>mni2tal_matrix
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MNI2TAL_MATRIX - Talairach to MNI coordinates (best guess)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function M2T = mni2tal_matrix() </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> MNI2TAL_MATRIX - Talairach to MNI coordinates (best guess)
+ 
+ MNI2TALAIRACH = mni2tal_matrix
+ 
+ MNI2TALAIRACH is a struct containing rotation matrices 
+ used by mni2tal and tal2mni
+ 
+ See also, <a href="mni2tal.html" class="code" title="function outpoints = mni2tal(inpoints)">MNI2TAL</a>, <a href="tal2mni.html" class="code" title="function outpoints = tal2mni(inpoints)">TAL2MNI</a> &amp;
+ http://www.mrc-cbu.cam.ac.uk/Imaging/mnispace.html</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="mni2tal.html" class="code" title="function outpoints = mni2tal(inpoints)">mni2tal</a>	MNI2TAL - MNI to Talairach coordinates (best guess)</li><li><a href="tal2mni.html" class="code" title="function outpoints = tal2mni(inpoints)">tal2mni</a>	TAL2MNI - Talairach to MNI coordinates</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function M2T = mni2tal_matrix()</a>
+0002 
+0003 <span class="comment">% MNI2TAL_MATRIX - Talairach to MNI coordinates (best guess)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% MNI2TALAIRACH = mni2tal_matrix</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% MNI2TALAIRACH is a struct containing rotation matrices</span>
+0008 <span class="comment">% used by mni2tal and tal2mni</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% See also, MNI2TAL, TAL2MNI &amp;</span>
+0011 <span class="comment">% http://www.mrc-cbu.cam.ac.uk/Imaging/mnispace.html</span>
+0012 <span class="comment">%</span>
+0013 
+0014 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0015 
+0016 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0017 <span class="comment">% Matthew Brett 2/2/01, matthew.brett@mrc-cbu.cam.ac.uk</span>
+0018 <span class="comment">% modified 02/2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0019 <span class="comment">%                   - removed dependence on spm_matrix by</span>
+0020 <span class="comment">%                     creating this function, thereby</span>
+0021 <span class="comment">%                     abstracting the important matrix</span>
+0022 <span class="comment">%                     transforms (easier to change if needed).</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0025 
+0026 
+0027 <span class="comment">% See notes below for explanations...</span>
+0028 
+0029 
+0030 <span class="comment">% rotn  = spm_matrix([0 0 0 0.05]); % similar to Rx(eye(3),-0.05), DLW</span>
+0031 M2T.rotn  = [      1         0         0         0;
+0032                    0    0.9988    0.0500         0;
+0033                    0   -0.0500    0.9988         0;
+0034                    0         0         0    1.0000 ];
+0035 
+0036 
+0037 <span class="comment">% upz   = spm_matrix([0 0 0 0 0 0 0.99 0.97 0.92]);</span>
+0038 M2T.upZ   = [ 0.9900         0         0         0;
+0039                    0    0.9700         0         0;
+0040                    0         0    0.9200         0;
+0041                    0         0         0    1.0000 ];
+0042 
+0043 
+0044 <span class="comment">% downz = spm_matrix([0 0 0 0 0 0 0.99 0.97 0.84]);</span>
+0045 M2T.downZ = [ 0.9900         0         0         0;
+0046                    0    0.9700         0         0;
+0047                    0         0    0.8400         0;
+0048                    0         0         0    1.0000 ];
+0049 
+0050 <span class="comment">% from original mni2tal...</span>
+0051 <span class="comment">%upT   = spm_matrix([0 0 0 0.05 0 0 0.99 0.97 0.92]);</span>
+0052 <span class="comment">%downT = spm_matrix([0 0 0 0.05 0 0 0.99 0.97 0.84]);</span>
+0053 
+0054                
+0055 
+0056 <span class="keyword">return</span>
+0057 
+0058 
+0059 <span class="comment">% from http://www.mrc-cbu.cam.ac.uk/Imaging/mnispace.html</span>
+0060 <span class="comment">%</span>
+0061 <span class="comment">% Approach 2: a non-linear transform of MNI to Talairach</span>
+0062 <span class="comment">%</span>
+0063 <span class="comment">% An alternative is to use some sort of transformation that</span>
+0064 <span class="comment">% may differ for different brain areas. One method might be</span>
+0065 <span class="comment">% to do an automated non-linear match of the MNI to the</span>
+0066 <span class="comment">% Talairach brain. For example, you could apply an SPM or</span>
+0067 <span class="comment">% AIR warping algorithm. However, there are two problems</span>
+0068 <span class="comment">% here. First, as we stated above, we do not have an MRI</span>
+0069 <span class="comment">% image of the brain in the Talairach atlas, which was a</span>
+0070 <span class="comment">% post-mortem specimen. Second, the automated non-linear</span>
+0071 <span class="comment">% transforms produce quite complex equations relating the</span>
+0072 <span class="comment">% two sets of coordinates.</span>
+0073 <span class="comment">%</span>
+0074 <span class="comment">% An alternative is to apply something like the transform</span>
+0075 <span class="comment">% that Talairach and Tournoux designed; here different</span>
+0076 <span class="comment">% linear transforms are applied to different brain regions.</span>
+0077 <span class="comment">% This is the approach I describe below.</span>
+0078 <span class="comment">%</span>
+0079 <span class="comment">% To get a good match for both the temporal lobes and the</span>
+0080 <span class="comment">% top of the brain, I used different zooms, in the Z (down/up)</span>
+0081 <span class="comment">% direction, for the brain above the level of the AC/PC line,</span>
+0082 <span class="comment">% and the brain below. The algorithm was:</span>
+0083 <span class="comment">%</span>
+0084 <span class="comment">% I assumed that the AC was in the correct position in the MNI</span>
+0085 <span class="comment">% brain, and therefore that no translations were necessary;</span>
+0086 <span class="comment">% Assumed that the MNI brain was in the correct orientation in</span>
+0087 <span class="comment">% terms of rotation around the Y axis (roll) and the Z axis (yaw);</span>
+0088 <span class="comment">% Using the SPM99b display tool, I compared the MNI brain to the</span>
+0089 <span class="comment">% images in the Talairach atlas;</span>
+0090 <span class="comment">%</span>
+0091 <span class="comment">% Compared to the atlas, the MNI brain seemed tipped backwards,</span>
+0092 <span class="comment">% so that the cerebellar / cerebral cortex line in the sagittal</span>
+0093 <span class="comment">% view, at the AC, was too low. Similarly, the bottom of the</span>
+0094 <span class="comment">% anterior part of the corpus collosum seemed too high. I</span>
+0095 <span class="comment">% therefore applied a small (0.05 radian) pitch correction to</span>
+0096 <span class="comment">% the MNI brain;</span>
+0097 <span class="comment">%</span>
+0098 <span class="comment">% Matching the top of the MNI brain to the top of the brain in</span>
+0099 <span class="comment">% the atlas, required a zoom of 0.92 in Z. Similarly a Y zoom</span>
+0100 <span class="comment">% of 0.97 was required as a best compromise in matching the front</span>
+0101 <span class="comment">% and back of the MNI brain to the atlas. The left / right match</span>
+0102 <span class="comment">% required a 0.99 zoom in X;</span>
+0103 <span class="comment">%</span>
+0104 <span class="comment">% The transform above provided a good match for the brain superior</span>
+0105 <span class="comment">% to the AC/PC line, but a poor match below, with the temporal lobes</span>
+0106 <span class="comment">% extending further downwards in the MNI brain than in the atlas. I</span>
+0107 <span class="comment">% therefore derived a transform for the brain below the AC/PC line,</span>
+0108 <span class="comment">% that was the same as the transform above, except with a Z zoom of</span>
+0109 <span class="comment">% 0.84;</span>
+0110 <span class="comment">%</span>
+0111 <span class="comment">% This algorithm gave me the following transformations:</span>
+0112 <span class="comment">%</span>
+0113 <span class="comment">% Above the AC (Z &gt;= 0):</span>
+0114 <span class="comment">%</span>
+0115 <span class="comment">% X'= 0.9900X</span>
+0116 <span class="comment">%</span>
+0117 <span class="comment">% Y'=  0.9688Y +0.0460Z</span>
+0118 <span class="comment">%</span>
+0119 <span class="comment">% Z'= -0.0485Y +0.9189Z</span>
+0120 <span class="comment">%</span>
+0121 <span class="comment">%</span>
+0122 <span class="comment">% Below the AC (Z &lt; 0):</span>
+0123 <span class="comment">%</span>
+0124 <span class="comment">% X'= 0.9900X</span>
+0125 <span class="comment">%</span>
+0126 <span class="comment">% Y'=  0.9688Y +0.0420Z</span>
+0127 <span class="comment">%</span>
+0128 <span class="comment">% Z'= -0.0485Y +0.8390Z</span>
+0129 <span class="comment">%</span>
+0130 <span class="comment">%</span>
+0131 <span class="comment">% The matlab function mni2tal.m implements these transforms.</span>
+0132 <span class="comment">% It returns estimated Talairach coordinates, from the</span>
+0133 <span class="comment">% transformations above, for given points in the MNI brain.</span>
+0134 <span class="comment">% To use it, save as mni2tal.m somewhere on your matlab path.</span>
+0135 <span class="comment">%</span>
+0136 <span class="comment">% So, taking our example point in the MNI brain, X = 10mm, Y = 12mm, Z = 14mm:</span>
+0137 <span class="comment">%</span>
+0138 <span class="comment">% With the mni2tal.m function above on your path, you could</span>
+0139 <span class="comment">% type the following at the matlab prompt:</span>
+0140 <span class="comment">%</span>
+0141 <span class="comment">%</span>
+0142 <span class="comment">% mni2tal([10 12 14])</span>
+0143 <span class="comment">%</span>
+0144 <span class="comment">% Which would give the following output (see above):</span>
+0145 <span class="comment">%</span>
+0146 <span class="comment">%</span>
+0147 <span class="comment">% ans =</span>
+0148 <span class="comment">%</span>
+0149 <span class="comment">%     9.9000   12.2692   12.2821</span>
+0150 <span class="comment">%</span>
+0151 <span class="comment">%</span>
+0152 <span class="comment">% which is, again, an estimate of the equivalent X, Y and Z</span>
+0153 <span class="comment">% coordinates in the Talairach brain.</span>
+0154 <span class="comment">%</span>
+0155 <span class="comment">% The inverse function, tal2mni.m, gives MNI coordinates for</span>
+0156 <span class="comment">% given Talairach coordinates, using the same algorithm.</span>
+0157 <span class="comment">%</span>
+0158 <span class="comment">% We could of course do a more complex transform to attempt</span>
+0159 <span class="comment">% to make a closer match between the two brains. The approach</span>
+0160 <span class="comment">% above is only intended to be preliminary. It does have the</span>
+0161 <span class="comment">% advantage that it is very simple, and therefore the distortions</span>
+0162 <span class="comment">% involved are easy to visualise, and unlikely to have dramatic</span>
+0163 <span class="comment">% unexpected effects.</span>
+0164 <span class="comment">%</span>
+0165 <span class="comment">% Incidentally, if you use the above transform, and you want to</span>
+0166 <span class="comment">% cite it, I suggest that you cite this web address. The transform</span>
+0167 <span class="comment">% is also mentioned briefly in the following papers: Duncan, J.,</span>
+0168 <span class="comment">% Seitz, R.J., Kolodny, J., Bor, D., Herzog, H., Ahmed, A., Newell, F.N.,</span>
+0169 <span class="comment">% Emslie, H. &quot;A neural basis for General Intelligence&quot;, Science (21 July</span>
+0170 <span class="comment">% 2000), 289 (5478), 457-460; Calder, A.J., Lawrence, A.D. and</span>
+0171 <span class="comment">% Young,A.W. &quot;Neuropsychology of Fear and Loathing&quot; Nature Reviews</span>
+0172 <span class="comment">% Neuroscience (2001), Vol.2 No.5 352-363</span>
+0173 <span class="comment">%</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

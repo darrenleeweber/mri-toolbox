@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of avw_read</title>
+  <meta name="keywords" content="avw_read">
+  <meta name="description" content="avw_read - read Analyze format data image (*.img)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mri_toolbox</a> &gt; avw_read.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mri_toolbox&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>avw_read
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>avw_read - read Analyze format data image (*.img)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ avw, machine ] = avw_read(fileprefix,IMGorient,machine) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> avw_read - read Analyze format data image (*.img)
+ 
+ [ avw, machine ] = avw_read([fileprefix], [orient], [machine])
+ 
+ This function calls avw_hdr_read and avw_img_read, providing
+ just a slightly easier command line function call.
+ 
+ fileprefix - a string, the filename without the .img extension.
+              A gui prompt appears if this argument is missing.
+ 
+ orient - read a specified orientation, integer values:
+ 
+          '', use header history orient field
+          0,  transverse unflipped (LAS*)
+          1,  coronal unflipped (LA*S)
+          2,  sagittal unflipped (L*AS)
+          3,  transverse flipped (LPS*)
+          4,  coronal flipped (LA*I)
+          5,  sagittal flipped (L*AI)
+ 
+ where * follows the slice dimension and letters indicate +XYZ
+ orientations (L left, R right, A anterior, P posterior,
+ I inferior, &amp; S superior).
+ 
+ It is rare, but a dataset might be stored in the 3-5 
+ orientations. For more information about orientation, see the
+ documentation in the mri_toolbox doc directory and the
+ extensive comments in avw_img_read and avw_hdr_read.  
+ See also the <a href="avw_flip.html" class="code" title="function [ avw ] = avw_flip(avw,dims)">avw_flip</a> function for any orthogonal
+ reorientation (although this should not be necessary
+ and must be done with great care, try not to invalidate
+ the Analyze orientation specifications).
+
+ machine - a string, see machineformat in fread for details.
+           The default here is 'ieee-le' but the routine
+           will automatically switch between little and big
+           endian to read any such Analyze header.  It
+           reports the appropriate machine format and can
+           return the machine value.
+
+ Returned values:
+
+ avw.hdr - a struct with image data parameters.
+ avw.img - a 3D matrix of image data (double precision).
+
+ All going well, the returned 3D matrix in avw.img will
+ correspond with the default ANALYZE coordinate system,
+ which is a Left-handed coordinate system (radiological
+ orientation):
+
+ X-Y plane is Transverse/Axial
+ X-Z plane is Coronal
+ Y-Z plane is Sagittal
+
+ X axis runs from patient Right (low X) to patient Left (high X)
+ Y axis runs from Posterior (low Y) to Anterior (high Y)
+ Z axis runs from Inferior (low Z) to Superior (high Z)
+
+ See also: <a href="avw_hdr_read.html" class="code" title="function [ avw, machine ] = avw_hdr_read(fileprefix, machine)">avw_hdr_read</a>, <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a> (both called by this function),
+           <a href="avw_write.html" class="code" title="function avw_write(avw, fileprefix, IMGorient, machine)">avw_write</a>, <a href="avw_img_write.html" class="code" title="function avw_img_write(avw, fileprefix, IMGorient, machine)">avw_img_write</a>, <a href="avw_hdr_write.html" class="code" title="function avw_hdr_write(avw, fileprefix, machine)">avw_hdr_write</a>,
+           <a href="avw_view.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">avw_view</a>, <a href="avw_flip.html" class="code" title="function [ avw ] = avw_flip(avw,dims)">avw_flip</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>	avw_img_read - read Analyze format data image (*.img)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="avw_view.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">avw_view</a>	avw_view - create and navigate ortho views of Analyze 7.5 volume</li><li><a href="avw_view_new.html" class="code" title="function [ varargout ] = avw_view(avw,parent,command),">avw_view_new</a>	avw_view - create and navigate ortho views of Analyze 7.5 volume</li><li><a href="mri_open.html" class="code" title="function [mri] = mri_open(mri)">mri_open</a>	mri_open - function to call various mri data tools</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ avw, machine ] = avw_read(fileprefix,IMGorient,machine)</a>
+0002 
+0003 <span class="comment">% avw_read - read Analyze format data image (*.img)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% [ avw, machine ] = avw_read([fileprefix], [orient], [machine])</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% This function calls avw_hdr_read and avw_img_read, providing</span>
+0008 <span class="comment">% just a slightly easier command line function call.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% fileprefix - a string, the filename without the .img extension.</span>
+0011 <span class="comment">%              A gui prompt appears if this argument is missing.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% orient - read a specified orientation, integer values:</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%          '', use header history orient field</span>
+0016 <span class="comment">%          0,  transverse unflipped (LAS*)</span>
+0017 <span class="comment">%          1,  coronal unflipped (LA*S)</span>
+0018 <span class="comment">%          2,  sagittal unflipped (L*AS)</span>
+0019 <span class="comment">%          3,  transverse flipped (LPS*)</span>
+0020 <span class="comment">%          4,  coronal flipped (LA*I)</span>
+0021 <span class="comment">%          5,  sagittal flipped (L*AI)</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% where * follows the slice dimension and letters indicate +XYZ</span>
+0024 <span class="comment">% orientations (L left, R right, A anterior, P posterior,</span>
+0025 <span class="comment">% I inferior, &amp; S superior).</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% It is rare, but a dataset might be stored in the 3-5</span>
+0028 <span class="comment">% orientations. For more information about orientation, see the</span>
+0029 <span class="comment">% documentation in the mri_toolbox doc directory and the</span>
+0030 <span class="comment">% extensive comments in avw_img_read and avw_hdr_read.</span>
+0031 <span class="comment">% See also the avw_flip function for any orthogonal</span>
+0032 <span class="comment">% reorientation (although this should not be necessary</span>
+0033 <span class="comment">% and must be done with great care, try not to invalidate</span>
+0034 <span class="comment">% the Analyze orientation specifications).</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">% machine - a string, see machineformat in fread for details.</span>
+0037 <span class="comment">%           The default here is 'ieee-le' but the routine</span>
+0038 <span class="comment">%           will automatically switch between little and big</span>
+0039 <span class="comment">%           endian to read any such Analyze header.  It</span>
+0040 <span class="comment">%           reports the appropriate machine format and can</span>
+0041 <span class="comment">%           return the machine value.</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">% Returned values:</span>
+0044 <span class="comment">%</span>
+0045 <span class="comment">% avw.hdr - a struct with image data parameters.</span>
+0046 <span class="comment">% avw.img - a 3D matrix of image data (double precision).</span>
+0047 <span class="comment">%</span>
+0048 <span class="comment">% All going well, the returned 3D matrix in avw.img will</span>
+0049 <span class="comment">% correspond with the default ANALYZE coordinate system,</span>
+0050 <span class="comment">% which is a Left-handed coordinate system (radiological</span>
+0051 <span class="comment">% orientation):</span>
+0052 <span class="comment">%</span>
+0053 <span class="comment">% X-Y plane is Transverse/Axial</span>
+0054 <span class="comment">% X-Z plane is Coronal</span>
+0055 <span class="comment">% Y-Z plane is Sagittal</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">% X axis runs from patient Right (low X) to patient Left (high X)</span>
+0058 <span class="comment">% Y axis runs from Posterior (low Y) to Anterior (high Y)</span>
+0059 <span class="comment">% Z axis runs from Inferior (low Z) to Superior (high Z)</span>
+0060 <span class="comment">%</span>
+0061 <span class="comment">% See also: avw_hdr_read, avw_img_read (both called by this function),</span>
+0062 <span class="comment">%           avw_write, avw_img_write, avw_hdr_write,</span>
+0063 <span class="comment">%           avw_view, avw_flip</span>
+0064 <span class="comment">%</span>
+0065 
+0066 
+0067 <span class="comment">% $Revision: 1.2 $ $Date: 2004/04/08 20:11:24 $</span>
+0068 
+0069 <span class="comment">% Licence:  GNU GPL, no express or implied warranties</span>
+0070 <span class="comment">% History:  07/2003, Darren.Weber_at_radiology.ucsf.edu</span>
+0071 <span class="comment">%                    The Analyze format is copyright</span>
+0072 <span class="comment">%                    (c) Copyright, 1986-1995</span>
+0073 <span class="comment">%                    Biomedical Imaging Resource, Mayo Foundation</span>
+0074 <span class="comment">%                    - created this wrapper for avw_img_read, see</span>
+0075 <span class="comment">%                      that function for extensive comments</span>
+0076 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0077 
+0078 <span class="keyword">if</span> ~exist(<span class="string">'fileprefix'</span>,<span class="string">'var'</span>),
+0079   [fileprefix, pathname, filterindex] = uigetfile(<span class="string">'*.hdr'</span>,<span class="string">'locate an Analyze .hdr file'</span>);
+0080   <span class="keyword">if</span> pathname, cd(pathname); <span class="keyword">end</span>
+0081   <span class="keyword">if</span> ~fileprefix,
+0082     error(<span class="string">'no .hdr file specified'</span>);
+0083   <span class="keyword">end</span>
+0084 <span class="keyword">end</span>
+0085 <span class="keyword">if</span> ~exist(<span class="string">'IMGorient'</span>,<span class="string">'var'</span>), IMGorient = <span class="string">''</span>; <span class="keyword">end</span>
+0086 <span class="keyword">if</span> ~exist(<span class="string">'machine'</span>,<span class="string">'var'</span>), machine = <span class="string">'ieee-le'</span>; <span class="keyword">end</span>
+0087 
+0088 <span class="keyword">if</span> findstr(<span class="string">'.hdr'</span>,fileprefix),
+0089     fileprefix = strrep(fileprefix,<span class="string">'.hdr'</span>,<span class="string">''</span>);
+0090 <span class="keyword">end</span>
+0091 <span class="keyword">if</span> findstr(<span class="string">'.img'</span>,fileprefix),
+0092     fileprefix = strrep(fileprefix,<span class="string">'.img'</span>,<span class="string">''</span>);
+0093 <span class="keyword">end</span>
+0094 
+0095 <span class="comment">% MAIN</span>
+0096 
+0097 fid = fopen(sprintf(<span class="string">'%s.img'</span>,fileprefix),<span class="string">'r'</span>,machine);
+0098 <span class="keyword">if</span> fid &lt; 0,
+0099     msg = sprintf(<span class="string">'...cannot open file %s.img\n\n'</span>,fileprefix);
+0100     error(msg);
+0101 <span class="keyword">else</span>
+0102     <span class="comment">% avw_img_read will call avw_hdr_read also</span>
+0103     avw = <a href="avw_img_read.html" class="code" title="function [ avw, machine ] = avw_img_read(fileprefix,IMGorient,machine)">avw_img_read</a>(fileprefix,IMGorient,machine);
+0104 <span class="keyword">end</span>
+0105 
+0106 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Mon 29-Mar-2004 13:14:32 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>
